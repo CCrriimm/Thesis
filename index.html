@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
     <title>Tom's Chicken - Login</title>
     <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
     <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
@@ -17,8 +17,8 @@
         background-color: #f8f9fa;
         height: 100vh;
         display: flex;
-        align-items: center;
         justify-content: center;
+        align-items: center;
       }
       .login-card {
         width: 100%;
@@ -26,11 +26,23 @@
         border-radius: 15px;
         overflow: hidden;
       }
+      #ChickenBG {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+        opacity: 0.7;
+      }
     </style>
+    
   </head>
   <body>
+    <video width="100%" height="100%" id="ChickenBG" autoplay loop muted style="border-radius: 10px;"><source src="Media/ChickenBG.mp4" type="video/mp4"></video>
     <div class="card login-card shadow-lg border-0">
-      <div class="card-header bg-danger text-white text-center py-4">
+      <div class="card-header text-white text-center py-4" style="background-color: #F57D10ff;">
         <h3 class="fw-bold mb-0">Tom's Chicken</h3>
         <small>Login to your account</small>
       </div>
@@ -58,14 +70,14 @@
               type="password"
               id="password"
               class="form-control"
-              placeholder="••••••••"
+              placeholder="**********"
               required
             />
           </div>
           <button
             type="submit"
             id="loginBtn"
-            class="btn btn-dark w-100 py-2 fw-bold"
+            class="btn w-100 py-2 text-white fw-bold" style="background-color: #F57D10ff;"
           >
             LOGIN
           </button>
@@ -91,12 +103,8 @@
 
       loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-
-        // 1. Get Inputs
         const email = document.getElementById("email").value;
         const pass = document.getElementById("password").value;
-
-        // Reset UI
         errorAlert.classList.add("d-none");
         loginBtn.innerHTML = "Checking...";
         loginBtn.disabled = true;
@@ -109,25 +117,17 @@
             pass,
           );
           const user = userCredential.user;
-
-          // 3. Check Database for Role & Status (The "Security Check")
-          // We look inside the 'users' folder for the specific User ID (uid)
           const userRef = ref(db, "users/" + user.uid);
           const snapshot = await get(userRef);
-
           if (snapshot.exists()) {
             const userData = snapshot.val();
-
-            // --- CHECK 1: IS IT AN ADMIN? ---
             if (userData.role === "admin") {
               if (userData.status === "active") {
-                window.location.href = "admin.html"; // Success!
+                window.location.href = "admin.html";
               } else {
-                // Account Deactivated Logic
                 showError(
                   "Access Denied: Your admin account has been deactivated.",
                 );
-                // Optional: Force logout immediately so they aren't "technically" logged in
                 // auth.signOut();
               }
             }
