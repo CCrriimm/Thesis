@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tom's Chicken - Login</title>
+    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
+    <script src="Bootstrap/Scripts/bootstrap.min.js"></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+    <style>
+      body {
+        background-color: #f8f9fa;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .login-card {
+        width: 100%;
+        max-width: 400px;
+        border-radius: 15px;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card login-card shadow-lg border-0">
+      <div class="card-header bg-danger text-white text-center py-4">
+        <h3 class="fw-bold mb-0">Tom's Chicken</h3>
+        <small>Login to your account</small>
+      </div>
+      <div class="card-body p-4">
+        <div
+          id="error-alert"
+          class="alert alert-danger d-none"
+          role="alert"
+        ></div>
+
+        <form id="loginForm">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              class="form-control"
+              placeholder="name@gmail.com"
+              required
+            />
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-bold">Password</label>
+            <input
+              type="password"
+              id="password"
+              class="form-control"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            id="loginBtn"
+            class="btn btn-dark w-100 py-2 fw-bold"
+          >
+            LOGIN
+          </button>
+        </form>
+      </div>
+      <div class="card-footer text-center bg-white py-3">
+        <small class="text-muted">Don't have an account? <a href="Signup.html">Sign up</a> </small>
+      </div>
+    </div>
+
+    <script type="module">
+      import {
+        auth,
+        db,
+        ref,
+        get,
+        signInWithEmailAndPassword,
+      } from "./js/firebase-config.js";
+
+      const loginForm = document.getElementById("loginForm");
+      const errorAlert = document.getElementById("error-alert");
+      const loginBtn = document.getElementById("loginBtn");
+
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // 1. Get Inputs
+        const email = document.getElementById("email").value;
+        const pass = document.getElementById("password").value;
+
+        // Reset UI
+        errorAlert.classList.add("d-none");
+        loginBtn.innerHTML = "Checking...";
+        loginBtn.disabled = true;
+
+        try {
+          // 2. Authenticate (Check Email & Password exist in Firebase Auth)
+          const userCredential = await signInWithEmailAndPassword(
+            auth,
+            email,
+            pass,
+          );
+          const user = userCredential.user;
+
+          // 3. Check Database for Role & Status (The "Security Check")
+          // We look inside the 'users' folder for the specific User ID (uid)
+          const userRef = ref(db, "users/" + user.uid);
+          const snapshot = await get(userRef);
+
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+
+            // --- CHECK 1: IS IT AN ADMIN? ---
+            if (userData.role === "admin") {
+              if (userData.status === "active") {
+                window.location.href = "admin.html"; // Success!
+              } else {
+                // Account Deactivated Logic
+                showError(
+                  "Access Denied: Your admin account has been deactivated.",
+                );
+                // Optional: Force logout immediately so they aren't "technically" logged in
+                // auth.signOut();
+              }
+            }
+            // --- CHECK 2: IS IT A CUSTOMER? ---
+            else if (userData.role === "customer") {
+              // Customers usually don't have "deactivated" status, but you can add it if needed
+              window.location.href = "customer.html";
+            }
+            // --- CHECK 3: UNKNOWN ROLE ---
+            else {
+              showError("Error: Account role not defined.");
+            }
+          } else {
+            showError("User data not found in database.");
+          }
+        } catch (error) {
+          // Handle Wrong Password or User Not Found
+          console.error(error);
+          if (error.code === "auth/invalid-credential") {
+            showError("Incorrect email or password.");
+          } else {
+            showError("Login failed: " + error.message);
+          }
+        } finally {
+          loginBtn.innerHTML = "LOGIN";
+          loginBtn.disabled = false;
+        }
+      });
+
+      function showError(msg) {
+        errorAlert.textContent = msg;
+        errorAlert.classList.remove("d-none");
+      }
+    </script>
+  </body>
+</html>
