@@ -102,25 +102,24 @@
       const loginBtn = document.getElementById("loginBtn");
 
       loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Prevents the form from submitting and refreshing the page
         const email = document.getElementById("email").value;
         const pass = document.getElementById("password").value;
-        errorAlert.classList.add("d-none");
-        loginBtn.innerHTML = "Checking...";
-        loginBtn.disabled = true;
+        errorAlert.classList.add("d-none"); // Hides any previous error messages
+        loginBtn.innerHTML = "Checking..."; // Changes the button text to indicate that the login process is underway
+        loginBtn.disabled = true; // Disables the button to prevent multiple clicks while processing
 
         try {
-          // 2. Authenticate (Check Email & Password exist in Firebase Auth)
-          const userCredential = await signInWithEmailAndPassword(
+          const userCredential = await signInWithEmailAndPassword( // Checks if email/password exist in Firebase Authentication
             auth,
             email,
             pass,
           );
-          const user = userCredential.user;
-          const userRef = ref(db, "users/" + user.uid);
-          const snapshot = await get(userRef);
-          if (snapshot.exists()) {
-            const userData = snapshot.val();
+          const user = userCredential.user; //Gets the UID in Firebase Authentication
+          const userRef = ref(db, "users/" + user.uid); // Uses the UID to find the user data in Firebase Realtime Database
+          const snapshot = await get(userRef); // Checks if user data exists in the database and retrieves it (Like yung value yung email and role and status)
+          if (snapshot.exists()) { 
+            const userData = snapshot.val(); // Gets the user data (email, role, status) from the database
             if (userData.role === "admin") {
               if (userData.status === "active") {
                 window.location.href = "admin.html";
@@ -128,15 +127,12 @@
                 showError(
                   "Access Denied: Your admin account has been deactivated.",
                 );
-                // auth.signOut();
+                // auth.signOut(); 
               }
             }
-            // --- CHECK 2: IS IT A CUSTOMER? ---
             else if (userData.role === "customer") {
-              // Customers usually don't have "deactivated" status, but you can add it if needed
               window.location.href = "customer.html";
             }
-            // --- CHECK 3: UNKNOWN ROLE ---
             else {
               showError("Error: Account role not defined.");
             }
@@ -144,16 +140,15 @@
             showError("User data not found in database.");
           }
         } catch (error) {
-          // Handle Wrong Password or User Not Found
-          console.error(error);
+          console.error(error); // Logs the full error for debugging
           if (error.code === "auth/invalid-credential") {
             showError("Incorrect email or password.");
           } else {
             showError("Login failed: " + error.message);
           }
         } finally {
-          loginBtn.innerHTML = "LOGIN";
-          loginBtn.disabled = false;
+          loginBtn.innerHTML = "LOGIN"; // Resets the button text and state regardless of success or failure
+          loginBtn.disabled = false; // Re-enables the button so the user can try again if needed
         }
       });
 
