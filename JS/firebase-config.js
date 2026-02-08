@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 import { getDatabase, ref, push, onValue, set, get, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAcRdkDOLrTCGNfBWzXMid1bYzQ_x-zzrg",
@@ -19,4 +19,4 @@ const analytics = getAnalytics(app);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-export { app, db, auth, ref, push, onValue, set, get, update, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword };
+export { app, db, auth, ref, push, onValue, set, get, update, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail };

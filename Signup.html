@@ -256,8 +256,7 @@
         matchMsg.classList.remove("d-none");
 
         if (pass1.value === pass2.value) {
-          matchMsg.textContent = "✔ Passwords match"; 
-          matchMsg.classList.replace("text-danger", "text-success");
+          matchMsg.classList.add("d-none");
         } else {
           matchMsg.textContent = "✖ Passwords do not match";
           matchMsg.classList.replace("text-success", "text-danger");
@@ -277,7 +276,7 @@
         console.log("Your verification code is:", generatedOTP);
 
         document.getElementById("otpInput").value = ""; // Clears OTP input
-        errorAlert.classList.add("d-none");
+        document.getElementById("otpError").classList.add("d-none"); // Hides error message from previous attempts (clinose modal)
         otpModal.show();
       });
 
@@ -286,7 +285,7 @@
           const confirmBtn = document.getElementById("confirmCodeBtn");
 
           if (parseInt(userCode) === generatedOTP) {
-            document.getElementById("otpError").classList.add("d-none");
+            document.getElementById("otpError").classList.add("d-none"); // Hides error message(correct OTP)
             confirmBtn.innerHTML = "Creating Account...";
             confirmBtn.disabled = true;
 
