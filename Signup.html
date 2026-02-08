@@ -2,13 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 shrink-to-fit=no"  />
     <title>Tom's Chicken - Sign Up</title>
+    <script src="Bootstrap/Scripts/bootstrap.min.js"></script>
     <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
     <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
     <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" 
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
     />
 
     <style>
@@ -93,10 +94,12 @@
           <div class="mb-2">
             <label class="form-label fw-bold small">Phone Number</label>
             <input
+              data-bs-toggle="tooltip" 
+              data-bs-title="no need to include +63 and spaces"
               type="tel"
               id="phone"
               class="form-control"
-              placeholder="09** *** ****"
+              placeholder="09*********"
               required
             />
           </div>
@@ -105,6 +108,8 @@
             <label class="form-label fw-bold small">Password</label>
             <div class="password-container">
               <input
+                data-bs-toggle="tooltip" 
+                data-bs-title="at least 6 characters long"
                 type="password"
                 id="password"
                 class="form-control"
@@ -119,6 +124,8 @@
             <label class="form-label fw-bold small">Confirm Password</label>
             <div class="password-container">
               <input
+                data-bs-toggle="tooltip" 
+                data-bs-title="at least 6 characters long and must match password"
                 type="password"
                 id="confirmPassword"
                 class="form-control"
@@ -169,7 +176,7 @@
           <div class="modal-body text-center">
             <p class="mb-1">We sent a 6-digit code to your email/phone.</p>
             <small class="text-muted fst-italic d-block mb-3"
-              >(Demo Mode: Check the Alert or Console)</small
+              >(Check Console)</small
             >
 
             <input
@@ -213,7 +220,6 @@
         createUserWithEmailAndPassword,
       } from "./js/firebase-config.js";
 
-      // DOM Elements
       const form = document.getElementById("signupForm");
       const pass1 = document.getElementById("password");
       const pass2 = document.getElementById("confirmPassword");
@@ -221,15 +227,18 @@
       const errorAlert = document.getElementById("error-alert");
       const otpModal = new bootstrap.Modal(document.getElementById("otpModal"));
 
-      let generatedOTP = null; // We store the fake code here
+      //Bootstrap Tooltips
+      const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-      // --- 1. EYE ICON LOGIC (Toggle Visibility) ---
-      function setupToggle(iconId, inputId) {
-        document.getElementById(iconId).addEventListener("click", function () {
-          const input = document.getElementById(inputId);
+      let generatedOTP = null;
+
+      function setupToggle(iconId, inputId) { 
+        document.getElementById(iconId).addEventListener("click", function () { 
+          const input = document.getElementById(inputId); 
           if (input.type === "password") {
             input.type = "text";
-            this.classList.replace("fa-eye-slash", "fa-eye");
+            this.classList.replace("fa-eye-slash", "fa-eye"); 
           } else {
             input.type = "password";
             this.classList.replace("fa-eye", "fa-eye-slash");
@@ -239,7 +248,6 @@
       setupToggle("togglePass1", "password");
       setupToggle("togglePass2", "confirmPassword");
 
-      // --- 2. LIVE PASSWORD MATCH CHECK ---
       pass2.addEventListener("input", () => {
         if (pass2.value === "") {
           matchMsg.classList.add("d-none");
@@ -259,36 +267,30 @@
       form.addEventListener("submit", (e) => {
         e.preventDefault();
         errorAlert.classList.add("d-none");
-
-        //Password check
         if (pass1.value !== pass2.value) {
           showError("Passwords do not match!");
           return;
         }
 
-        generatedOTP = Math.floor(100000 + Math.random() * 900000);
+        generatedOTP = Math.floor(100000 + Math.random() * 900000); 
 
         console.log("Your verification code is:", generatedOTP);
 
-        // Open the Modal
+        document.getElementById("otpInput").value = ""; // Clears OTP input
+        errorAlert.classList.add("d-none");
         otpModal.show();
       });
 
-      // --- 4. VERIFY CODE -> SAVE TO FIREBASE ---
-      document
-        .getElementById("confirmCodeBtn")
-        .addEventListener("click", async () => {
+      document.getElementById("confirmCodeBtn").addEventListener("click", async () => {
           const userCode = document.getElementById("otpInput").value;
           const confirmBtn = document.getElementById("confirmCodeBtn");
 
-          // A. Check if code matches
           if (parseInt(userCode) === generatedOTP) {
             document.getElementById("otpError").classList.add("d-none");
             confirmBtn.innerHTML = "Creating Account...";
             confirmBtn.disabled = true;
 
             try {
-              // B. Create the User in Firebase Authentication
               const email = document.getElementById("email").value;
               const pass = document.getElementById("password").value;
 
@@ -298,32 +300,34 @@
                 pass,
               );
               const user = userCredential.user;
-
-              // C. Add the extra details to Realtime Database
-              await set(ref(db, "users/" + user.uid), {
-                firstName: document.getElementById("fname").value,
+              await set(ref(db, "users/" + user.uid), { // Writes user data to Firebase Realtime Database
+                firstName: document.getElementById("fname").value, 
                 lastName: document.getElementById("lname").value,
                 email: email,
                 phone: document.getElementById("phone").value,
-                role: "customer", // Default role
+                role: "customer",
                 status: "active",
               });
-
-              // D. Success! Redirect
               alert("Registration Successful!");
               window.location.href = "customer.html";
             } catch (error) {
               console.error(error);
               if (error.code === "auth/email-already-in-use") {
-                alert("Error: This email is already registered.");
-              } else {
-                alert("Error: " + error.message);
+                otpModal.hide();
+                showError("Error: This email is already registered.");
+              } 
+              else if (error.code === "auth/weak-password") {
+                otpModal.hide();
+                showError("Error: Password should be at least 6 characters.");
+              }
+              else {
+                otpModal.hide();
+                showError("Error: " + error.message);
               }
               confirmBtn.innerHTML = "CONFIRM CODE";
               confirmBtn.disabled = false;
             }
           } else {
-            // Wrong Code
             document.getElementById("otpError").classList.remove("d-none");
           }
         });

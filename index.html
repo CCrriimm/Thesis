@@ -92,7 +92,16 @@
               placeholder="**********"
               required
             />
+            <small class="text-muted"
+              >Forgot your password?
+              <a
+                href="ForgotPassword.html"
+                style="color: #f57d10ff; text-decoration: none"
+                >Reset here</a
+              ></small
+            >
           </div>
+          
           <button
             type="submit"
             id="loginBtn"
@@ -131,8 +140,8 @@
         const email = document.getElementById("email").value;
         const pass = document.getElementById("password").value;
         errorAlert.classList.add("d-none"); // Hides any previous error messages
-        loginBtn.innerHTML = "Checking..."; // Changes the button text to indicate that the login process is underway
-        loginBtn.disabled = true; // Disables the button to prevent multiple clicks while processing
+        loginBtn.innerHTML = "Checking..."; // Change button text
+        loginBtn.disabled = true; // Disables button to prevent multiple clicks
 
         try {
           const userCredential = await signInWithEmailAndPassword(
@@ -141,11 +150,11 @@
             email,
             pass,
           );
-          const user = userCredential.user; //Gets the UID in Firebase Authentication
-          const userRef = ref(db, "users/" + user.uid); // Uses the UID to find the user data in Firebase Realtime Database
+          const user = userCredential.user; //Gets UID in Firebase Authentication
+          const userRef = ref(db, "users/" + user.uid); // Uses  the UID to find the user data in Firebase Realtime Database
           const snapshot = await get(userRef); // Checks if user data exists in the database and retrieves it (Like yung value yung email and role and status)
           if (snapshot.exists()) {
-            const userData = snapshot.val(); // Gets the user data (email, role, status) from the database
+            const userData = snapshot.val(); // Gets user data (email, role, status) from the database
             if (userData.role === "admin") {
               if (userData.status === "active") {
                 window.location.href = "admin.html";
@@ -153,7 +162,6 @@
                 showError(
                   "Access Denied: Your admin account has been deactivated.",
                 );
-                // auth.signOut();
               }
             } else if (userData.role === "customer") {
               window.location.href = "customer.html";
@@ -164,15 +172,15 @@
             showError("User data not found in database.");
           }
         } catch (error) {
-          console.error(error); // Logs the full error for debugging
+          console.error(error); // Logs full error on terminal for debugging
           if (error.code === "auth/invalid-credential") {
             showError("Incorrect email or password.");
           } else {
             showError("Login failed: " + error.message);
           }
         } finally {
-          loginBtn.innerHTML = "LOGIN"; // Resets the button text and state regardless of success or failure
-          loginBtn.disabled = false; // Re-enables the button so the user can try again if needed
+          loginBtn.innerHTML = "LOGIN"; // Resets button text from logging in back to "LOGIN"
+          loginBtn.disabled = false; // Re-enables the button
         }
       });
 
