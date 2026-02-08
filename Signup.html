@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tom's Chicken - Sign Up</title>
+    <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
+    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+
+    <style>
+      body {
+        background-color: #f8f9fa;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .register-card {
+        width: 100%;
+        max-width: 500px;
+        border-radius: 15px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.95);
+      }
+      #ChickenBG {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+      }
+      .password-container {
+        position: relative;
+      }
+      .toggle-eye {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6c757d;
+      }
+    </style>
+  </head>
+  <body>
+    <video width="100%" height="100%" id="ChickenBG" autoplay loop muted>
+      <source src="Media/ChickenBG.mp4" type="video/mp4" />
+    </video>
+
+    <div class="card register-card shadow-lg border-0">
+      <div
+        class="card-header text-white text-center py-3"
+        style="background-color: #f57d10ff"
+      >
+        <h3 class="fw-bold mb-0">Join Tom's Chicken</h3>
+        <small>Create your customer account now!</small>
+      </div>
+      <div class="card-body p-4">
+        <div
+          id="error-alert"
+          class="alert alert-danger d-none small"
+          role="alert"
+        ></div>
+
+        <form id="signupForm">
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label fw-bold small">First Name</label>
+              <input type="text" id="fname" class="form-control" required />
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-bold small">Last Name</label>
+              <input type="text" id="lname" class="form-control" required />
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label fw-bold small">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              class="form-control"
+              placeholder="username@example.com"
+              required
+            />
+          </div>
+          <div class="mb-2">
+            <label class="form-label fw-bold small">Phone Number</label>
+            <input
+              type="tel"
+              id="phone"
+              class="form-control"
+              placeholder="09** *** ****"
+              required
+            />
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label fw-bold small">Password</label>
+            <div class="password-container">
+              <input
+                type="password"
+                id="password"
+                class="form-control"
+                placeholder="••••••"
+                required
+              />
+              <i class="fa-solid fa-eye-slash toggle-eye" id="togglePass1"></i>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold small">Confirm Password</label>
+            <div class="password-container">
+              <input
+                type="password"
+                id="confirmPassword"
+                class="form-control"
+                placeholder="••••••"
+                required
+              />
+              <i class="fa-solid fa-eye-slash toggle-eye" id="togglePass2"></i>
+            </div>
+            <div id="matchMsg" class="mt-1 small fw-bold text-danger d-none">
+              Passwords do not match
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            id="signupBtn"
+            class="btn w-100 py-2 text-white fw-bold"
+            style="background-color: #f57d10ff"
+          >
+            VERIFY & REGISTER
+          </button>
+        </form>
+      </div>
+      <div class="card-footer text-center bg-white py-3">
+        <small class="text-muted"
+          >Already have an account?
+          <a href="index.html" style="color: #f57d10ff; text-decoration: none"
+            >Login</a
+          ></small
+        >
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="otpModal"
+      tabindex="-1"
+      data-bs-backdrop="static"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div
+            class="modal-header text-white"
+            style="background-color: #f57d10ff"
+          >
+            <h5 class="modal-title">Verify Account</h5>
+          </div>
+          <div class="modal-body text-center">
+            <p class="mb-1">We sent a 6-digit code to your email/phone.</p>
+            <small class="text-muted fst-italic d-block mb-3"
+              >(Demo Mode: Check the Alert or Console)</small
+            >
+
+            <input
+              type="number"
+              id="otpInput"
+              class="form-control text-center fs-2 letter-spacing-2"
+              placeholder="000000"
+              style="letter-spacing:5px"
+            />
+            <p id="otpError" class="text-danger small mt-2 d-none fw-bold">
+              Invalid Code! Please try again.
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              id="confirmCodeBtn"
+              class="btn text-white fw-bold"
+              style="background-color: #f57d10ff"
+            >
+              CONFIRM CODE
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import {
+        auth,
+        db,
+        ref, 
+        set, 
+        createUserWithEmailAndPassword,
+      } from "./js/firebase-config.js";
+
+      // DOM Elements
+      const form = document.getElementById("signupForm");
+      const pass1 = document.getElementById("password");
+      const pass2 = document.getElementById("confirmPassword");
+      const matchMsg = document.getElementById("matchMsg");
+      const errorAlert = document.getElementById("error-alert");
+      const otpModal = new bootstrap.Modal(document.getElementById("otpModal"));
+
+      let generatedOTP = null; // We store the fake code here
+
+      // --- 1. EYE ICON LOGIC (Toggle Visibility) ---
+      function setupToggle(iconId, inputId) {
+        document.getElementById(iconId).addEventListener("click", function () {
+          const input = document.getElementById(inputId);
+          if (input.type === "password") {
+            input.type = "text";
+            this.classList.replace("fa-eye-slash", "fa-eye");
+          } else {
+            input.type = "password";
+            this.classList.replace("fa-eye", "fa-eye-slash");
+          }
+        });
+      }
+      setupToggle("togglePass1", "password");
+      setupToggle("togglePass2", "confirmPassword");
+
+      // --- 2. LIVE PASSWORD MATCH CHECK ---
+      pass2.addEventListener("input", () => {
+        if (pass2.value === "") {
+          matchMsg.classList.add("d-none");
+          return;
+        }
+        matchMsg.classList.remove("d-none");
+
+        if (pass1.value === pass2.value) {
+          matchMsg.textContent = "✔ Passwords match"; 
+          matchMsg.classList.replace("text-danger", "text-success");
+        } else {
+          matchMsg.textContent = "✖ Passwords do not match";
+          matchMsg.classList.replace("text-success", "text-danger");
+        }
+      });
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        errorAlert.classList.add("d-none");
+
+        //Password check
+        if (pass1.value !== pass2.value) {
+          showError("Passwords do not match!");
+          return;
+        }
+
+        generatedOTP = Math.floor(100000 + Math.random() * 900000);
+
+        console.log("Your verification code is:", generatedOTP);
+
+        // Open the Modal
+        otpModal.show();
+      });
+
+      // --- 4. VERIFY CODE -> SAVE TO FIREBASE ---
+      document
+        .getElementById("confirmCodeBtn")
+        .addEventListener("click", async () => {
+          const userCode = document.getElementById("otpInput").value;
+          const confirmBtn = document.getElementById("confirmCodeBtn");
+
+          // A. Check if code matches
+          if (parseInt(userCode) === generatedOTP) {
+            document.getElementById("otpError").classList.add("d-none");
+            confirmBtn.innerHTML = "Creating Account...";
+            confirmBtn.disabled = true;
+
+            try {
+              // B. Create the User in Firebase Authentication
+              const email = document.getElementById("email").value;
+              const pass = document.getElementById("password").value;
+
+              const userCredential = await createUserWithEmailAndPassword(
+                auth,
+                email,
+                pass,
+              );
+              const user = userCredential.user;
+
+              // C. Add the extra details to Realtime Database
+              await set(ref(db, "users/" + user.uid), {
+                firstName: document.getElementById("fname").value,
+                lastName: document.getElementById("lname").value,
+                email: email,
+                phone: document.getElementById("phone").value,
+                role: "customer", // Default role
+                status: "active",
+              });
+
+              // D. Success! Redirect
+              alert("Registration Successful!");
+              window.location.href = "customer.html";
+            } catch (error) {
+              console.error(error);
+              if (error.code === "auth/email-already-in-use") {
+                alert("Error: This email is already registered.");
+              } else {
+                alert("Error: " + error.message);
+              }
+              confirmBtn.innerHTML = "CONFIRM CODE";
+              confirmBtn.disabled = false;
+            }
+          } else {
+            // Wrong Code
+            document.getElementById("otpError").classList.remove("d-none");
+          }
+        });
+
+      function showError(msg) {
+        errorAlert.textContent = msg;
+        errorAlert.classList.remove("d-none");
+      }
+    </script>
+  </body>
+</html>
