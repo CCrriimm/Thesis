@@ -62,15 +62,14 @@
             }
         }
 
-        // Function to Read Items (Listen to Firebase)
-        // runs automatically whenever you (or anyone else) adds an item
+        // Function to Read Items (Listen to Firebase) runs automatically whenever you (or anyone else) adds an item 
         const menuRef = ref(db, 'menu_items');
         onValue(menuRef, (snapshot) => {
             const list = document.getElementById("menuList");
-            list.innerHTML = ""; // Clear current list
+            list.innerHTML = "";
 
             snapshot.forEach((child) => {
-                const item = child.val(); // Get data
+                const item = child.val();
                 list.innerHTML += `
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         ${item.name} (${item.category})

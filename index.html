@@ -1,194 +1,235 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
-    />
-    <title>Tom's Chicken - Login</title>
-    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tom's Chicken - Home</title>
+    
+    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
-    <script src="Bootstrap/Scripts/bootstrap.min.js"></script>
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-    ></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    />
 
     <style>
-      body {
-        background-color: #f8f9fa;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .login-card {
-        width: 100%;
-        max-width: 400px;
-        border-radius: 15px;
-        overflow: hidden;
-        background: rgba(255, 255, 255, 0.95);
-      }
-      #ChickenBG {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        z-index: -1;
-      }
-    </style>
-  </head>
-  <body>
-    <video
-      width="100%"
-      height="100%"
-      id="ChickenBG"
-      autoplay
-      loop
-      muted
-      style="border-radius: 10px"
-    >
-      <source src="Media/ChickenBG.mp4" type="video/mp4" />
-    </video>
-    <div class="card login-card shadow-lg border-0">
-      <div
-        class="card-header text-white text-center py-4"
-        style="background-color: #f57d10ff"
-      >
-        <h3 class="fw-bold mb-0">Tom's Chicken</h3>
-        <small>Login to your account</small>
-      </div>
-      <div class="card-body p-4">
-        <div
-          id="error-alert"
-          class="alert alert-danger d-none"
-          role="alert"
-        ></div>
+        /* --- YOUR THEME --- */
+        :root {
+            --toms-orange: #f57d10ff;
+            --toms-dark: #212529;
+        }
 
-        <form id="loginForm">
-          <div class="mb-3">
-            <label class="form-label fw-bold">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              class="form-control"
-              placeholder="username@example.com"
-              required
-            />
-          </div>
-          <div class="mb-4">
-            <label class="form-label fw-bold">Password</label>
-            <input
-              type="password"
-              id="password"
-              class="form-control"
-              placeholder="**********"
-              required
-            />
-            <small class="text-muted"
-              >Forgot your password?
-              <a
-                href="Resetpass.html"
-                style="color: #f57d10ff; text-decoration: none"
-                >Reset here</a
-              ></small
-            >
-          </div>
-          
-          <button
-            type="submit"
-            id="loginBtn"
-            class="btn w-100 py-2 text-white fw-bold"
-            style="background-color: #f57d10ff"
-          >
-            LOGIN
-          </button>
-        </form>
-      </div>
-      <div class="card-footer text-center bg-white py-3">
-        <small class="text-muted"
-          >Don't have an account?
-          <a href="Signup.html" style="color: #f57d10ff; text-decoration: none"
-            >Sign up</a
-          >
-        </small>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        /* NAVBAR */
+        .navbar {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+        .nav-link {
+            font-weight: 600;
+            color: var(--toms-dark) !important;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: var(--toms-orange) !important;
+        }
+        .btn-orange {
+            background-color: var(--toms-orange);
+            color: white;
+            border-radius: 50px;
+            padding: 8px 25px;
+            font-weight: bold;
+            border: none;
+            transition: transform 0.2s;
+        }
+        .btn-orange:hover {
+            background-color: #d1660a;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* HERO SECTION (Video Background) */
+        .hero-section {
+            position: relative;
+            height: 90vh; /* Takes up 90% of screen */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            overflow: hidden;
+        }
+        #HeroVideo {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); /* Darkens the video */
+            z-index: 0;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* INFO CARDS (The "About" preview) */
+        .info-card {
+            border: none;
+            transition: transform 0.3s;
+        }
+        .info-card:hover {
+            transform: translateY(-10px);
+        }
+        .icon-box {
+            font-size: 3rem;
+            color: var(--toms-orange);
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+  <div class="modal fade" id="authModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header text-white" style="background-color: #f57d10ff">
+          <h5 class="modal-title fw-bold">🔒 Authentication Required</h5>
+        </div>
+        <div class="modal-body text-center py-4">
+          <i class="fa-solid fa-user-lock fs-1 mb-3" style="color: #f57d10ff"></i>
+          <p class="mb-1 fw-bold">You must be logged in to book a table.</p>
+          <small class="text-muted">Please sign in to continue with your reservation.</small>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <a href="login.html" class="btn text-white fw-bold" style="background-color: #f57d10ff">Login / Sign Up</a>
+        </div>
       </div>
     </div>
+  </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3" href="index.html" style="color: var(--toms-orange);">
+                Tom's<span class="text-dark">Chicken</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="menu.html">Menu</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="checkReservationAuth()">Reservation</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+
+            <div id="authSection" class="d-none d-lg-block">
+                <a href="login.html" class="btn-orange">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-section">
+        <video autoplay muted loop id="HeroVideo">
+            <source src="Media/ChickenBG.mp4" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content container">
+            <h1 class="display-2 fw-bold mb-3">UNLIMITED HAPPINESS</h1>
+            <p class="lead mb-4 fs-4">Experience the best wings in town. Crispy, spicy, and refillable.</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="menu.html" class="btn btn-orange btn-lg px-4">View Menu</a>
+                <button onclick="checkReservationAuth()" class="btn btn-outline-light btn-lg px-4 rounded-pill fw-bold">Book a Table</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="py-5 bg-light">
+        <div class="container text-center">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card info-card h-100 p-4 shadow-sm">
+                        <div class="card-body">
+                            <i class="fa-solid fa-drumstick-bite icon-box"></i>
+                            <h4 class="fw-bold">Unlimited Wings</h4>
+                            <p class="text-muted">Eat as much as you can. Our refills are fast, hot, and delicious.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card info-card h-100 p-4 shadow-sm">
+                        <div class="card-body">
+                            <i class="fa-solid fa-chair icon-box"></i>
+                            <h4 class="fw-bold">Cozy Ambience</h4>
+                            <p class="text-muted">Perfect for family dinners, dates, or hanging out with friends.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card info-card h-100 p-4 shadow-sm">
+                        <div class="card-body">
+                            <i class="fa-solid fa-calendar-check icon-box"></i>
+                            <h4 class="fw-bold">Easy Booking</h4>
+                            <p class="text-muted">Reserve your table online and skip the waiting line.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-dark text-white text-center py-4">
+        <div class="container">
+            <h4 style="color: var(--toms-orange);">Tom's Chicken</h4>
+            <p class="small mb-0">&copy; 2026. All Rights Reserved.</p>
+        </div>
+    </footer>
 
     <script type="module">
-      import {
-        auth,
-        db,
-        ref,
-        get,
-        signInWithEmailAndPassword,
-      } from "./js/firebase-config.js";
+        import { auth, onAuthStateChanged, signOut } from "./js/firebase-config.js";
 
-      const loginForm = document.getElementById("loginForm");
-      const errorAlert = document.getElementById("error-alert");
-      const loginBtn = document.getElementById("loginBtn");
+        const authSection = document.getElementById("authSection");
+        const authModal = new bootstrap.Modal(document.getElementById('authModal'));
 
-      loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault(); // Prevents the form from submitting and refreshing the page
-        const email = document.getElementById("email").value;
-        const pass = document.getElementById("password").value;
-        errorAlert.classList.add("d-none"); // Hides any previous error messages
-        loginBtn.innerHTML = "Checking..."; // Change button text
-        loginBtn.disabled = true; // Disables button to prevent multiple clicks
-
-        try {
-          const userCredential = await signInWithEmailAndPassword(
-            // Checks if email/password exist in Firebase Authentication
-            auth,
-            email,
-            pass,
-          );
-          const user = userCredential.user; //Gets UID in Firebase Authentication
-          const userRef = ref(db, "users/" + user.uid); // Uses  the UID to find the user data in Firebase Realtime Database
-          const snapshot = await get(userRef); // Checks if user data exists in the database and retrieves it (Like yung value yung email and role and status)
-          if (snapshot.exists()) {
-            const userData = snapshot.val(); // Gets user data (email, role, status) from the database
-            if (userData.role === "admin") {
-              if (userData.status === "active") {
-                window.location.href = "admin.html";
-              } else {
-                showError(
-                  "Access Denied: Your admin account has been deactivated.",
-                );
-              }
-            } else if (userData.role === "customer") {
-              window.location.href = "customer.html";
+        // 1. LISTEN FOR LOGIN STATE
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // USER IS LOGGED IN -> Show "Logout"
+                authSection.innerHTML = `
+                    <button id="logoutBtn" class="btn btn-dark rounded-pill px-4">Logout</button>
+                `;
+                document.getElementById("logoutBtn").addEventListener("click", () => {
+                    signOut(auth).then(() => window.location.reload());
+                });
             } else {
-              showError("Error: Account role not defined.");
+                // USER IS GUEST -> Show "Login"
+                authSection.innerHTML = `
+                    <a href="login.html" class="btn-orange text-decoration-none">Login / Sign Up</a>
+                `;
             }
-          } else {
-            showError("User data not found in database.");
-          }
-        } catch (error) {
-          console.error(error); // Logs full error on terminal for debugging
-          if (error.code === "auth/invalid-credential") {
-            showError("Incorrect email or password.");
-          } else {
-            showError("Login failed: " + error.message);
-          }
-        } finally {
-          loginBtn.innerHTML = "LOGIN"; // Resets button text from logging in back to "LOGIN"
-          loginBtn.disabled = false; // Re-enables the button
-        }
-      });
+        });
 
-      function showError(msg) {
-        // Function to display error messages
-        errorAlert.textContent = msg;
-        errorAlert.classList.remove("d-none");
-      }
+        // 2. RESERVATION GATE
+        window.checkReservationAuth = function() {
+            const user = auth.currentUser;
+            if (user) {
+                window.location.href = "reservation.html";
+            } else {
+                authModal.show();
+            }
+        }
     </script>
-  </body>
+</body>
 </html>
