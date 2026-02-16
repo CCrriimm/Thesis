@@ -10,15 +10,15 @@
     <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
 
     <style>
-        /* --- YOUR THEME --- */
         :root {
             --toms-orange: #f57d10ff;
             --toms-dark: #212529;
         }
 
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { 
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        }
 
-        /* NAVBAR */
         .navbar {
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             padding-top: 15px;
@@ -70,7 +70,7 @@
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6); /* Darkens the video */
+            background: rgba(0, 0, 0, 0.6);
             z-index: 0;
         }
         .hero-content {
@@ -78,7 +78,6 @@
             z-index: 1;
         }
 
-        /* INFO CARDS (The "About" preview) */
         .info-card {
             border: none;
             transition: transform 0.3s;
@@ -131,7 +130,10 @@
                         <a class="nav-link" href="#" onclick="checkReservationAuth()">Reservation</a>
                     </li>
                     <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
-                </ul>
+                </ul> <!--Mobile Navigation-->
+                <div id="authSectionMobile" class="d-lg-none mt-3 text-center">
+                    <a href="login.html" class="btn-orange text-decoration-none">Login / Sign Up</a>
+                </div>
             </div>
 
             <div id="authSection" class="d-none d-lg-block">
@@ -201,27 +203,37 @@
         import { auth, onAuthStateChanged, signOut } from "./js/firebase-config.js";
 
         const authSection = document.getElementById("authSection");
+        const authSectionMobile = document.getElementById("authSectionMobile");
         const authModal = new bootstrap.Modal(document.getElementById('authModal'));
 
-        // 1. LISTEN FOR LOGIN STATE
+        // check if user is logged in or not and update navbar accordingly
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // USER IS LOGGED IN -> Show "Logout"
+                // if user is signed in show "Logout"
                 authSection.innerHTML = `
                     <button id="logoutBtn" class="btn btn-dark rounded-pill px-4">Logout</button>
+                `;
+                authSectionMobile.innerHTML = `
+                    <button id="logoutBtnMobile" class="btn btn-dark rounded-pill px-4">Logout</button>
                 `;
                 document.getElementById("logoutBtn").addEventListener("click", () => {
                     signOut(auth).then(() => window.location.reload());
                 });
+                document.getElementById("logoutBtnMobile").addEventListener("click", () => {
+                    signOut(auth).then(() => window.location.reload());
+                });
             } else {
-                // USER IS GUEST -> Show "Login"
+                // if user is not signed in show "Login / Sign Up"
                 authSection.innerHTML = `
+                    <a href="login.html" class="btn-orange text-decoration-none">Login / Sign Up</a>
+                `;
+                authSectionMobile.innerHTML = `
                     <a href="login.html" class="btn-orange text-decoration-none">Login / Sign Up</a>
                 `;
             }
         });
 
-        // 2. RESERVATION GATE
+        // check if user is logged in or not and redirect accordingly
         window.checkReservationAuth = function() {
             const user = auth.currentUser;
             if (user) {

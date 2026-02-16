@@ -109,8 +109,6 @@
             <label class="form-label fw-bold small">Password</label>
             <div class="password-container">
               <input
-                data-bs-toggle="tooltip" 
-                data-bs-title="at least 6 characters long"
                 type="password"
                 id="password"
                 class="form-control"
@@ -119,14 +117,30 @@
               />
               <i class="fa-solid fa-eye-slash toggle-eye" id="togglePass1"></i>
             </div>
+
+            <div id="passwordRequirements" class="mt-2 small">
+              <div id="req-length" class="text-danger">
+                <i class="fa-solid fa-circle-xmark"></i> 6-12 characters
+              </div>
+              <div id="req-uppercase" class="text-danger">
+                <i class="fa-solid fa-circle-xmark"></i> At least one uppercase letter
+              </div>
+              <div id="req-lowercase" class="text-danger">
+                <i class="fa-solid fa-circle-xmark"></i> At least one lowercase letter
+              </div>
+              <div id="req-number" class="text-danger">
+                <i class="fa-solid fa-circle-xmark"></i> At least one number
+              </div>
+              <div id="req-symbol" class="text-danger">
+                <i class="fa-solid fa-circle-xmark"></i> At least one symbol (_ - @ # $ % & *)
+              </div>
+            </div>
           </div>
 
           <div class="mb-3">
             <label class="form-label fw-bold small">Confirm Password</label>
             <div class="password-container">
               <input
-                data-bs-toggle="tooltip" 
-                data-bs-title="at least 6 characters long and must match password"
                 type="password"
                 id="confirmPassword"
                 class="form-control"
@@ -249,6 +263,38 @@
       setupToggle("togglePass1", "password");
       setupToggle("togglePass2", "confirmPassword");
 
+      pass1.addEventListener("input", () => {
+        const password = pass1.value;
+        
+        const lengthValid = password.length >= 6 && password.length <= 12;
+        updateRequirement("req-length", lengthValid);
+        
+        const uppercaseValid = /[A-Z]/.test(password);
+        updateRequirement("req-uppercase", uppercaseValid);
+        
+        const lowercaseValid = /[a-z]/.test(password);
+        updateRequirement("req-lowercase", lowercaseValid);
+        
+        const numberValid = /[0-9]/.test(password);
+        updateRequirement("req-number", numberValid);
+        
+        const symbolValid = /[_\-@#$%&*]/.test(password);
+        updateRequirement("req-symbol", symbolValid);
+      });
+
+      function updateRequirement(elementId, isValid) {
+        const element = document.getElementById(elementId);
+        if (isValid) {
+          element.classList.remove("text-danger");
+          element.classList.add("text-success");
+          element.querySelector("i").classList.replace("fa-circle-xmark", "fa-circle-check");
+        } else {
+          element.classList.remove("text-success");
+          element.classList.add("text-danger");
+          element.querySelector("i").classList.replace("fa-circle-check", "fa-circle-xmark");
+        }
+      }
+
       pass2.addEventListener("input", () => {
         if (pass2.value === "") {
           matchMsg.classList.add("d-none");
@@ -267,6 +313,27 @@
       form.addEventListener("submit", (e) => {
         e.preventDefault();
         errorAlert.classList.add("d-none");
+        if (pass1.value.length < 6 || pass1.value.length > 12) {
+          showError("Password must be 6-12 characters long!");
+          return;
+        }
+        if (!/[A-Z]/.test(pass1.value)) {
+          showError("Password must contain at least one uppercase letter!");
+          return;
+        }
+        if (!/[a-z]/.test(pass1.value)) {
+          showError("Password must contain at least one lowercase letter!");
+          return;
+        }
+        if (!/[0-9]/.test(pass1.value)) {
+          showError("Password must contain at least one number!");
+          return;
+        }
+        if (!/[_\-@#$%&*]/.test(pass1.value)) {
+          showError("Password must contain at least one symbol (_ - @ # $ % & *)!");
+          return;
+        }
+
         if (pass1.value !== pass2.value) {
           showError("Passwords do not match!");
           return;
