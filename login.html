@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+    />
+    <title>Tom's Chicken - Login</title>
+    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
+    <script src="Bootstrap/Scripts/bootstrap.min.js"></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+
+    <style>
+      body {
+        background-color: #f8f9fa;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .login-card {
+        width: 100%;
+        max-width: 400px;
+        border-radius: 15px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.95);
+      }
+      #ChickenBG {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+      }
+      .password-container {
+        position: relative;
+      }
+      .toggle-eye {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6c757d;
+      }
+    </style>
+  </head>
+  <body>
+    <video
+      width="100%"
+      height="100%"
+      id="ChickenBG"
+      autoplay
+      loop
+      muted
+      style="border-radius: 10px"
+    >
+      <source src="Media/ChickenBG.mp4" type="video/mp4" />
+    </video>
+    <div class="card login-card shadow-lg border-0">
+      <div
+        class="card-header text-white text-center py-4"
+        style="background-color: #f57d10ff"
+      >
+        <h3 class="fw-bold mb-0">Tom's Chicken</h3>
+        <small>Login to your account</small>
+      </div>
+      <div class="card-body p-4">
+        <div
+          id="error-alert"
+          class="alert alert-danger d-none"
+          role="alert"
+        ></div>
+
+        <form id="loginForm">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              class="form-control"
+              placeholder="username@example.com"
+              required
+            />
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-bold">Password</label>
+            <div class="password-container">
+            <input
+              type="password"
+              id="password"
+              class="form-control"
+              placeholder="**********"
+              required
+            />
+            <i class="fa-solid fa-eye-slash toggle-eye" id="togglePassword"></i>
+            </div>
+            <small class="text-muted"
+              >Forgot your password?
+              <a
+                href="Resetpass.html"
+                style="color: #f57d10ff; text-decoration: none"
+                >Reset here</a
+              ></small
+            >
+          </div>
+          
+          <button
+            type="submit"
+            id="loginBtn"
+            class="btn w-100 py-2 text-white fw-bold"
+            style="background-color: #f57d10ff"
+          >
+            LOGIN
+          </button>
+        </form>
+      </div>
+      <div class="card-footer text-center bg-white py-3">
+        <small class="text-muted"
+          >Don't have an account?
+          <a href="Signup.html" style="color: #f57d10ff; text-decoration: none"
+            >Sign up</a
+          >
+        </small>
+      </div>
+    </div>
+
+    <script type="module">
+      import {
+        auth,
+        db,
+        ref,
+        get,
+        signInWithEmailAndPassword,
+      } from "./js/firebase-config.js";
+
+      const loginForm = document.getElementById("loginForm");
+      const errorAlert = document.getElementById("error-alert");
+      const loginBtn = document.getElementById("loginBtn");
+
+      document.getElementById("togglePassword").addEventListener("click", function () {
+        const passwordInput = document.getElementById("password");
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          this.classList.replace("fa-eye-slash", "fa-eye");
+        } else {
+          passwordInput.type = "password";
+          this.classList.replace("fa-eye", "fa-eye-slash");
+        }
+      });
+
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault(); // Prevents the form from submitting and refreshing the page
+        const email = document.getElementById("email").value;
+        const pass = document.getElementById("password").value;
+        errorAlert.classList.add("d-none"); // Hides any previous error messages
+        loginBtn.innerHTML = "Checking..."; // Change button text
+        loginBtn.disabled = true; // Disables button to prevent multiple clicks
+
+        try {
+          const userCredential = await signInWithEmailAndPassword(
+            // Checks if email/password exist in Firebase Authentication
+            auth,
+            email,
+            pass,
+          );
+          const user = userCredential.user; //Gets UID in Firebase Authentication
+          const userRef = ref(db, "users/" + user.uid); // Uses  the UID to find the user data in Firebase Realtime Database
+          const snapshot = await get(userRef); // Checks if user data exists in the database and retrieves it (Like yung value yung email and role and status)
+          if (snapshot.exists()) {
+            const userData = snapshot.val(); // Gets user data (email, role, status) from the database
+            if (userData.role === "admin") {
+              if (userData.status === "active") {
+                window.location.href = "admin.html";
+              } else {
+                showError(
+                  "Access Denied: Your admin account has been deactivated.",
+                );
+              }
+            } else if (userData.role === "customer") {
+              window.location.href = "index.html";
+            } else {
+              showError("Error: Account role not defined.");
+            }
+          } else {
+            showError("User data not found in database.");
+          }
+        } catch (error) {
+          console.error(error); // Logs full error on terminal for debugging
+          if (error.code === "auth/invalid-credential") {
+            showError("Incorrect email or password.");
+          } else {
+            showError("Login failed: " + error.message);
+          }
+        } finally {
+          loginBtn.innerHTML = "LOGIN"; // Resets button text from logging in back to "LOGIN"
+          loginBtn.disabled = false; // Re-enables the button
+        }
+      });
+
+      function showError(msg) {
+        // Function to display error messages
+        errorAlert.textContent = msg;
+        errorAlert.classList.remove("d-none");
+      }
+    </script>
+  </body>
+</html>
