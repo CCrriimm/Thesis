@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Tables</title>
+    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <style>
+      :root {
+        --toms-orange: #f57d10ff;
+        --sidebar-width: 250px;
+      }
+      body {
+        background-color: #f8f9fa;
+        overflow-x: hidden;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: fixed;
+        background: #212529;
+        color: white;
+        z-index: 999;
+      }
+      .sidebar-header {
+        padding: 20px;
+        background: var(--toms-orange);
+      }
+      .sidebar-menu {
+        padding: 20px 0;
+        list-style: none;
+        margin: 0;
+      }
+      .sidebar-menu li a {
+        display: block;
+        padding: 15px 25px;
+        color: #adb5bd;
+        text-decoration: none;
+        border-left: 4px solid transparent;
+      }
+      .sidebar-menu li a:hover,
+      .sidebar-menu li a.active {
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+        border-left-color: var(--toms-orange);
+      }
+      .sidebar-menu i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+      }
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 30px;
+      }
+
+      /* TABLE CARDS */
+      .table-card {
+        border: none;
+        border-radius: 15px;
+        transition: transform 0.2s;
+        text-align: center;
+      }
+      .table-card:hover {
+        transform: scale(1.03);
+      }
+      .status-available {
+        background-color: #e8f5e9;
+        border: 2px solid #4caf50;
+      }
+      .status-occupied {
+        background-color: #ffebee;
+        border: 2px solid #f44336;
+      }
+      .unli-code {
+        font-size: 1.5rem;
+        letter-spacing: 2px;
+        color: #d32f2f;
+      }
+      .btn-orange {
+        background-color: var(--toms-orange);
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h4 class="mb-0 fw-bold">Tom's Admin</h4>
+      </div>
+      <ul class="sidebar-menu">
+        <li>
+          <a href="admin.html"
+            ><i class="fa-solid fa-gauge-high"></i> Dashboard</a
+          >
+        </li>
+        <li>
+          <a href="admin-payments.html"
+            ><i class="fa-solid fa-money-bill-wave"></i> Payments</a
+          >
+        </li>
+        <li>
+          <a href="admin-tables.html" class="active"
+            ><i class="fa-solid fa-chair"></i> Tables</a
+          >
+        </li>
+        <li>
+          <a href="admin-reservations.html"
+            ><i class="fa-solid fa-calendar-check"></i> Reservations</a
+          >
+        </li>
+        <li>
+          <a href="admin-users.html"
+            ><i class="fa-solid fa-users-gear"></i> Users</a
+          >
+        </li>
+        <li class="mt-5">
+          <a href="#" id="adminLogoutBtn" class="text-danger"
+            ><i class="fa-solid fa-right-from-bracket"></i> Logout</a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <div class="main-content">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Table Management</h2>
+        <span class="badge bg-dark fs-6" id="activeCount">0 / 10 Active</span>
+      </div>
+
+      <!-- Confirm End Session Modal -->
+    <div class="modal fade" id="confirmEndModal" tabindex="-1" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header text-white" style="background-color: #dc3545">
+            <h5 class="modal-title fw-bold"><i class="fa-solid fa-triangle-exclamation"></i> End Session</h5>
+          </div>
+          <div class="modal-body text-center py-4">
+            <i class="fa-solid fa-chair fs-1 mb-3 text-danger"></i>
+            <p class="fw-bold mb-1">Are you sure you want to end this session?</p>
+            <small class="text-muted">This will disable the refill code for <span id="endTableName" class="fw-bold text-danger"></span>.</small>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger fw-bold" id="confirmEndBtn">Yes, End Session</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header text-white" style="background-color: var(--toms-orange)">
+            <h5 class="modal-title fw-bold"><i class="fa-solid fa-circle-check"></i> Success</h5>
+          </div>
+          <div class="modal-body text-center py-4">
+            <i class="fa-solid fa-circle-check fs-1 mb-3" style="color: var(--toms-orange)"></i>
+            <p class="fw-bold mb-0" id="successMessage"></p>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button type="button" class="btn text-white fw-bold" style="background-color: var(--toms-orange)" data-bs-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <p class="text-muted mb-4">
+        Generate access codes for walk-in customers so they can use the QR
+        Refill System.
+      </p>
+
+      <div class="row g-4" id="tableGrid"></div>
+    </div>
+
+    <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
+
+    <script type="module">
+      import {
+        auth,
+        db,
+        ref,
+        get,
+        onAuthStateChanged,
+        onValue,
+        update,
+        signOut,
+      } from "./js/firebase-config.js";
+
+      // 1. SECURITY CHECK
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) return (window.location.href = "login.html");
+        const snap = await get(ref(db, "users/" + user.uid));
+        if (!snap.exists() || snap.val().role !== "admin")
+          window.location.href = "login.html";
+      });
+
+      // 2. RENDER TABLES REAL-TIME
+      const TOTAL_TABLES = 10;
+      const tablesRef = ref(db, "tables");
+
+      onValue(tablesRef, (snapshot) => {
+        const tableGrid = document.getElementById("tableGrid");
+        tableGrid.innerHTML = "";
+        let activeCount = 0;
+
+        let dbData = {};
+        if (snapshot.exists()) {
+          dbData = snapshot.val();
+        }
+
+        for (let i = 1; i <= TOTAL_TABLES; i++) {
+          let tableInfo = {};
+          if (dbData[i]) {
+            tableInfo = dbData[i];
+          } else {
+            tableInfo = { status: "available", code: "" };
+          }
+
+          const isOccupied = tableInfo.status === "occupied";
+          if (isOccupied) {
+            activeCount++;
+          }
+
+          let cardClass = "";
+          if (isOccupied) {
+            cardClass = "status-occupied";
+          } else {
+            cardClass = "status-available";
+          }
+
+          let statusText = "";
+          if (isOccupied) {
+            statusText = '<span class="text-danger fw-bold"><i class="fa-solid fa-user-check"></i> Occupied (Unli)</span>';
+          } else {
+            statusText = '<span class="text-success fw-bold"><i class="fa-solid fa-check-circle"></i> Available</span>';
+          }
+
+          let codeHTML = "";
+          if (isOccupied) {
+            codeHTML = `
+              <h4 class="unli-code fw-bold my-3">${tableInfo.code}</h4>
+              <button onclick="clearTable(${i})" class="btn btn-outline-danger btn-sm w-100 fw-bold">End Session</button>
+            `;
+          } else {
+            codeHTML = `
+              <div class="my-4 text-muted small">No active code</div>
+              <button onclick="activateTable(${i})" class="btn btn-orange btn-sm w-100 fw-bold">Generate Unli Code</button>
+            `;
+          }
+
+          tableGrid.innerHTML += `
+            <div class="col-md-4 col-lg-3">
+              <div class="card table-card h-100 p-3 shadow-sm ${cardClass}">
+                <div class="card-body p-0">
+                  <h4 class="fw-bold mb-1">Table ${i}</h4>
+                  <div class="mb-2">${statusText}</div>
+                  ${codeHTML}
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        document.getElementById("activeCount").innerText = activeCount + " / " + TOTAL_TABLES + " Active";
+      });
+
+      // 3. ACTIVATE TABLE (Generate Random Code)
+      window.activateTable = async function (tableNum) {
+        const randomCode = "UNLI-" + Math.floor(1000 + Math.random() * 9000);
+        await update(ref(db, "tables/" + tableNum), {
+          status: "occupied",
+          code: randomCode,
+          startTime: Date.now(),
+        });
+
+        // Show success modal
+        document.getElementById("successMessage").textContent = "Table " + tableNum + " is now active! Code: " + randomCode;
+        const successModal = new bootstrap.Modal(document.getElementById("successModal"));
+        successModal.show();
+      };
+
+      // 4. CLEAR TABLE - Step 1: Show confirmation modal
+      let tableToEnd = null;
+
+      window.clearTable = function (tableNum) {
+        tableToEnd = tableNum;
+        document.getElementById("endTableName").textContent = "Table " + tableNum;
+        const confirmModal = new bootstrap.Modal(document.getElementById("confirmEndModal"));
+        confirmModal.show();
+      };
+
+      // 4. CLEAR TABLE - Step 2: User confirmed, proceed with ending session
+      document.getElementById("confirmEndBtn").addEventListener("click", async function () {
+        // Hide the confirmation modal first
+        const confirmModal = bootstrap.Modal.getInstance(document.getElementById("confirmEndModal"));
+        confirmModal.hide();
+
+        if (tableToEnd !== null) {
+          await update(ref(db, "tables/" + tableToEnd), {
+            status: "available",
+            code: "",
+            startTime: null,
+          });
+
+          // Show success modal
+          document.getElementById("successMessage").textContent = "Session for Table " + tableToEnd + " has been ended successfully.";
+          const successModal = new bootstrap.Modal(document.getElementById("successModal"));
+          successModal.show();
+
+          tableToEnd = null;
+        }
+      });
+
+      document
+        .getElementById("adminLogoutBtn")
+        .addEventListener("click", () =>
+          signOut(auth).then(() => (window.location.href = "login.html")),
+        );
+    </script>
+  </body>
+</html>

@@ -1,84 +1,248 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Tom's Admin - Add Menu</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tom's Admin - Dashboard</title>
     <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
-    <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
-    <script src="Bootstrap/Scripts/bootstrap.min.js"></script>
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-    ></script>
-</head>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <style>
+      :root {
+        --toms-orange: #f57d10ff;
+        --sidebar-width: 250px;
+      }
+      body {
+        background-color: #f8f9fa;
+        overflow-x: hidden;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: fixed;
+        background: #212529;
+        color: white;
+        z-index: 999;
+      }
+      .sidebar-header {
+        padding: 20px;
+        background: var(--toms-orange);
+      }
+      .sidebar-menu {
+        padding: 20px 0;
+        list-style: none;
+        margin: 0;
+      }
+      .sidebar-menu li a {
+        display: block;
+        padding: 15px 25px;
+        color: #adb5bd;
+        text-decoration: none;
+        border-left: 4px solid transparent;
+      }
+      .sidebar-menu li a:hover,
+      .sidebar-menu li a.active {
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+        border-left-color: var(--toms-orange);
+      }
+      .sidebar-menu i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+      }
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 30px;
+      }
+      .stat-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: transform 0.3s;
+      }
+      .stat-card:hover {
+        transform: translateY(-5px);
+      }
+      .icon-box {
+        width: 60px;
+        height: 60px;
+        background: rgba(245, 125, 16, 0.1);
+        color: var(--toms-orange);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        font-size: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h4 class="mb-0 fw-bold">Tom's Admin</h4>
+      </div>
+      <ul class="sidebar-menu">
+        <li>
+          <a href="admin.html" class="active"
+            ><i class="fa-solid fa-gauge-high"></i> Dashboard</a
+          >
+        </li>
+        <li>
+          <a href="admin-payments.html"
+            ><i class="fa-solid fa-money-bill-wave"></i> Payments</a
+          >
+        </li>
+        <li>
+          <a href="admin-tables.html"
+            ><i class="fa-solid fa-chair"></i> Tables</a
+          >
+        </li>
+        <li>
+          <a href="admin-reservations.html"
+            ><i class="fa-solid fa-calendar-check"></i> Reservations</a
+          >
+        </li>
+        <li>
+          <a href="admin-users.html"
+            ><i class="fa-solid fa-users-gear"></i> Users</a
+          >
+        </li>
+        <li class="mt-5">
+          <a href="#" id="adminLogoutBtn" class="text-danger"
+            ><i class="fa-solid fa-right-from-bracket"></i> Logout</a
+          >
+        </li>
+      </ul>
+    </nav>
 
-<body class="p-4">
-    <div class="container">
-        <h2>Admin Panel: Add Menu Items</h2>
+    <div class="main-content">
+      <h2 class="fw-bold mb-4">Dashboard Overview</h2>
 
-        <div class="card p-3 mb-4 bg-light">
-            <div class="row g-2">
-                <div class="col-md-4">
-                    <input type="text" id="itemName" class="form-control" placeholder="Item Name (e.g., 1pc Chicken)">
-                </div>
-                <div class="col-md-3">
-                    <input type="number" id="itemPrice" class="form-control" placeholder="Price (e.g., 99)">
-                </div>
-                <div class="col-md-3">
-                    <select id="itemCategory" class="form-select">
-                        <option value="meal">Meal</option>
-                        <option value="refill">Refill Item</option>
-                        <option value="drink">Drink</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button onclick="addItem()" class="btn btn-primary w-100">Add Item</button>
-                </div>
+      <div class="row g-4 mb-5">
+        <!-- Pending Payments Card -->
+        <div class="col-md-4">
+          <div class="card stat-card h-100 p-3">
+            <div class="d-flex align-items-center">
+              <div class="icon-box me-3">
+                <i class="fa-solid fa-hourglass-half"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1">Pending Payments</h6>
+                <h3 class="fw-bold mb-0" id="pendingCount">0</h3>
+              </div>
             </div>
+          </div>
         </div>
 
-        <h4>Current Menu in Database:</h4>
-        <ul id="menuList" class="list-group">
-        </ul>
+        <!-- Active Tables Card -->
+        <div class="col-md-4">
+          <div class="card stat-card h-100 p-3">
+            <div class="d-flex align-items-center">
+              <div class="icon-box me-3 text-success bg-success-subtle">
+                <i class="fa-solid fa-chair"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1">Active Tables</h6>
+                <h3 class="fw-bold mb-0" id="activeTablesCount">0 / 10</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Today's Reservations Card -->
+        <div class="col-md-4">
+          <div class="card stat-card h-100 p-3">
+            <div class="d-flex align-items-center">
+              <div class="icon-box me-3 text-primary bg-primary-subtle">
+                <i class="fa-solid fa-calendar-day"></i>
+              </div>
+              <div>
+                <h6 class="text-muted mb-1">Today's Reservations</h6>
+                <h3 class="fw-bold mb-0" id="todayReservationsCount">0</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
     <script type="module">
-        import { db, ref, push, onValue } from "./JS/firebase-config.js";
+      import {
+        auth,
+        db,
+        ref,
+        get,
+        onAuthStateChanged,
+        onValue,
+        signOut,
+      } from "./js/firebase-config.js";
 
-        window.addItem = function () {
-            const name = document.getElementById("itemName").value;
-            const price = document.getElementById("itemPrice").value;
-            const cat = document.getElementById("itemCategory").value;
-
-            if (name && price) {
-                push(ref(db, 'menu_items'), {
-                    name: name,
-                    price: price,
-                    category: cat
-                });
-                alert("Saved to Database!");
-                document.getElementById("itemName").value = "";
-            }
+      // 1. SECURITY CHECK
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = "login.html";
+          return;
         }
+        const snap = await get(ref(db, "users/" + user.uid));
+        if (!snap.exists() || snap.val().role !== "admin" || snap.val().status !== "active") {
+          window.location.href = "login.html";
+        }
+      });
 
-        // Function to Read Items (Listen to Firebase) runs automatically whenever you (or anyone else) adds an item 
-        const menuRef = ref(db, 'menu_items');
-        onValue(menuRef, (snapshot) => {
-            const list = document.getElementById("menuList");
-            list.innerHTML = "";
+      // 2. MONITOR PENDING PAYMENTS
+      onValue(ref(db, "payments"), (snapshot) => {
+        let pendingCount = 0;
+        if (snapshot.exists()) {
+          snapshot.forEach((child) => {
+            if (child.val().status === "pending") {
+              pendingCount++;
+            }
+          });
+        }
+        document.getElementById("pendingCount").textContent = pendingCount;
+      });
 
-            snapshot.forEach((child) => {
-                const item = child.val();
-                list.innerHTML += `
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        ${item.name} (${item.category})
-                        <span class="badge bg-success rounded-pill">₱${item.price}</span>
-                    </li>
-                `;
-            });
+      // 3. MONITOR ACTIVE TABLES
+      const TOTAL_TABLES = 10;
+      onValue(ref(db, "tables"), (snapshot) => {
+        let activeCount = 0;
+        if (snapshot.exists()) {
+          snapshot.forEach((child) => {
+            if (child.val().status === "occupied") {
+              activeCount++;
+            }
+          });
+        }
+        document.getElementById("activeTablesCount").textContent = activeCount + " / " + TOTAL_TABLES;
+      });
+
+      // 4. MONITOR TODAY'S RESERVATIONS
+      onValue(ref(db, "reservations"), (snapshot) => {
+        let todayCount = 0;
+        const today = new Date().toLocaleDateString();
+        if (snapshot.exists()) {
+          snapshot.forEach((child) => {
+            const reservation = child.val();
+            const reservationDate = new Date(reservation.date).toLocaleDateString();
+            if (reservationDate === today) {
+              todayCount++;
+            }
+          });
+        }
+        document.getElementById("todayReservationsCount").textContent = todayCount;
+      });
+
+      // 5. LOGOUT
+      document.getElementById("adminLogoutBtn").addEventListener("click", () => {
+        signOut(auth).then(() => {
+          window.location.href = "login.html";
         });
+      });
     </script>
-</body>
-
+  </body>
 </html>

@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Reservations</title>
+    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <style>
+      :root {
+        --toms-orange: #f57d10ff;
+        --sidebar-width: 250px;
+      }
+      body {
+        background-color: #f8f9fa;
+        overflow-x: hidden;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: fixed;
+        background: #212529;
+        color: white;
+        z-index: 999;
+      }
+      .sidebar-header {
+        padding: 20px;
+        background: var(--toms-orange);
+      }
+      .sidebar-menu {
+        padding: 20px 0;
+        list-style: none;
+        margin: 0;
+      }
+      .sidebar-menu li a {
+        display: block;
+        padding: 15px 25px;
+        color: #adb5bd;
+        text-decoration: none;
+        border-left: 4px solid transparent;
+      }
+      .sidebar-menu li a:hover,
+      .sidebar-menu li a.active {
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+        border-left-color: var(--toms-orange);
+      }
+      .sidebar-menu i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+      }
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 30px;
+      }
+      .btn-orange {
+        background-color: var(--toms-orange);
+        color: white;
+        border: none;
+      }
+      .btn-orange:hover {
+        background-color: #d1660a;
+        color: white;
+      }
+      .nav-pills .nav-link.active {
+        background-color: var(--toms-orange);
+      }
+      .nav-pills .nav-link {
+        color: #212529;
+        font-weight: bold;
+      }
+      .order-note {
+        font-size: 0.85rem;
+        background: #fff3cd;
+        padding: 8px 10px;
+        border-radius: 5px;
+        border-left: 3px solid #ffc107;
+        display: inline-block;
+        margin-top: 5px;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h4 class="mb-0 fw-bold">Tom's Admin</h4>
+      </div>
+      <ul class="sidebar-menu">
+        <li>
+          <a href="admin.html"
+            ><i class="fa-solid fa-gauge-high"></i> Dashboard</a
+          >
+        </li>
+        <li>
+          <a href="admin-payments.html"
+            ><i class="fa-solid fa-money-bill-wave"></i> Payments</a
+          >
+        </li>
+        <li>
+          <a href="admin-tables.html"
+            ><i class="fa-solid fa-chair"></i> Tables</a
+          >
+        </li>
+        <li>
+          <a href="admin-reservations.html" class="active"
+            ><i class="fa-solid fa-calendar-check"></i> Reservations</a
+          >
+        </li>
+        <li>
+          <a href="admin-users.html"
+            ><i class="fa-solid fa-users-gear"></i> Users</a
+          >
+        </li>
+        <li class="mt-5">
+          <a href="#" id="adminLogoutBtn" class="text-danger"
+            ><i class="fa-solid fa-right-from-bracket"></i> Logout</a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <div class="main-content">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Reservations & Walk-ins</h2>
+        <button
+          class="btn btn-orange fw-bold shadow-sm"
+          data-bs-toggle="modal"
+          data-bs-target="#walkInModal"
+          onclick="setDefaultDateTime()"
+        >
+          <i class="fa-solid fa-plus"></i> Add Reservation/Walk-in
+        </button>
+      </div>
+
+      <ul class="nav nav-pills mb-3" id="resTabs">
+        <li class="nav-item">
+          <a
+            class="nav-link active"
+            href="#"
+            onclick="filterRes('upcoming', event)"
+            >Upcoming / Seated</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="filterRes('history', event)"
+            >History</a
+          >
+        </li>
+      </ul>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th>Customer Info</th>
+                  <th>Date & Time</th>
+                  <th>Pax & Table</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="resTableBody">
+                <tr>
+                  <td colspan="5" class="text-center text-muted">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="walkInModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title fw-bold">Add Reservation</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="walkInForm">
+              <div class="mb-3">
+                <label class="form-label fw-bold small">Customer Name</label>
+                <input type="text" id="wiName" class="form-control" required />
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-6">
+                  <label class="form-label fw-bold small">Date</label>
+                  <input
+                    type="date"
+                    id="wiDate"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="col-6">
+                  <label class="form-label fw-bold small">Time</label>
+                  <input
+                    type="time"
+                    id="wiTime"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-6">
+                  <label class="form-label fw-bold small">No. of People</label>
+                  <input
+                    type="number"
+                    id="wiPax"
+                    class="form-control"
+                    min="1"
+                    value="1"
+                    required
+                  />
+                </div>
+                <div class="col-6">
+                  <label class="form-label fw-bold small">Table Needed</label>
+                  <select id="wiTableSize" class="form-select" required>
+                    <option value="2-Person">2-Person</option>
+                    <option value="4-Person">4-Person</option>
+                    <option value="6-Person">6-Person</option>
+                    <option value="8-Person">8-Person</option>
+                    <option value="10+ Person">10+ Person</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-bold small"
+                  >Advance Order (Manual Notes)</label
+                >
+                <textarea
+                  id="wiNotes"
+                  class="form-control"
+                  rows="3"
+                  placeholder="e.g.&#10;CH1-x1,&#10;Sol-x2,"
+                ></textarea>
+                <small class="text-muted"
+                  >Type orders manually like on a paper pad.</small
+                >
+              </div>
+
+              <button type="submit" class="btn btn-orange w-100 fw-bold py-2">
+                Save Record
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
+    <script type="module">
+      import {
+        auth,
+        db,
+        ref,
+        get,
+        onAuthStateChanged,
+        onValue,
+        update,
+        push,
+        signOut,
+      } from "./js/firebase-config.js";
+
+      let currentView = "upcoming";
+      let allRes = [];
+      const walkInModal = new bootstrap.Modal(
+        document.getElementById("walkInModal"),
+      );
+
+      // 1. SECURITY
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) return (window.location.href = "login.html");
+        const snap = await get(ref(db, "users/" + user.uid));
+        if (!snap.exists() || snap.val().role !== "admin")
+          window.location.href = "login.html";
+      });
+
+      // 2. SET DEFAULT DATE/TIME
+      window.setDefaultDateTime = function () {
+        const now = new Date();
+        document.getElementById("wiDate").value = now
+          .toISOString()
+          .split("T")[0];
+        document.getElementById("wiTime").value = now
+          .toTimeString()
+          .slice(0, 5);
+      };
+
+      // 3. DYNAMIC TABLE SIZE LOGIC (Locks out tables that are too small)
+      document.getElementById("wiPax").addEventListener("input", function () {
+        const pax = parseInt(this.value) || 1;
+        const select = document.getElementById("wiTableSize");
+
+        Array.from(select.options).forEach((option) => {
+          let capacity = 10; // default for 10+
+          if (option.value === "2-Person") capacity = 2;
+          else if (option.value === "4-Person") capacity = 4;
+          else if (option.value === "6-Person") capacity = 6;
+          else if (option.value === "8-Person") capacity = 8;
+
+          // If people > capacity, disable that option
+          if (pax > capacity) {
+            option.disabled = true;
+            option.hidden = true;
+          } else {
+            option.disabled = false;
+            option.hidden = false;
+          }
+        });
+
+        // Auto-select the first available valid option so the user doesn't get stuck
+        const firstAvailable = Array.from(select.options).find(
+          (opt) => !opt.disabled,
+        );
+        if (firstAvailable) select.value = firstAvailable.value;
+      });
+
+      // 4. LOAD DATA
+      onValue(ref(db, "reservations"), (snapshot) => {
+        allRes = [];
+        if (snapshot.exists()) {
+          snapshot.forEach((child) => {
+            allRes.push({ id: child.key, ...child.val() });
+          });
+        }
+        renderTable();
+      });
+
+      // 5. RENDER TABLE
+      function renderTable() {
+        const tbody = document.getElementById("resTableBody");
+        tbody.innerHTML = "";
+
+        let filtered = allRes.filter((r) => {
+          if (currentView === "upcoming")
+            return (
+              r.status === "pending" ||
+              r.status === "approved" ||
+              r.status === "seated"
+            );
+          return r.status === "completed" || r.status === "cancelled";
+        });
+
+        filtered.sort(
+          (a, b) =>
+            new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time),
+        );
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-4">No records found.</td></tr>`;
+          return;
+        }
+
+        filtered.forEach((r) => {
+          let typeBadge =
+            r.type === "walk-in"
+              ? '<span class="badge bg-info text-dark">In-Store</span>'
+              : '<span class="badge bg-primary">Online</span>';
+
+          let statBadge = "";
+          if (r.status === "pending")
+            statBadge =
+              '<span class="badge bg-warning text-dark">Pending</span>';
+          else if (r.status === "approved")
+            statBadge = '<span class="badge bg-success">Incoming</span>';
+          else if (r.status === "seated")
+            statBadge = '<span class="badge bg-dark">Seated</span>';
+          else if (r.status === "completed")
+            statBadge = '<span class="badge bg-secondary">Completed</span>';
+          else statBadge = '<span class="badge bg-danger">Cancelled</span>';
+
+          let actions = "";
+          if (currentView === "upcoming") {
+            if (r.status === "pending") {
+              actions = `<button onclick="updateStatus('${r.id}', 'approved')" class="btn btn-sm btn-success w-100 mb-1 fw-bold">Approve</button>
+                            <button onclick="updateStatus('${r.id}', 'cancelled')" class="btn btn-sm btn-outline-danger w-100">Cancel</button>`;
+            } else if (r.status === "approved") {
+              actions = `<button onclick="updateStatus('${r.id}', 'seated')" class="btn btn-sm btn-dark w-100 fw-bold">Mark Seated</button>`;
+            } else if (r.status === "seated") {
+              actions = `<button onclick="updateStatus('${r.id}', 'completed')" class="btn btn-sm btn-outline-dark w-100">End Session</button>`;
+            }
+          }
+
+          // Advance Order Display
+          let notesHTML = r.notes
+            ? `<div class="order-note"><i class="fa-solid fa-utensils"></i> <b>Order Notes:</b><br>${r.notes}</div>`
+            : "";
+
+          tbody.innerHTML += `
+            <tr>
+              <td>
+                <span class="fw-bold fs-6">${r.name}</span><br>
+                ${typeBadge}
+              </td>
+              <td>
+                <span class="fw-bold">${r.date}</span><br>
+                <span class="text-muted"><i class="fa-regular fa-clock"></i> ${r.time}</span>
+              </td>
+              <td>
+                <span class="fw-bold"><i class="fa-solid fa-users"></i> ${r.pax} People</span><br>
+                <small class="text-muted">Table: ${r.tableSize}</small><br>
+                ${notesHTML}
+              </td>
+              <td>${statBadge}</td>
+              <td style="width: 120px;">${actions}</td>
+            </tr>
+          `;
+        });
+      }
+
+      window.filterRes = function (view, e) {
+        currentView = view;
+        document
+          .querySelectorAll("#resTabs .nav-link")
+          .forEach((l) => l.classList.remove("active"));
+        e.target.classList.add("active");
+        renderTable();
+      };
+
+      window.updateStatus = async function (id, newStatus) {
+        if (confirm(`Update this reservation to ${newStatus.toUpperCase()}?`)) {
+          await update(ref(db, "reservations/" + id), { status: newStatus });
+        }
+      };
+
+      // 6. SUBMIT FORM
+      document
+        .getElementById("walkInForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          await push(ref(db, "reservations"), {
+            name: document.getElementById("wiName").value,
+            date: document.getElementById("wiDate").value,
+            time: document.getElementById("wiTime").value,
+            pax: document.getElementById("wiPax").value,
+            tableSize: document.getElementById("wiTableSize").value,
+            notes: document.getElementById("wiNotes").value,
+            type: "walk-in",
+            status: "seated", // Defaulting to seated for admin manual entry
+          });
+
+          document.getElementById("walkInForm").reset();
+          walkInModal.hide();
+        });
+
+      document
+        .getElementById("adminLogoutBtn")
+        .addEventListener("click", () => {
+          signOut(auth).then(() => (window.location.href = "login.html"));
+        });
+    </script>
+  </body>
+</html>
