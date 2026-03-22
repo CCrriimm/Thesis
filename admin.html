@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tom's Admin - Dashboard</title>
     <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
@@ -108,7 +109,7 @@
         </li>
         <li>
           <a href="admin-users.html"
-            ><i class="fa-solid fa-users-gear"></i> Users</a
+            ><i class="fa-solid fa-user-shield"></i> Admins</a
           >
         </li>
         <li class="mt-5">
@@ -123,7 +124,7 @@
       <h2 class="fw-bold mb-4">Dashboard Overview</h2>
 
       <div class="row g-4 mb-5">
-        <!-- Pending Payments Card -->
+        <!-- Pending Payments -->
         <div class="col-md-4">
           <div class="card stat-card h-100 p-3">
             <div class="d-flex align-items-center">
@@ -138,7 +139,7 @@
           </div>
         </div>
 
-        <!-- Active Tables Card -->
+        <!-- Active Tables -->
         <div class="col-md-4">
           <div class="card stat-card h-100 p-3">
             <div class="d-flex align-items-center">
@@ -153,7 +154,7 @@
           </div>
         </div>
 
-        <!-- Today's Reservations Card -->
+        <!-- Today's Reservations -->
         <div class="col-md-4">
           <div class="card stat-card h-100 p-3">
             <div class="d-flex align-items-center">
@@ -170,7 +171,6 @@
       </div>
     </div>
 
-    <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
     <script type="module">
       import {
         auth,
@@ -182,19 +182,20 @@
         signOut,
       } from "./js/firebase-config.js";
 
-      // 1. SECURITY CHECK
+      //----------- Check if user is admin
       onAuthStateChanged(auth, async (user) => {
         if (!user) {
           window.location.href = "login.html";
           return;
         }
+        currentUserUid = user.uid;
         const snap = await get(ref(db, "users/" + user.uid));
-        if (!snap.exists() || snap.val().role !== "admin" || snap.val().status !== "active") {
+        if (!snap.exists() || snap.val().role !== "admin") {
           window.location.href = "login.html";
         }
-      });
+      });//----------- End of Auth Check
 
-      // 2. MONITOR PENDING PAYMENTS
+      // Checks Pending Payments
       onValue(ref(db, "payments"), (snapshot) => {
         let pendingCount = 0;
         if (snapshot.exists()) {
@@ -205,9 +206,9 @@
           });
         }
         document.getElementById("pendingCount").textContent = pendingCount;
-      });
+      });//----------- End of Pending Payments Check
 
-      // 3. MONITOR ACTIVE TABLES
+      // Checks Active Tables
       const TOTAL_TABLES = 10;
       onValue(ref(db, "tables"), (snapshot) => {
         let activeCount = 0;
@@ -219,9 +220,9 @@
           });
         }
         document.getElementById("activeTablesCount").textContent = activeCount + " / " + TOTAL_TABLES;
-      });
+      });//----------- End of Active Tables Check
 
-      // 4. MONITOR TODAY'S RESERVATIONS
+      // Checks Todays Reservations
       onValue(ref(db, "reservations"), (snapshot) => {
         let todayCount = 0;
         const today = new Date().toLocaleDateString();
@@ -235,9 +236,9 @@
           });
         }
         document.getElementById("todayReservationsCount").textContent = todayCount;
-      });
+      });//----------- End of Today's Reservations Check
 
-      // 5. LOGOUT
+      // Logout
       document.getElementById("adminLogoutBtn").addEventListener("click", () => {
         signOut(auth).then(() => {
           window.location.href = "login.html";

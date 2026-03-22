@@ -74,7 +74,6 @@
         background-color: #d1660a;
         color: white;
       }
-      /* Custom Pills for Tabs */
       .nav-pills .nav-link.active {
         background-color: var(--toms-orange);
       }
@@ -112,7 +111,7 @@
         </li>
         <li>
           <a href="admin-users.html"
-            ><i class="fa-solid fa-users-gear"></i> Users</a
+            ><i class="fa-solid fa-user-shield"></i> Admins</a
           >
         </li>
         <li class="mt-5">
@@ -199,6 +198,7 @@
               alt="Receipt"
               class="receipt-img shadow-sm mb-3 bg-white p-2 border"
             />
+            <h4 id="modalCustomerName" class="fw-bold"></h4>
             <h4 id="modalAmount" class="fw-bold"></h4>
           </div>
           <div class="modal-footer justify-content-center" id="modalActions">
@@ -243,15 +243,20 @@
       let allPayments = [];
       let currentView = "pending"; // tracks which tab we are on
 
-      // 1. SECURITY CHECK
+      // check if user is admin
       onAuthStateChanged(auth, async (user) => {
-        if (!user) return (window.location.href = "login.html");
-        const snap = await get(ref(db, "users/" + user.uid));
-        if (!snap.exists() || snap.val().role !== "admin")
+        if (!user) {
           window.location.href = "login.html";
-      });
+          return;
+        }
+        currentUserUid = user.uid;
+        const snap = await get(ref(db, "users/" + user.uid));
+        if (!snap.exists() || snap.val().role !== "admin") {
+          window.location.href = "login.html";
+        }
+      }); //----------- End of admin Check
 
-      // 2. FETCH DATA FROM FIREBASE
+      // get all payments data and update in real-time
       const paymentsRef = ref(db, "payments");
       onValue(paymentsRef, (snapshot) => {
         allPayments = [];
@@ -274,14 +279,14 @@
           });
         }
         renderTable();
-      });
+      }); //----------- End of Payment Data
 
-      // 3. RENDER TABLE BASED ON ACTIVE TAB
+      // create the table
       function renderTable() {
         const tbody = document.getElementById("paymentsTableBody");
         tbody.innerHTML = "";
 
-        // Filter data based on the tab selected
+        // filter data based on selection
         let filtered = allPayments.filter((p) => {
           if (currentView === "pending") return p.status === "pending";
           if (currentView === "history") return p.status !== "pending";
@@ -296,24 +301,31 @@
         }
 
         filtered.forEach((p) => {
-          // Formatting UI elements
-          let statusBadge =
-            p.status === "pending"
-              ? '<span class="badge bg-warning text-dark">Pending</span>'
-              : p.status === "approved"
-                ? '<span class="badge bg-success">Approved</span>'
-                : '<span class="badge bg-danger">Rejected</span>';
+          // Create status badge with colors
+          let statusBadge = "";
+          if (p.status === "pending") {
+            statusBadge =
+              '<span class="badge bg-warning text-dark">Pending</span>';
+          } else if (p.status === "approved") {
+            statusBadge = '<span class="badge bg-success">Approved</span>';
+          } else {
+            statusBadge = '<span class="badge bg-danger">Rejected</span>';
+          }
 
-          let catBadge =
-            p.category === "Online Reservation"
-              ? '<span class="badge bg-primary">Reservation</span>'
-              : '<span class="badge bg-info text-dark">Online Order</span>';
+          let catBadge = "";
+          if (p.category === "Online Reservation") {
+            catBadge = '<span class="badge bg-primary">Reservation</span>';
+          } else {
+            catBadge =
+              '<span class="badge bg-info text-dark">Online Order</span>';
+          }
 
-          let actionBtn =
-            p.status === "pending"
-              ? `<button onclick="viewReceipt('${p.id}', '${p.receiptUrl}', '${p.amount}', false)" class="btn btn-sm btn-orange"><i class="fa-solid fa-eye"></i> Verify</button>`
-              : `<button onclick="viewReceipt('${p.id}', '${p.receiptUrl}', '${p.amount}', true)" class="btn btn-sm btn-secondary"><i class="fa-solid fa-file-invoice"></i> View</button>`;
-
+          let actionBtn = "";
+          if (p.status === "pending") {
+            actionBtn = `<button onclick="viewReceipt('${p.id}', '${p.receiptUrl}', '${p.amount}', '${p.customerName}', false)" class="btn btn-sm btn-orange"><i class="fa-solid fa-eye"></i> Verify</button>`;
+          } else {
+            actionBtn = `<button onclick="viewReceipt('${p.id}', '${p.receiptUrl}', '${p.amount}', '${p.customerName}', true)" class="btn btn-sm btn-secondary"><i class="fa-solid fa-file-invoice"></i> View</button>`;
+          }
           tbody.innerHTML += `
                     <tr>
                         <td class="text-muted fw-bold">#${p.id.substring(1, 6).toUpperCase()}</td>
@@ -326,9 +338,9 @@
                     </tr>
                 `;
         });
-      }
+      } //----------- End of table
 
-      // 4. TAB FILTER LOGIC
+      // TAB FILTERING
       window.filterPayments = function (view, event) {
         currentView = view;
         document
@@ -338,9 +350,17 @@
         renderTable();
       };
 
-      // 5. MODAL LOGIC (Hides approve/reject buttons if viewing history)
-      window.viewReceipt = function (id, imgUrl, amount, isHistory) {
+      // verify/view receipt modal
+      window.viewReceipt = function (
+        id,
+        imgUrl,
+        amount,
+        customerName,
+        isHistory,
+      ) {
         currentPaymentId = id;
+        document.getElementById("modalCustomerName").innerText =
+          "Name: " + customerName;
         document.getElementById("modalReceiptImg").src = imgUrl;
         document.getElementById("modalAmount").innerText = "Amount: ₱" + amount;
 
@@ -352,7 +372,7 @@
         receiptModal.show();
       };
 
-      // 6. APPROVE / REJECT ACTIONS
+      // approve/reject receipt
       document
         .getElementById("approveBtn")
         .addEventListener("click", async () => {
@@ -369,31 +389,31 @@
             status: "rejected",
           });
           receiptModal.hide();
-        });
+        }); //----------- End of Modal
 
-      // 7. DEV TOOL: ADD FAKE DATA (Now includes category & timestamp)
+      // Fake Data Generator for Testing
       window.addFakePayment = function () {
         const categories = ["Online Reservation", "Online Order"];
         const randomCat =
           categories[Math.floor(Math.random() * categories.length)];
 
         push(ref(db, "payments"), {
-          customerName: "Sample Customer",
-          amount: "499",
+          customerName: "Customer",
+          amount: "999",
           category: randomCat,
-          timestamp: Date.now(), // Saves current exact time
+          timestamp: Date.now(),
           status: "pending",
-          receiptUrl:
-            "https://files.jotform.com/jotformapps/how-to-make-a-receipt-image-1.png",
+          receiptUrl: "https://c.tenor.com/nsQ57a43PG0AAAAC/tenor.gif",
         });
-        alert("Test payment added!");
-      };
+      }; //----------- End of Fake Data Generator
 
-      // LOGOUT
+      // logout
       document
         .getElementById("adminLogoutBtn")
         .addEventListener("click", () => {
-          signOut(auth).then(() => (window.location.href = "login.html"));
+          signOut(auth).then(() => {
+            window.location.href = "login.html";
+          });
         });
     </script>
   </body>

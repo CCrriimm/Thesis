@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Manage Admins</title>
+    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <style>
+      :root {
+        --toms-orange: #f57d10ff;
+        --sidebar-width: 250px;
+      }
+      body {
+        background-color: #f8f9fa;
+        overflow-x: hidden;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: fixed;
+        background: #212529;
+        color: white;
+        z-index: 999;
+      }
+      .sidebar-header {
+        padding: 20px;
+        background: var(--toms-orange);
+      }
+      .sidebar-menu {
+        padding: 20px 0;
+        list-style: none;
+        margin: 0;
+      }
+      .sidebar-menu li a {
+        display: block;
+        padding: 15px 25px;
+        color: #adb5bd;
+        text-decoration: none;
+        border-left: 4px solid transparent;
+      }
+      .sidebar-menu li a:hover,
+      .sidebar-menu li a.active {
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+        border-left-color: var(--toms-orange);
+      }
+      .sidebar-menu i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+      }
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 30px;
+      }
+      .btn-orange {
+        background-color: var(--toms-orange);
+        color: white;
+        border: none;
+      }
+      .btn-orange:hover {
+        background-color: #d1660a;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h4 class="mb-0 fw-bold">Tom's Admin</h4>
+      </div>
+      <ul class="sidebar-menu">
+        <li>
+          <a href="admin.html"
+            ><i class="fa-solid fa-gauge-high"></i> Dashboard</a
+          >
+        </li>
+        <li>
+          <a href="admin-payments.html"
+            ><i class="fa-solid fa-money-bill-wave"></i> Payments</a
+          >
+        </li>
+        <li>
+          <a href="admin-tables.html"
+            ><i class="fa-solid fa-chair"></i> Tables</a
+          >
+        </li>
+        <li>
+          <a href="admin-reservations.html"
+            ><i class="fa-solid fa-calendar-check"></i> Reservations</a
+          >
+        </li>
+        <li>
+          <a href="admin-users.html" class="active"
+            ><i class="fa-solid fa-user-shield"></i> Admins</a
+          >
+        </li>
+        <li class="mt-5">
+          <a href="#" id="adminLogoutBtn" class="text-danger"
+            ><i class="fa-solid fa-right-from-bracket"></i> Logout</a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <div class="main-content">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Administrator Accounts</h2>
+        <button
+          class="btn btn-orange fw-bold shadow-sm"
+          data-bs-toggle="modal"
+          data-bs-target="#addAdminModal"
+        >
+          <i class="fa-solid fa-plus"></i> Create Admin
+        </button>
+      </div>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th>Admin Name</th>
+                  <th>Contact Info</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminsTableBody">
+                <tr>
+                  <td colspan="4" class="text-center text-muted">
+                    Loading admins...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for Adding New Admin -->
+    <div class="modal fade" id="addAdminModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title fw-bold">Create New Admin</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="addAdminForm">
+              <div class="row mb-2">
+                <div class="col-6">
+                  <label class="form-label fw-bold small">First Name</label>
+                  <input
+                    type="text"
+                    id="newAdminFname"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="col-6">
+                  <label class="form-label fw-bold small">Last Name</label>
+                  <input
+                    type="text"
+                    id="newAdminLname"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="mb-2">
+                <label class="form-label fw-bold small">Email Address</label>
+                <input
+                  type="email"
+                  id="newAdminEmail"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="mb-4">
+                <label class="form-label fw-bold small">Password</label>
+                <input
+                  type="password"
+                  id="newAdminPass"
+                  class="form-control"
+                  minlength="6"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                id="createAdminBtn"
+                class="btn btn-orange w-100 fw-bold py-2"
+              >
+                Create Account
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Modal for Adding New Admin -->
+
+    <!-- Bootstrap Toasts -->
+    <!-- Success -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+      <div
+        id="successToast"
+        class="toast align-items-center text-white border-0"
+        style="background-color: var(--toms-orange)"
+        role="alert"
+      >
+        <div class="d-flex">
+          <div class="toast-body fw-bold" id="successToastMsg">
+            <i class="fa-solid fa-circle-check me-2"></i> Done!
+          </div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div
+      class="position-fixed bottom-0 end-0 p-3"
+      style="z-index: 9999; margin-bottom: 70px"
+    >
+      <div
+        id="errorToast"
+        class="toast align-items-center text-white bg-danger border-0"
+        role="alert"
+      >
+        <div class="d-flex">
+          <div class="toast-body fw-bold" id="errorToastMsg">
+            <i class="fa-solid fa-circle-xmark me-2"></i> Error!
+          </div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- for Deactivate/Reactivate -->
+    <div
+      class="position-fixed start-50 translate-middle-x"
+      style="z-index: 9999"
+    >
+      <div
+        id="confirmToast"
+        class="toast"
+        data-bs-autohide="false"
+        role="alert"
+      >
+        <div class="toast-header" style="background-color: var(--toms-orange)">
+          <i class="fa-solid fa-triangle-exclamation text-white me-2"></i>
+          <strong class="me-auto text-white">Confirm Action</strong>
+        </div>
+        <div class="toast-body text-center">
+          <p class="mb-3 fw-bold" id="confirmToastMsg">Are you sure?</p>
+          <div class="d-flex justify-content-center gap-2">
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              data-bs-dismiss="toast"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-sm fw-bold text-white"
+              id="confirmToastBtn"
+              style="background-color: var(--toms-orange)"
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Bootstrap Toasts -->
+
+    <script type="module">
+      import {
+        app,
+        auth,
+        db,
+        ref,
+        get,
+        set,
+        onAuthStateChanged,
+        onValue,
+        update,
+        signOut,
+      } from "./js/firebase-config.js";
+
+      // Fixes the issue of the current user being logged out when creating a new admin
+      // ===============================================================================
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import {
+        getAuth,
+        createUserWithEmailAndPassword,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+      // ===============================================================================
+
+      let currentUserUid = null;
+      const addAdminModal = new bootstrap.Modal(
+        document.getElementById("addAdminModal"),
+      );
+      const successToast = new bootstrap.Toast(
+        document.getElementById("successToast"),
+        { delay: 3000 },
+      );
+      const errorToast = new bootstrap.Toast(
+        document.getElementById("errorToast"),
+        { delay: 4000 },
+      );
+      const confirmToast = new bootstrap.Toast(
+        document.getElementById("confirmToast"),
+      );
+
+      // checks if admin
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = "login.html";
+          return;
+        }
+        currentUserUid = user.uid;
+        const snap = await get(ref(db, "users/" + user.uid));
+        if (!snap.exists() || snap.val().role !== "admin") {
+          window.location.href = "login.html";
+        }
+      });
+
+      // only admin shows
+      onValue(ref(db, "users"), (snapshot) => {
+        const tbody = document.getElementById("adminsTableBody");
+        tbody.innerHTML = "";
+        let hasAdmins = false;
+
+        if (snapshot.exists()) {
+          snapshot.forEach((child) => {
+            const data = child.val();
+
+            // Only show if role is admin
+            if (data.role === "admin") {
+              hasAdmins = true;
+              const uid = child.key;
+
+              // Display Name
+              let name = "";
+              const fullName = (data.firstName + " " + data.lastName).trim();
+              if (fullName) {
+                name = fullName;
+              } else {
+                name = "Admin";
+              }
+
+              // Status Badge
+              let statusBadge = "";
+              if (data.status === "deactivated") {
+                statusBadge =
+                  '<span class="badge bg-danger">Deactivated</span>';
+              } else {
+                statusBadge = '<span class="badge bg-success">Active</span>';
+              }
+
+              // Button (Deactivate/Reactivate)
+              let actionBtn = "";
+              if (uid === currentUserUid) {
+                actionBtn = `<button class="btn btn-sm btn-outline-secondary w-100" disabled>Current Session</button>`;
+              } else {
+                if (data.status === "deactivated") {
+                  actionBtn = `<button onclick="changeStatus('${uid}', 'active')" class="btn btn-sm btn-success w-100 fw-bold">Re-Activate</button>`;
+                } else {
+                  actionBtn = `<button onclick="changeStatus('${uid}', 'deactivated')" class="btn btn-sm btn-outline-danger w-100 fw-bold">Deactivate</button>`;
+                }
+              }
+
+              tbody.innerHTML += `
+                  <tr>
+                    <td class="fw-bold"><i class="fa-solid text-muted me-2"></i>${name}</td>
+                    <td><small>${data.email}</small></td>
+                    <td>${statusBadge}</td>
+                    <td style="width: 150px;">${actionBtn}</td>
+                  </tr>
+                `;
+            }
+          });
+        }
+
+        if (!hasAdmins)
+          tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-4">No admins found.</td></tr>`;
+      });
+
+      // Helper: Show Success Toast
+      function showSuccess(msg) {
+        document.getElementById("successToastMsg").innerHTML = '<i class="fa-solid fa-circle-check me-2"></i>' + msg;
+        successToast.show();
+      }
+
+      // Helper: Show Error Toast
+      function showError(msg) {
+        document.getElementById("errorToastMsg").innerHTML = '<i class="fa-solid fa-circle-xmark me-2"></i>' + msg;
+        errorToast.show();
+      }
+
+      // Helper: Show Confirm Toast with a callback
+      function showConfirm(msg, onConfirm) {
+        document.getElementById("confirmToastMsg").textContent = msg;
+        
+        // Remove old listener to prevent stacking
+        const confirmBtn = document.getElementById("confirmToastBtn");
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        
+        newConfirmBtn.addEventListener("click", function () {
+          confirmToast.hide();
+          onConfirm();
+        });
+        
+        confirmToast.show();
+      }
+
+      // button function (Deactivate/Reactivate)
+      window.changeStatus = function (uid, newStatus) {
+        let msg = "";
+        if (newStatus === "deactivated") {
+          msg = "Are you sure you want to deactivate this admin?";
+        } else {
+          msg = "Are you sure you want to re-activate this admin?";
+        }
+
+        showConfirm(msg, async function () {
+          try {
+            await update(ref(db, "users/" + uid), { status: newStatus });
+            if (newStatus === "deactivated") {
+              showSuccess("Admin has been deactivated successfully.");
+            } else {
+              showSuccess("Admin has been re-activated successfully.");
+            }
+          } catch (error) {
+            showError("Failed to update status: " + error.message);
+          }
+        });
+      };
+
+      // create new admin
+      document
+        .getElementById("addAdminForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById("createAdminBtn");
+          btn.disabled = true;
+          btn.innerText = "Creating...";
+
+          try {
+            // Create a temporary secondary app so it doesn't log YOU out
+            const secondaryApp = initializeApp(app.options, "SecondaryApp");
+            const secondaryAuth = getAuth(secondaryApp);
+
+            const email = document.getElementById("newAdminEmail").value;
+            const pass = document.getElementById("newAdminPass").value;
+
+            const userCred = await createUserWithEmailAndPassword(
+              secondaryAuth,
+              email,
+              pass,
+            );
+
+            // Add details to Realtime Database
+            await set(ref(db, "users/" + userCred.user.uid), {
+              firstName: document.getElementById("newAdminFname").value,
+              lastName: document.getElementById("newAdminLname").value,
+              email: email,
+              role: "admin",
+              status: "active",
+            });
+
+            // Logout secondary app to clean up
+            await secondaryAuth.signOut();
+
+            document.getElementById("addAdminForm").reset();
+          addAdminModal.hide();
+          showSuccess("New Admin account created successfully!");
+          } catch (error) {
+            console.error(error);
+            alert("Error: " + error.message);
+          } finally {
+            btn.disabled = false;
+            btn.innerText = "Create Account";
+          }
+        });
+
+      document
+        .getElementById("adminLogoutBtn")
+        .addEventListener("click", () => {
+          signOut(auth).then(() => {
+            window.location.href = "login.html";
+          });
+        });
+    </script>
+  </body>
+</html>
