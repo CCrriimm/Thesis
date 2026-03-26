@@ -618,19 +618,19 @@
       const floorLayouts = {
         1: [
           { id: 1, x: 80, y: 80, seats: 6, color: "#FF6B6B" },
-          { id: 2, x: 280, y: 80, seats: 4, color: "#4ECDC4" },
-          { id: 3, x: 480, y: 80, seats: 2, color: "#45B7D1" },
-          { id: 4, x: 75, y: 369, seats: 6, color: "srgb(123, 123, 123, 1)" },
+          { id: 2, x: 76, y: 428, seats: 4, color: "#4ECDC4" },
+          { id: 3, x: 480, y: 369, seats: 4, color: "#45B7D1" },
+          { id: 4, x: 75, y: 337, seats: 6, color: "#FF6B6B" },
           { id: 5, x: 280, y: 280, seats: 4, color: "#4ECDC4" },
-          { id: 6, x: 480, y: 280, seats: 2, color: "#45B7D1" },
+          { id: 6, x: 480, y: 100, seats: 15, color: "#45B7D1" },
         ],
         2: [
           { id: 7, x: 80, y: 80, seats: 6, color: "#FF6B6B" },
           { id: 8, x: 280, y: 80, seats: 4, color: "#4ECDC4" },
-          { id: 9, x: 480, y: 80, seats: 2, color: "#45B7D1" },
+          { id: 9, x: 300, y: 80, seats: 15, color: "#45B7D1" },
           { id: 10, x: 80, y: 280, seats: 6, color: "#FF6B6B" },
           { id: 11, x: 280, y: 280, seats: 4, color: "#4ECDC4" },
-          { id: 12, x: 480, y: 280, seats: 2, color: "#45B7D1" },
+          { id: 12, x: 480, y: 280, seats: 4, color: "#45B7D1" },
         ],
       };
 
@@ -638,12 +638,12 @@
       const tableSize = {
         6: { width: 100, height: 80 },
         4: { width: 90, height: 70 },
-        2: { width: 70, height: 60 },
+        15: { width: 90, height: 200 },
       };
 
       // Background image for canvas
       const backgroundImage = new Image();
-      backgroundImage.src = "Media/1st_Floor.png"; // ← Change this to your image path
+      backgroundImage.src = "Media/1st_Floor2.png"; // ← Change this to your image path
       backgroundImage.onload = function () {
         // Image loaded successfully
         console.log("Background image loaded");
