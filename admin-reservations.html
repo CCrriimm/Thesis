@@ -232,14 +232,26 @@
                   />
                 </div>
                 <div class="col-6">
-                  <label class="form-label fw-bold small">Table Needed</label>
-                  <select id="wiTableSize" class="form-select" required>
-                    <option value="2-Person">2-Person</option>
-                    <option value="4-Person">4-Person</option>
-                    <option value="6-Person">6-Person</option>
-                    <option value="8-Person">8-Person</option>
-                    <option value="10+ Person">10+ Person</option>
-                  </select>
+                  <label class="form-label fw-bold small"
+                    >Table Selection</label
+                  >
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      id="wiTableSize"
+                      class="form-control"
+                      placeholder="Select a table..."
+                      readonly
+                      required
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-orange"
+                      id="openTableSelectionBtn"
+                    >
+                      <i class="fa-solid fa-map"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -267,6 +279,90 @@
       </div>
     </div>
 
+    <div class="modal fade" id="tableSelectionModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title fw-bold">Select Table</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <!-- Floor Selector -->
+            <div class="mb-4">
+              <label class="fw-bold small mb-2">Select Floor:</label>
+              <div class="btn-group w-100" role="group">
+                <input
+                  type="radio"
+                  class="btn-check"
+                  name="floorSelect"
+                  id="floor1"
+                  value="1"
+                  checked
+                />
+                <label class="btn btn-outline-orange fw-bold" for="floor1">
+                  1st Floor
+                </label>
+
+                <input
+                  type="radio"
+                  class="btn-check"
+                  name="floorSelect"
+                  id="floor2"
+                  value="2"
+                />
+                <label class="btn btn-outline-orange fw-bold" for="floor2">
+                  2nd Floor
+                </label>
+              </div>
+            </div>
+
+            <!-- Canvas -->
+            <div class="text-center">
+              <canvas
+                id="restaurantCanvas"
+                style="
+                  max-width: 100%;
+                  height: auto;
+                  border: 2px solid #ddd;
+                  border-radius: 10px;
+                  background: #f9f9f9;
+                  cursor: pointer;
+                  display: block;
+                  margin: 0 auto;
+                "
+              ></canvas>
+            </div>
+
+            <!-- Selected Table Info -->
+            <div class="mt-3 p-2 bg-light rounded" id="selectedTableInfo">
+              <small class="text-muted">Click on a table to select</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-orange fw-bold"
+              id="confirmTableBtn"
+              disabled
+            >
+              Confirm Selection
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script type="module">
       import {
         auth,
@@ -286,7 +382,7 @@
         document.getElementById("walkInModal"),
       );
 
-      // 1. SECURITY
+      // admin authentication check
       onAuthStateChanged(auth, async (user) => {
         if (!user) {
           window.location.href = "login.html";
@@ -299,15 +395,48 @@
         }
       });
 
-      // 2. SET DEFAULT DATE/TIME
+      // for default date and time
       window.setDefaultDateTime = function () {
-        const now = new Date();
-        document.getElementById("wiDate").value = now
-          .toISOString()
-          .split("T")[0];
-        document.getElementById("wiTime").value = now
-          .toTimeString()
-          .slice(0, 5);
+        // Clear everything in the form first
+        document.getElementById("walkInForm").reset();
+
+        // Get the current date and time
+        let today = new Date();
+
+        // format the date (YYYY-MM-DD)
+        let year = today.getFullYear();
+        let month = today.getMonth() + 1; // month of javascript starts at 0 so we add 1
+        let day = today.getDate();
+
+        // Add a zero in front if the month or day is a single digit (like '03' instead of '3')
+        if (month < 10) { month = '0' + month; }
+        if (day < 10) { day = '0' + day; }
+
+        let formattedDate = year + '-' + month + '-' + day;
+        document.getElementById("wiDate").value = formattedDate;
+
+        // format the time (HH:MM)
+        let hours = today.getHours();
+        let minutes = today.getMinutes();
+
+        // Add a zero if the hour or minute is a single digit
+        if (hours < 10) { hours = '0' + hours; }
+        if (minutes < 10) { minutes = '0' + minutes; }
+
+        let formattedTime = hours + ':' + minutes;
+        document.getElementById("wiTime").value = formattedTime;
+
+        // Reset the table size dropdown to default and unhide all options
+        // Manually reset the values
+        document.getElementById("wiPax").value = "1";
+        document.getElementById("wiTableSize").value = "--, --, --";
+
+        // Unhide all options in the dropdown using a simple loop
+        let select = document.getElementById("wiTableSize");
+        for (let i = 0; i < select.options.length; i++) {
+            select.options[i].disabled = false;
+            select.options[i].hidden = false;
+        }
       };
 
       // 3. DYNAMIC TABLE SIZE LOGIC (Locks out tables that are too small)
@@ -339,7 +468,7 @@
         if (firstAvailable) select.value = firstAvailable.value;
       });
 
-      // 4. LOAD DATA
+      // load reservations and listen for changes
       onValue(ref(db, "reservations"), (snapshot) => {
         allRes = [];
         if (snapshot.exists()) {
@@ -350,7 +479,7 @@
         renderTable();
       });
 
-      // 5. RENDER TABLE
+      // table rendering with dynamic actions based on status and view
       function renderTable() {
         const tbody = document.getElementById("resTableBody");
         tbody.innerHTML = "";
@@ -376,17 +505,20 @@
         }
 
         filtered.forEach((r) => {
-          let typeBadge =
-            r.type === "walk-in"
-              ? '<span class="badge bg-info text-dark">In-Store</span>'
-              : '<span class="badge bg-primary">Online</span>';
+          let typeBadge = "";
+          if (r.type === "walk-in") {
+            typeBadge = '<span class="badge bg-info text-dark">In-Store</span>';
+          } else {
+            typeBadge = '<span class="badge bg-primary">Online</span>';
+          }
+
 
           let statBadge = "";
           if (r.status === "pending")
             statBadge =
               '<span class="badge bg-warning text-dark">Pending</span>';
           else if (r.status === "approved")
-            statBadge = '<span class="badge bg-success">Incoming</span>';
+            statBadge = '<span class="badge bg-success">Approved</span>';
           else if (r.status === "seated")
             statBadge = '<span class="badge bg-dark">Seated</span>';
           else if (r.status === "completed")
@@ -399,7 +531,7 @@
               actions = `<button onclick="updateStatus('${r.id}', 'approved')" class="btn btn-sm btn-success w-100 mb-1 fw-bold">Approve</button>
                             <button onclick="updateStatus('${r.id}', 'cancelled')" class="btn btn-sm btn-outline-danger w-100">Cancel</button>`;
             } else if (r.status === "approved") {
-              actions = `<button onclick="updateStatus('${r.id}', 'seated')" class="btn btn-sm btn-dark w-100 fw-bold">Mark Seated</button>`;
+              actions = `<button onclick="updateStatus('${r.id}', 'seated')" class="btn btn-sm bg-success w-100 fw-bold text-white">Check In</button>`;
             } else if (r.status === "seated") {
               actions = `<button onclick="updateStatus('${r.id}', 'completed')" class="btn btn-sm btn-outline-dark w-100">End Session</button>`;
             }
@@ -447,7 +579,7 @@
         }
       };
 
-      // 6. SUBMIT FORM
+      // SUBMIT FORM
       document
         .getElementById("walkInForm")
         .addEventListener("submit", async (e) => {
@@ -461,17 +593,279 @@
             tableSize: document.getElementById("wiTableSize").value,
             notes: document.getElementById("wiNotes").value,
             type: "walk-in",
-            status: "seated", // Defaulting to seated for admin manual entry
+            status: "approved", // Defaulting to seated for admin manual entry
           });
 
           document.getElementById("walkInForm").reset();
           walkInModal.hide();
         });
 
-      document.getElementById("adminLogoutBtn").addEventListener("click", () => {
-        signOut(auth).then(() => {
-          window.location.href = "login.html";
+      document
+        .getElementById("adminLogoutBtn")
+        .addEventListener("click", () => {
+          signOut(auth).then(() => {
+            window.location.href = "login.html";
+          });
         });
+
+      // TABLE SELECTION CANVAS
+      const canvas = document.getElementById("restaurantCanvas");
+      const ctx = canvas.getContext("2d");
+      let selectedTable = null;
+      let tableSelectionModal = null;
+
+      // Define table layouts for each floor
+      const floorLayouts = {
+        1: [
+          { id: 1, x: 80, y: 80, seats: 6, color: "#FF6B6B" },
+          { id: 2, x: 280, y: 80, seats: 4, color: "#4ECDC4" },
+          { id: 3, x: 480, y: 80, seats: 2, color: "#45B7D1" },
+          { id: 4, x: 75, y: 369, seats: 6, color: "srgb(123, 123, 123, 1)" },
+          { id: 5, x: 280, y: 280, seats: 4, color: "#4ECDC4" },
+          { id: 6, x: 480, y: 280, seats: 2, color: "#45B7D1" },
+        ],
+        2: [
+          { id: 7, x: 80, y: 80, seats: 6, color: "#FF6B6B" },
+          { id: 8, x: 280, y: 80, seats: 4, color: "#4ECDC4" },
+          { id: 9, x: 480, y: 80, seats: 2, color: "#45B7D1" },
+          { id: 10, x: 80, y: 280, seats: 6, color: "#FF6B6B" },
+          { id: 11, x: 280, y: 280, seats: 4, color: "#4ECDC4" },
+          { id: 12, x: 480, y: 280, seats: 2, color: "#45B7D1" },
+        ],
+      };
+
+      // Table dimensions
+      const tableSize = {
+        6: { width: 100, height: 80 },
+        4: { width: 90, height: 70 },
+        2: { width: 70, height: 60 },
+      };
+
+      // Background image for canvas
+      const backgroundImage = new Image();
+      backgroundImage.src = "Media/1st_Floor.png"; // ← Change this to your image path
+      backgroundImage.onload = function () {
+        // Image loaded successfully
+        console.log("Background image loaded");
+      };
+
+      function setCanvasSize() {
+        const container = canvas.parentElement;
+        const width = Math.min(container.clientWidth - 20, 600);
+        canvas.width = width;
+        canvas.height = (width / 600) * 500;
+      }
+
+      function drawFloor(floorNum) {
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw background image (if loaded)
+        if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
+          ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+        } else {
+          // Fallback background color if image not loaded
+          ctx.fillStyle = "#f9f9f9";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw title
+        ctx.fillStyle = "#333";
+        ctx.font = "bold 18px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText(`Floor ${floorNum} Layout`, canvas.width / 2, 30);
+
+        // Draw tables
+        const tables = floorLayouts[floorNum];
+        tables.forEach((table) => {
+          drawTable(table);
+        });
+      }
+
+      function drawTable(table) {
+        const size = tableSize[table.seats];
+        const { width, height } = size;
+
+        // Determine if table is selected
+        const isSelected = selectedTable?.id === table.id;
+        
+        let bgColor = "";
+        if (isSelected) {
+          bgColor = "#9edfba";
+        } else {
+          bgColor = table.color;
+        }
+
+        let borderColor = "";
+        if (isSelected) {
+          borderColor = "#f57d10ff";
+        } else {
+          borderColor = "#999";
+        }
+
+        let borderWidth = 0;
+        if (isSelected) {
+          borderWidth = 3;
+        } else {
+          borderWidth = 2;
+        }
+
+        // Draw table background
+        ctx.fillStyle = bgColor;
+        ctx.strokeStyle = borderColor;
+        ctx.lineWidth = borderWidth;
+        ctx.fillRect(table.x, table.y, width, height);
+        ctx.strokeRect(table.x, table.y, width, height);
+
+        // Draw table info text
+        let textColor = "";
+        if (isSelected) {
+          textColor = "#333";
+        } else {
+          textColor = "#fff";
+        }
+
+        ctx.fillStyle = textColor;
+        ctx.font = "bold 13px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        const centerX = table.x + width / 2;
+        const centerY = table.y + height / 2;
+
+        ctx.fillText(`Table ${table.id}`, centerX, centerY - 10);
+        ctx.font = "12px Arial";
+        ctx.fillText(`${table.seats} Seater`, centerX, centerY + 10);
+      }
+
+      function isPointInTable(x, y, table) {
+        const size = tableSize[table.seats];
+        const { width, height } = size;
+        return (
+          x >= table.x &&
+          x <= table.x + width &&
+          y >= table.y &&
+          y <= table.y + height
+        );
+      }
+
+      // Canvas click handler
+      canvas.addEventListener("click", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        const currentFloor = document.querySelector(
+          'input[name="floorSelect"]:checked',
+        ).value;
+        const tables = floorLayouts[currentFloor];
+
+        tables.forEach((table) => {
+          if (isPointInTable(clickX, clickY, table)) {
+            selectedTable = table;
+            drawFloor(currentFloor);
+            updateTableInfo(table, currentFloor);
+            document.getElementById("confirmTableBtn").disabled = false;
+          }
+        });
+      });
+
+      function updateTableInfo(table, floor) {
+        const info = document.getElementById("selectedTableInfo");
+        info.innerHTML = `
+          <strong style="color: var(--toms-orange);">
+            <i class="fa-solid fa-check-circle"></i> 
+            Table ${table.id} (${table.seats} Seater) - Floor ${floor} selected
+          </strong>
+        `;
+      }
+
+      // Floor selector change
+      document
+        .querySelectorAll('input[name="floorSelect"]')
+        .forEach((radio) => {
+          radio.addEventListener("change", (e) => {
+            selectedTable = null;
+            document.getElementById("confirmTableBtn").disabled = true;
+            drawFloor(e.target.value);
+            document.getElementById("selectedTableInfo").innerHTML =
+              '<small class="text-muted">Click on a table to select</small>';
+          });
+        });
+
+      // Confirm table selection
+      document
+        .getElementById("confirmTableBtn")
+        .addEventListener("click", () => {
+          if (selectedTable) {
+            const floor = document.querySelector(
+              'input[name="floorSelect"]:checked',
+            ).value;
+
+            let floorText = "";
+            if (floor === "1") {
+              floorText = "1st Floor";
+            } else {
+              floorText = "2nd Floor";
+            }
+            
+            document.getElementById("wiTableSize").value =
+              `Table ${selectedTable.id}, ${floorText}, ${selectedTable.seats} Seater`;
+
+            // Close table selection modal
+            if (tableSelectionModal) {
+              tableSelectionModal.hide();
+            }
+          }
+        });
+
+      // Initialize table selection modal
+      const tableModalElement = document.getElementById("tableSelectionModal");
+      tableSelectionModal = new bootstrap.Modal(tableModalElement, {
+        backdrop: "static",
+        keyboard: false,
+      });
+
+      // Use 'shown' instead of 'show' so it waits for the animation to finish!
+      tableModalElement.addEventListener("shown.bs.modal", () => {
+        selectedTable = null;
+        document.getElementById("confirmTableBtn").disabled = true;
+        
+        // No timeout needed anymore!
+        setCanvasSize();
+        
+        // Checks which floor is currently selected before drawing
+        const floor = document.querySelector('input[name="floorSelect"]:checked').value;
+        drawFloor(floor);
+        
+        document.getElementById("selectedTableInfo").innerHTML =
+          '<small class="text-muted">Click on a table to select</small>';
+      });
+
+      tableModalElement.addEventListener("hide.bs.modal", () => {
+        selectedTable = null;
+        document.getElementById("confirmTableBtn").disabled = true;
+      });
+
+      // Handle table selection button click - manually show modal without Bootstrap data attributes
+      document
+        .getElementById("openTableSelectionBtn")
+        .addEventListener("click", () => {
+          tableSelectionModal.show();
+        });
+
+      // Handle window resize for canvas responsiveness
+      window.addEventListener("resize", () => {
+        if (tableModalElement.classList.contains("show")) {
+          setCanvasSize();
+          const floor = document.querySelector(
+            'input[name="floorSelect"]:checked',
+          ).value;
+          drawFloor(floor);
+        }
       });
     </script>
   </body>

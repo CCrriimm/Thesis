@@ -426,11 +426,12 @@
       function showConfirm(msg, onConfirm) {
         document.getElementById("confirmToastMsg").textContent = msg;
         
-        // Remove old listener to prevent stacking
+        // Remove old button and listener to prevent multiple bindings
         const confirmBtn = document.getElementById("confirmToastBtn");
         const newConfirmBtn = confirmBtn.cloneNode(true);
         confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
         
+        // add new event listener for the new confirm button
         newConfirmBtn.addEventListener("click", function () {
           confirmToast.hide();
           onConfirm();
@@ -448,6 +449,7 @@
           msg = "Are you sure you want to re-activate this admin?";
         }
 
+        // toast appears for confirmation
         showConfirm(msg, async function () {
           try {
             await update(ref(db, "users/" + uid), { status: newStatus });
