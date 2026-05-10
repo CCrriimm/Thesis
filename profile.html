@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tom's Chicken - My Profile</title>
+    
+    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        :root { --toms-orange: #f57d10ff; --toms-dark: #212529; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; padding-bottom: 50px; }
+        
+        .navbar { box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .mobile-container { max-width: 600px; margin: 0 auto; padding: 15px; }
+
+        /* PROFILE CARD */
+        .profile-card {
+            background: white; border-radius: 15px; border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); padding: 20px;
+            text-align: center; margin-bottom: 20px;
+        }
+        .profile-avatar {
+            width: 80px; height: 80px; background-color: var(--toms-orange); color: white;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; font-weight: bold; margin: 0 auto 10px auto;
+        }
+
+        /* TABS */
+        .nav-pills .nav-link { color: var(--toms-dark); font-weight: bold; border-radius: 50px; padding: 8px 20px; }
+        .nav-pills .nav-link.active { background-color: var(--toms-orange); color: white; }
+
+        /* ITEM CARDS (Reservations & Orders) */
+        .item-card {
+            background: white; border-radius: 12px; border: 1px solid #eee;
+            padding: 15px; margin-bottom: 15px; position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .item-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
+        .status-badge { font-size: 0.75rem; padding: 5px 10px; border-radius: 50px; font-weight: bold; }
+        
+        .btn-orange-outline { border: 2px solid var(--toms-orange); color: var(--toms-orange); border-radius: 50px; font-weight: bold; transition: 0.2s; }
+        .btn-orange-outline:hover { background-color: var(--toms-orange); color: white; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+        <div class="container mobile-container py-0 d-flex justify-content-between">
+            <a class="navbar-brand fw-bold fs-4" href="index.html" style="color: var(--toms-orange);">
+                <i class="fa-solid fa-arrow-left text-dark me-2" onclick="history.back(); return false;"></i> 
+                Tom's<span class="text-dark">Chicken</span>
+            </a>
+            <button id="logoutBtn" class="btn btn-sm btn-dark rounded-pill px-3">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container mobile-container mt-3">
+        
+        <div class="profile-card">
+            <div class="profile-avatar" id="userInitial">?</div>
+            <h4 class="fw-bold mb-0" id="userName">Loading...</h4>
+            <p class="text-muted small mb-3" id="userEmail">Loading email...</p>
+            
+            <a href="Resetpass.html" class="btn btn-orange-outline btn-sm px-4">
+                <i class="fa-solid fa-lock"></i> Change Password
+            </a>
+        </div>
+
+        <ul class="nav nav-pills justify-content-center mb-4" id="profileTabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" onclick="switchTab('reservations', event)">My Reservations</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="switchTab('orders', event)">My Orders</a>
+            </li>
+        </ul>
+
+        <div id="reservationsSection">
+            <div id="reservationsList">
+                <p class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin"></i> Loading reservations...</p>
+            </div>
+        </div>
+
+        <div id="ordersSection" class="d-none">
+            <div id="ordersList">
+                <p class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin"></i> Loading orders...</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        import { auth, db, ref, get, onValue, onAuthStateChanged, signOut } from "./js/firebase-config.js";
+
+        let currentUserName = "";
+
+        // 1. SECURITY & PROFILE LOAD
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+            } else {
+                // Load User Data
+                const snap = await get(ref(db, 'users/' + user.uid));
+                if (snap.exists()) {
+                    const data = snap.val();
+                    currentUserName = `${data.firstName} ${data.lastName}`;
+                    
+                    document.getElementById('userName').innerText = currentUserName;
+                    document.getElementById('userEmail').innerText = data.email;
+                    document.getElementById('userInitial').innerText = data.firstName.charAt(0).toUpperCase();
+
+                    // Start fetching their records now that we know their name
+                    loadMyReservations();
+                    loadMyOrders();
+                }
+            }
+        });
+
+        // 2. TAB SWITCHER
+        window.switchTab = function(tabName, event) {
+            event.preventDefault();
+            document.querySelectorAll('#profileTabs .nav-link').forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (tabName === 'reservations') {
+                document.getElementById('reservationsSection').classList.remove('d-none');
+                document.getElementById('ordersSection').classList.add('d-none');
+            } else {
+                document.getElementById('reservationsSection').classList.add('d-none');
+                document.getElementById('ordersSection').classList.remove('d-none');
+            }
+        }
+
+        // 3. LOAD RESERVATIONS (Real-time)
+        function loadMyReservations() {
+            onValue(ref(db, 'reservations'), (snapshot) => {
+                const container = document.getElementById('reservationsList');
+                container.innerHTML = '';
+                let hasData = false;
+
+                if (snapshot.exists()) {
+                    let myRes = [];
+                    snapshot.forEach(child => {
+                        let data = child.val();
+                        // Filter to only show THIS customer's reservations
+                        if (data.name === currentUserName) {
+                            myRes.push({ id: child.key, ...data });
+                        }
+                    });
+
+                    // Sort newest first
+                    myRes.sort((a,b) => new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time));
+
+                    myRes.forEach(r => {
+                        hasData = true;
+                        
+                        // Status Badge Logic
+                        let badge = "";
+                        if (r.status === "pending") badge = `<span class="status-badge bg-warning text-dark"><i class="fa-solid fa-clock"></i> Pending Review</span>`;
+                        else if (r.status === "approved") badge = `<span class="status-badge bg-success text-white"><i class="fa-solid fa-check"></i> Approved</span>`;
+                        else if (r.status === "seated") badge = `<span class="status-badge bg-dark text-white"><i class="fa-solid fa-chair"></i> Currently Seated</span>`;
+                        else if (r.status === "completed") badge = `<span class="status-badge bg-secondary text-white">Completed</span>`;
+                        else badge = `<span class="status-badge bg-danger text-white">Cancelled</span>`;
+
+                        container.innerHTML += `
+                            <div class="item-card">
+                                <div class="item-header">
+                                    <span class="fw-bold text-muted small">Ref: #${r.id.substring(1, 6).toUpperCase()}</span>
+                                    ${badge}
+                                </div>
+                                <h5 class="fw-bold mb-1">${r.date}</h5>
+                                <p class="text-muted mb-2"><i class="fa-regular fa-clock"></i> ${r.time} &nbsp; | &nbsp; <i class="fa-solid fa-users"></i> ${r.pax} People</p>
+                                <small class="text-dark bg-light px-2 py-1 rounded"><b>Table:</b> ${r.tableSize}</small>
+                            </div>
+                        `;
+                    });
+                }
+
+                if (!hasData) {
+                    container.innerHTML = `<div class="text-center text-muted py-5"><i class="fa-solid fa-calendar-xmark fa-3x mb-3 opacity-25"></i><p>You have no reservations yet.</p></div>`;
+                }
+            });
+        }
+
+        // 4. LOAD ONLINE ORDERS (Real-time)
+        function loadMyOrders() {
+            onValue(ref(db, 'orders'), (snapshot) => {
+                const container = document.getElementById('ordersList');
+                container.innerHTML = '';
+                let hasData = false;
+
+                if (snapshot.exists()) {
+                    let myOrders = [];
+                    snapshot.forEach(child => {
+                        let data = child.val();
+                        // Filter to only show THIS customer's orders
+                        if (data.customerName === currentUserName) {
+                            myOrders.push({ id: child.key, ...data });
+                        }
+                    });
+
+                    // Sort newest first
+                    myOrders.sort((a,b) => b.timestamp - a.timestamp);
+
+                    myOrders.forEach(o => {
+                        hasData = true;
+                        
+                        // Status Badge Logic
+                        let badge = "";
+                        if (o.status === "pending") badge = `<span class="status-badge bg-warning text-dark"><i class="fa-solid fa-clock"></i> Pending Payment</span>`;
+                        else if (o.status === "approved") badge = `<span class="status-badge bg-primary text-white"><i class="fa-solid fa-thumbs-up"></i> Confirmed</span>`;
+                        else if (o.status === "preparing") badge = `<span class="status-badge bg-info text-dark"><i class="fa-solid fa-fire-burner"></i> Kitchen is Preparing</span>`;
+                        else if (o.status === "done") badge = `<span class="status-badge bg-success text-white"><i class="fa-solid fa-bag-shopping"></i> Ready for Pickup!</span>`;
+                        else badge = `<span class="status-badge bg-danger text-white">Rejected</span>`;
+
+                        container.innerHTML += `
+                            <div class="item-card">
+                                <div class="item-header">
+                                    <span class="fw-bold text-muted small">Order: #${o.id.substring(1, 6).toUpperCase()}</span>
+                                    ${badge}
+                                </div>
+                                <h6 class="fw-bold text-success mb-2">Total: ₱${parseFloat(o.total).toFixed(2)}</h6>
+                                <p class="small mb-2 bg-light p-2 rounded"><b>Items:</b> ${o.items}</p>
+                                <small class="text-muted"><i class="fa-solid fa-person-walking"></i> Pickup Time: <b>${o.pickupTime}</b></small>
+                            </div>
+                        `;
+                    });
+                }
+
+                if (!hasData) {
+                    container.innerHTML = `<div class="text-center text-muted py-5"><i class="fa-solid fa-bag-shopping fa-3x mb-3 opacity-25"></i><p>You have no online orders yet.</p></div>`;
+                }
+            });
+        }
+
+        // 5. LOGOUT
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = "login.html";
+            });
+        });
+    </script>
+</body>
+</html>

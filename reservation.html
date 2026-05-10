@@ -184,7 +184,7 @@
 
     <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
     <script type="module">
-        import { auth, db, ref, get, push, onAuthStateChanged } from "./js/firebase-config.js";
+        import { auth, db, ref, get, push, set, onAuthStateChanged } from "./js/firebase-config.js";
 
         let currentUserName = "Unknown Customer";
         
@@ -249,8 +249,12 @@
             const receiptData = document.getElementById('receiptBase64').value;
             
             try {
-                // A. PUSH TO RESERVATIONS TABLE
-                await push(ref(db, 'reservations'), {
+                // 1. GENERATE RESERVATION ID FIRST (Don't save it yet, just create the 'folder')
+                const newResRef = push(ref(db, 'reservations'));
+                const resId = newResRef.key; // We capture the unique ID!
+
+                // 2. SAVE THE RESERVATION (Using the exact ID we just made)
+                await set(newResRef, {
                     name: currentUserName,
                     date: document.getElementById('resDate').value,
                     time: document.getElementById('resTime').value,
@@ -258,20 +262,21 @@
                     tableSize: document.getElementById('resTableSize').value,
                     notes: document.getElementById('resNotes').value,
                     type: 'online',
-                    status: 'pending' // Admin must approve it
+                    status: 'pending' // It is pending, so the Admin Reservation page will hide it
                 });
 
-                // B. PUSH TO PAYMENTS TABLE
+                // 3. SAVE THE PAYMENT (And attach the Reservation ID as a secret link!)
                 await push(ref(db, 'payments'), {
                     customerName: currentUserName,
                     amount: "500",
                     category: "Online Reservation",
                     timestamp: Date.now(),
-                    status: "pending", // Admin must verify it
-                    receiptUrl: receiptData // The converted Base64 image
+                    status: "pending", 
+                    receiptUrl: receiptData,
+                    reservationId: resId // <--- THIS IS THE BRIDGE!
                 });
 
-                alert("Reservation submitted successfully! Please wait for Admin approval.");
+                alert("Reservation submitted successfully! Please wait for Admin payment verification.");
                 window.location.href = "index.html";
 
             } catch (error) {

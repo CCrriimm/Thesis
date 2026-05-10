@@ -115,6 +115,9 @@
           >
         </li>
         <li>
+          <a href="kitchen.html"><i class="fa-solid fa-fire-burner"></i> Kitchen</a>
+        </li>
+        <li>
           <a href="admin-users.html"
             ><i class="fa-solid fa-user-shield"></i> Admins</a
           >
@@ -409,10 +412,14 @@
         let day = today.getDate();
 
         // Add a zero in front if the month or day is a single digit (like '03' instead of '3')
-        if (month < 10) { month = '0' + month; }
-        if (day < 10) { day = '0' + day; }
+        if (month < 10) {
+          month = "0" + month;
+        }
+        if (day < 10) {
+          day = "0" + day;
+        }
 
-        let formattedDate = year + '-' + month + '-' + day;
+        let formattedDate = year + "-" + month + "-" + day;
         document.getElementById("wiDate").value = formattedDate;
 
         // format the time (HH:MM)
@@ -420,10 +427,14 @@
         let minutes = today.getMinutes();
 
         // Add a zero if the hour or minute is a single digit
-        if (hours < 10) { hours = '0' + hours; }
-        if (minutes < 10) { minutes = '0' + minutes; }
+        if (hours < 10) {
+          hours = "0" + hours;
+        }
+        if (minutes < 10) {
+          minutes = "0" + minutes;
+        }
 
-        let formattedTime = hours + ':' + minutes;
+        let formattedTime = hours + ":" + minutes;
         document.getElementById("wiTime").value = formattedTime;
 
         // Reset the table size dropdown to default and unhide all options
@@ -434,8 +445,8 @@
         // Unhide all options in the dropdown using a simple loop
         let select = document.getElementById("wiTableSize");
         for (let i = 0; i < select.options.length; i++) {
-            select.options[i].disabled = false;
-            select.options[i].hidden = false;
+          select.options[i].disabled = false;
+          select.options[i].hidden = false;
         }
       };
 
@@ -485,12 +496,17 @@
         tbody.innerHTML = "";
 
         let filtered = allRes.filter((r) => {
-          if (currentView === "upcoming")
+          if (currentView === "upcoming") {
+            // --- NEW RULE: Hide Online Reservations if they are still pending payment! ---
+            if (r.type === "online" && r.status === "pending") {
+              return false; // Skip this one, do not show it!
+            }
             return (
               r.status === "pending" ||
               r.status === "approved" ||
               r.status === "seated"
             );
+          }
           return r.status === "completed" || r.status === "cancelled";
         });
 
@@ -512,7 +528,6 @@
             typeBadge = '<span class="badge bg-primary">Online</span>';
           }
 
-
           let statBadge = "";
           if (r.status === "pending")
             statBadge =
@@ -529,9 +544,11 @@
           if (currentView === "upcoming") {
             if (r.status === "pending") {
               actions = `<button onclick="updateStatus('${r.id}', 'approved')" class="btn btn-sm btn-success w-100 mb-1 fw-bold">Approve</button>
-                            <button onclick="updateStatus('${r.id}', 'cancelled')" class="btn btn-sm btn-outline-danger w-100">Cancel</button>`;
+                         <button onclick="updateStatus('${r.id}', 'cancelled')" class="btn btn-sm btn-outline-danger w-100">Cancel</button>`;
             } else if (r.status === "approved") {
-              actions = `<button onclick="updateStatus('${r.id}', 'seated')" class="btn btn-sm bg-success w-100 fw-bold text-white">Check In</button>`;
+              // --- ADDED THE CANCEL BUTTON HERE ---
+              actions = `<button onclick="updateStatus('${r.id}', 'seated')" class="btn btn-sm bg-success w-100 fw-bold text-white mb-1">Check In</button>
+                         <button onclick="updateStatus('${r.id}', 'cancelled')" class="btn btn-sm btn-outline-danger w-100">Cancel</button>`;
             } else if (r.status === "seated") {
               actions = `<button onclick="updateStatus('${r.id}', 'completed')" class="btn btn-sm btn-outline-dark w-100">End Session</button>`;
             }
@@ -614,39 +631,68 @@
       let selectedTable = null;
       let tableSelectionModal = null;
 
+      // DECIDES WHICH TABLE THEY ARE ALLOWED TO USE
+      function getAllowedTableSize(peopleCount) {
+        if (peopleCount <= 4) {
+          return 4; // 1-4 people get 4-pax table
+        } else if (peopleCount <= 6) {
+          return 6; // 5-6 people get 6-pax table
+        } else {
+          return 15; // 7+ people get 15-pax table
+        }
+      }
+
       // Define table layouts for each floor
       const floorLayouts = {
         1: [
-          { id: 1, x: 80, y: 80, seats: 6, color: "#FF6B6B" },
-          { id: 2, x: 76, y: 428, seats: 4, color: "#4ECDC4" },
-          { id: 3, x: 480, y: 369, seats: 4, color: "#45B7D1" },
-          { id: 4, x: 75, y: 337, seats: 6, color: "#FF6B6B" },
-          { id: 5, x: 280, y: 280, seats: 4, color: "#4ECDC4" },
-          { id: 6, x: 480, y: 100, seats: 15, color: "#45B7D1" },
+          { id: 1, x: 72, y: 244, seats: 6, color: "#FF6B6B" },
+          { id: 2, x: 74, y: 430, seats: 4, color: "#4ECDC4" },
+          { id: 3, x: 461, y: 423, seats: 4, color: "#4ECDC4" },
+          { id: 4, x: 72, y: 337, seats: 6, color: "#FF6B6B" },
+          { id: 5, x: 461, y: 350, seats: 4, color: "#4ECDC4" },
+          { id: 6, x: 460, y: 122, seats: 15, color: "#45B7D1" },
         ],
         2: [
-          { id: 7, x: 80, y: 80, seats: 6, color: "#FF6B6B" },
-          { id: 8, x: 280, y: 80, seats: 4, color: "#4ECDC4" },
-          { id: 9, x: 300, y: 80, seats: 15, color: "#45B7D1" },
-          { id: 10, x: 80, y: 280, seats: 6, color: "#FF6B6B" },
-          { id: 11, x: 280, y: 280, seats: 4, color: "#4ECDC4" },
-          { id: 12, x: 480, y: 280, seats: 4, color: "#45B7D1" },
+          { id: 7, x: 52, y: 342, seats: 6, color: "#FF6B6B" },
+          { id: 8, x: 279, y: 95, seats: 4, color: "#4ECDC4" },
+          { id: 9, x: 54, y: 45, seats: 15, color: "#45B7D1" },
+          { id: 10, x: 279, y: 215, seats: 4, color: "#FF6B6B" },
+          { id: 11, x: 463, y: 40, seats: 4, color: "#4ECDC4" },
+          { id: 12, x: 463, y: 149, seats: 4, color: "#45B7D1" },
+          { id: 13, x: 463, y: 257, seats: 4, color: "#FF6B6B" },
         ],
       };
 
       // Table dimensions
       const tableSize = {
         6: { width: 100, height: 80 },
-        4: { width: 90, height: 70 },
-        15: { width: 90, height: 200 },
+        4: { width: 95, height: 55 },
+        15: { width: 96, height: 215 },
       };
+
+      const selectedTableImages = {
+        6: new Image(),
+        4: new Image(),
+        15: new Image(),
+      };
+
+      selectedTableImages[6].src = "Media/6packs.png";
+      selectedTableImages[4].src = "Media/4packs.png";
+      selectedTableImages[15].src = "Media/15packs.png";
 
       // Background image for canvas
       const backgroundImage = new Image();
-      backgroundImage.src = "Media/1st_Floor2.png"; // ← Change this to your image path
+      backgroundImage.src = "Media/1st_Floor2.png";
       backgroundImage.onload = function () {
         // Image loaded successfully
         console.log("Background image loaded");
+      };
+
+      const backgroundImage2 = new Image();
+      backgroundImage2.src = "Media/2nd_Floor2.png";
+      backgroundImage2.onload = function () {
+        // Image loaded successfully
+        console.log("2nd floor background image loaded");
       };
 
       function setCanvasSize() {
@@ -660,9 +706,12 @@
         // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        // Select the correct background image based on floor
+        const bgImage = floorNum === 1 ? backgroundImage : backgroundImage2;
+
         // Draw background image (if loaded)
-        if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
-          ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+        if (bgImage.complete && bgImage.naturalWidth > 0) {
+          ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
         } else {
           // Fallback background color if image not loaded
           ctx.fillStyle = "#f9f9f9";
@@ -686,46 +735,61 @@
       }
 
       function drawTable(table) {
+        let currentPax = parseInt(document.getElementById("wiPax").value);
+        if (isNaN(currentPax)) {
+          currentPax = 1;
+        }
+        let allowedSize = getAllowedTableSize(currentPax);
+
+        if (table.seats !== allowedSize) {
+          return;
+        }
+
         const size = tableSize[table.seats];
         const { width, height } = size;
 
         // Determine if table is selected
         const isSelected = selectedTable?.id === table.id;
-        
-        let bgColor = "";
+
+        let imageDrawn = false;
         if (isSelected) {
-          bgColor = "#9edfba";
-        } else {
-          bgColor = table.color;
+          const img = selectedTableImages[table.seats];
+          if (img && img.complete && img.naturalWidth > 0) {
+            ctx.drawImage(img, table.x, table.y, width, height);
+            imageDrawn = true;
+          } else {
+            // Fallback if image is not loaded: draw a solid box
+            ctx.fillStyle = "#9edfba";
+            ctx.fillRect(table.x, table.y, width, height);
+            imageDrawn = true;
+          }
         }
 
-        let borderColor = "";
-        if (isSelected) {
-          borderColor = "#f57d10ff";
-        } else {
-          borderColor = "#999";
-        }
+        if (!imageDrawn) {
+          const hex = table.color.replace("#", "");
+          const r = parseInt(hex.substring(0, 2), 16);
+          const g = parseInt(hex.substring(2, 4), 16);
+          const b = parseInt(hex.substring(4, 6), 16);
+          const bgColor = `rgba(${r}, ${g}, ${b}, 0.0)`;
 
-        let borderWidth = 0;
-        if (isSelected) {
-          borderWidth = 3;
+          ctx.fillStyle = bgColor;
+          ctx.strokeStyle = "#999";
+          ctx.lineWidth = 2;
+          ctx.fillRect(table.x, table.y, width, height);
+          ctx.strokeRect(table.x, table.y, width, height);
         } else {
-          borderWidth = 2;
+          // Draw orange border on top of the selected image
+          ctx.strokeStyle = "#f57d10ff";
+          ctx.lineWidth = 3;
+          ctx.strokeRect(table.x, table.y, width, height);
         }
-
-        // Draw table background
-        ctx.fillStyle = bgColor;
-        ctx.strokeStyle = borderColor;
-        ctx.lineWidth = borderWidth;
-        ctx.fillRect(table.x, table.y, width, height);
-        ctx.strokeRect(table.x, table.y, width, height);
 
         // Draw table info text
         let textColor = "";
         if (isSelected) {
-          textColor = "#333";
+          textColor = "#FFFFFF";
         } else {
-          textColor = "#fff";
+          textColor = "#333";
         }
 
         ctx.fillStyle = textColor;
@@ -758,17 +822,32 @@
         const clickX = e.clientX - rect.left;
         const clickY = e.clientY - rect.top;
 
-        const currentFloor = document.querySelector(
-          'input[name="floorSelect"]:checked',
-        ).value;
+        const currentFloor = parseInt(
+          document.querySelector('input[name="floorSelect"]:checked').value,
+        );
         const tables = floorLayouts[currentFloor];
+        let currentPax = parseInt(document.getElementById("wiPax").value);
+        if (isNaN(currentPax)) {
+          currentPax = 1;
+        }
+        let allowedSize = getAllowedTableSize(currentPax);
 
         tables.forEach((table) => {
           if (isPointInTable(clickX, clickY, table)) {
-            selectedTable = table;
-            drawFloor(currentFloor);
-            updateTableInfo(table, currentFloor);
-            document.getElementById("confirmTableBtn").disabled = false;
+            // NEW LOGIC: Only allow selection if the size is correct
+            if (table.seats === allowedSize) {
+              selectedTable = table;
+              drawFloor(currentFloor);
+              updateTableInfo(table, currentFloor);
+              document.getElementById("confirmTableBtn").disabled = false;
+            } else {
+              // Show an error if they try to click the invisible area of a wrong table
+              const info = document.getElementById("selectedTableInfo");
+              info.innerHTML =
+                '<div class="alert alert-warning m-0 p-2 fw-bold">Wrong Size! Please select a ' +
+                allowedSize +
+                "-seater table.</div>";
+            }
           }
         });
       });
@@ -790,7 +869,8 @@
           radio.addEventListener("change", (e) => {
             selectedTable = null;
             document.getElementById("confirmTableBtn").disabled = true;
-            drawFloor(e.target.value);
+            const floor = parseInt(e.target.value); // Convert to number
+            drawFloor(floor);
             document.getElementById("selectedTableInfo").innerHTML =
               '<small class="text-muted">Click on a table to select</small>';
           });
@@ -811,7 +891,7 @@
             } else {
               floorText = "2nd Floor";
             }
-            
+
             document.getElementById("wiTableSize").value =
               `Table ${selectedTable.id}, ${floorText}, ${selectedTable.seats} Seater`;
 
@@ -833,14 +913,16 @@
       tableModalElement.addEventListener("shown.bs.modal", () => {
         selectedTable = null;
         document.getElementById("confirmTableBtn").disabled = true;
-        
+
         // No timeout needed anymore!
         setCanvasSize();
-        
+
         // Checks which floor is currently selected before drawing
-        const floor = document.querySelector('input[name="floorSelect"]:checked').value;
+        const floor = parseInt(
+          document.querySelector('input[name="floorSelect"]:checked').value,
+        );
         drawFloor(floor);
-        
+
         document.getElementById("selectedTableInfo").innerHTML =
           '<small class="text-muted">Click on a table to select</small>';
       });

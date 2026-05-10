@@ -110,6 +110,9 @@
           >
         </li>
         <li>
+          <a href="kitchen.html"><i class="fa-solid fa-fire-burner"></i> Kitchen</a>
+        </li>
+        <li>
           <a href="admin-users.html"
             ><i class="fa-solid fa-user-shield"></i> Admins</a
           >
@@ -240,6 +243,7 @@
         document.getElementById("receiptModal"),
       );
       let currentPaymentId = null;
+      let currentResId = null;
       let allPayments = [];
       let currentView = "pending"; // tracks which tab we are on
 
@@ -322,7 +326,7 @@
 
           let actionBtn = "";
           if (p.status === "pending") {
-            actionBtn = `<button onclick="viewReceipt('${p.id}', '${p.receiptUrl}', '${p.amount}', '${p.customerName}', false)" class="btn btn-sm btn-orange"><i class="fa-solid fa-eye"></i> Verify</button>`;
+            actionBtn = `<button onclick="viewReceipt('${p.id}', '${p.receiptUrl}', '${p.amount}', '${p.customerName}', false, '${p.reservationId || ""}')" class="btn btn-sm btn-orange"><i class="fa-solid fa-eye"></i> Verify</button>`;
           } else {
             actionBtn = `<button onclick="viewReceipt('${p.id}', '${p.receiptUrl}', '${p.amount}', '${p.customerName}', true)" class="btn btn-sm btn-secondary"><i class="fa-solid fa-file-invoice"></i> View</button>`;
           }
@@ -357,8 +361,10 @@
         amount,
         customerName,
         isHistory,
+        resId,
       ) {
         currentPaymentId = id;
+        currentResId = resId;
         document.getElementById("modalCustomerName").innerText =
           "Name: " + customerName;
         document.getElementById("modalReceiptImg").src = imgUrl;
@@ -376,18 +382,34 @@
       document
         .getElementById("approveBtn")
         .addEventListener("click", async () => {
+          // 1. Approve the Payment
           await update(ref(db, "payments/" + currentPaymentId), {
             status: "approved",
           });
+
+          // 2. Auto-Approve the linked Reservation!
+          if (currentResId && currentResId !== "") {
+            await update(ref(db, "reservations/" + currentResId), {
+              status: "approved",
+            });
+          }
           receiptModal.hide();
         });
 
       document
         .getElementById("rejectBtn")
         .addEventListener("click", async () => {
+          // 1. Reject the Payment
           await update(ref(db, "payments/" + currentPaymentId), {
             status: "rejected",
           });
+
+          // 2. Auto-Cancel the linked Reservation!
+          if (currentResId && currentResId !== "") {
+            await update(ref(db, "reservations/" + currentResId), {
+              status: "cancelled",
+            });
+          }
           receiptModal.hide();
         }); //----------- End of Modal
 

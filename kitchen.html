@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Kitchen Dashboard</title>
+    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <style>
+      :root {
+        --toms-orange: #f57d10ff;
+        --sidebar-width: 250px;
+      }
+      body {
+        background-color: #f8f9fa;
+        overflow-x: hidden;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      
+      /* --- ADMIN SIDEBAR STYLES --- */
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: fixed;
+        background: #212529;
+        color: white;
+        z-index: 999;
+      }
+      .sidebar-header {
+        padding: 20px;
+        background: var(--toms-orange);
+      }
+      .sidebar-menu {
+        padding: 20px 0;
+        list-style: none;
+        margin: 0;
+      }
+      .sidebar-menu li a {
+        display: block;
+        padding: 15px 25px;
+        color: #adb5bd;
+        text-decoration: none;
+        border-left: 4px solid transparent;
+      }
+      .sidebar-menu li a:hover,
+      .sidebar-menu li a.active {
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+        border-left-color: var(--toms-orange);
+      }
+      .sidebar-menu i {
+        margin-right: 10px;
+        width: 20px;
+        text-align: center;
+      }
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 30px;
+        min-height: 100vh;
+      }
+
+      /* --- KITCHEN TICKET STYLES --- */
+      .ticket {
+        background-color: #000000e0;
+        border: 1px solid #333;
+        border-top: 5px solid var(--toms-orange);
+        border-radius: 8px;
+        padding: 15px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .ticket.reservation { border-top-color: #4caf50; } 
+      .ticket.online { border-top-color: #2196f3; } 
+      .ticket.refill { border-top-color: #ff9800; } /* Added Refill Color */
+      
+      .ticket-header { display: flex; justify-content: space-between; border-bottom: 1px dashed #444; padding-bottom: 10px; margin-bottom: 10px; }
+      .ticket-time { font-size: 1.5rem; font-weight: bold; color: #fff; }
+      .ticket-items { flex-grow: 1; font-size: 1.2rem; font-family: monospace; white-space: pre-wrap; color: #ccc; }
+      .ticket-customer { color: #ccc; font-size: 1.1rem; margin-top: 5px; }
+      
+      .btn-done { background-color: var(--toms-orange); color: white; border: none; font-weight: bold; padding: 10px; font-size: 1.1rem; margin-top: 15px; border-radius: 5px; }
+      .btn-done:hover { background-color: #d1660a; color: white; }
+    </style>
+  </head>
+  <body>
+    <!-- ADMIN SIDEBAR -->
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h4 class="mb-0 fw-bold">Tom's Admin</h4>
+      </div>
+      <ul class="sidebar-menu">
+        <li>
+          <a href="admin.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        </li>
+        <li>
+          <a href="admin-payments.html"><i class="fa-solid fa-money-bill-wave"></i> Payments</a>
+        </li>
+        <li>
+          <a href="admin-tables.html"><i class="fa-solid fa-chair"></i> Tables</a>
+        </li>
+        <li>
+          <a href="admin-reservations.html"><i class="fa-solid fa-calendar-check"></i> Reservations</a>
+        </li>
+        <li>
+          <a href="kitchen.html" class="active"><i class="fa-solid fa-fire-burner"></i> Kitchen</a>
+        </li>
+        <li>
+          <a href="admin-users.html"><i class="fa-solid fa-user-shield"></i> Admins</a>
+        </li>
+        <li class="mt-5">
+          <a href="#" id="adminLogoutBtn" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- MAIN KITCHEN CONTENT -->
+    <div class="main-content">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold"><i class="fa-solid fa-fire-burner" style="color: var(--toms-orange);"></i> Chef Dashboard</h2>
+        <span class="fs-4 fw-bold text-muted" id="liveClock" style="letter-spacing: 2px;">00:00:00</span>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-12 d-flex gap-3">
+            <span class="badge px-3 py-2" style="background-color: #ff9800; font-size: 0.9rem;"><i class="fa-solid fa-rotate"></i> Table Refill</span>
+            <span class="badge px-3 py-2" style="background-color: #2196f3; font-size: 0.9rem;"><i class="fa-solid fa-bag-shopping"></i> Online Pickup</span>
+            <span class="badge px-3 py-2" style="background-color: #4caf50; font-size: 0.9rem;"><i class="fa-solid fa-calendar-check"></i> Reservation (Advance)</span>
+        </div>
+      </div>
+
+      <div class="row g-4" id="ticketsContainer">
+        <!-- Tickets will be injected here -->
+        <div class="col-12 text-center mt-5 text-muted">
+            <i class="fa-solid fa-spinner fa-spin fa-3x mb-3"></i>
+            <h4>Loading active orders...</h4>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { auth, db, ref, get, onValue, update, onAuthStateChanged, signOut } from "./js/firebase-config.js";
+
+      // SECURITY: Ensure user is admin
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = "login.html";
+          return;
+        }
+        const snap = await get(ref(db, "users/" + user.uid));
+        if (!snap.exists() || snap.val().role !== "admin") {
+          window.location.href = "login.html";
+        }
+      });
+
+      // LIVE CLOCK LOGIC
+      setInterval(() => {
+          document.getElementById('liveClock').innerText = new Date().toLocaleTimeString();
+      }, 1000);
+
+      // DATA STORAGE
+      let activeOrders = [];
+      let activeReservations = [];
+      let activeRefills = [];
+
+      // 1. LISTEN TO ONLINE ORDERS
+      onValue(ref(db, "orders"), (snapshot) => {
+          activeOrders = [];
+          if (snapshot.exists()) {
+              snapshot.forEach((child) => {
+                  let data = child.val();
+                  if (data.status === "preparing") {
+                      activeOrders.push({ id: child.key, type: 'online', ...data });
+                  }
+              });
+          }
+          renderKitchen();
+      });
+
+      // 2. LISTEN TO RESERVATIONS (For Advance Orders)
+      onValue(ref(db, "reservations"), (snapshot) => {
+          activeReservations = [];
+          if (snapshot.exists()) {
+              snapshot.forEach((child) => {
+                  let data = child.val();
+                  if ((data.status === "approved" || data.status === "seated") && 
+                      data.notes && data.notes.trim() !== "" && 
+                      data.foodStatus !== "served") {
+                      activeReservations.push({ id: child.key, type: 'reservation', ...data });
+                  }
+              });
+          }
+          renderKitchen();
+      });
+
+      // 3. LISTEN TO REFILLS
+      onValue(ref(db, "refills"), (snapshot) => {
+          activeRefills = [];
+          if (snapshot.exists()) {
+              snapshot.forEach((child) => {
+                  let data = child.val();
+                  // Show if it's preparing OR currently being served by the waiter
+                  if (data.status === "preparing" || data.status === "serving") {
+                      activeRefills.push({ id: child.key, type: 'refill', ...data });
+                  }
+              });
+          }
+          renderKitchen();
+      });
+
+      // TIME CHECKER: Is it within 60 minutes?
+      function isWithinOneHour(dateStr, timeStr) {
+          let now = new Date();
+          let resTime = new Date(dateStr + "T" + timeStr);
+          let diffInMinutes = (resTime - now) / (1000 * 60);
+          if (diffInMinutes <= 60 && diffInMinutes >= -120) {
+              return true;
+          }
+          return false;
+      }
+
+      // RENDER THE TICKETS
+      function renderKitchen() {
+          const container = document.getElementById("ticketsContainer");
+          container.innerHTML = "";
+          let ticketsToDisplay = [];
+
+          for (let i = 0; i < activeOrders.length; i++) { ticketsToDisplay.push(activeOrders[i]); }
+          for (let i = 0; i < activeRefills.length; i++) { ticketsToDisplay.push(activeRefills[i]); }
+          for (let i = 0; i < activeReservations.length; i++) {
+              let res = activeReservations[i];
+              if (isWithinOneHour(res.date, res.time)) {
+                  ticketsToDisplay.push(res);
+              }
+          }
+
+          // Sort tickets: Refills always jump to the front of the line. Everything else sorted by time.
+          ticketsToDisplay.sort((a, b) => {
+              if (a.type === 'refill' && b.type !== 'refill') return -1;
+              if (a.type !== 'refill' && b.type === 'refill') return 1;
+              
+              if (a.type === 'refill' && b.type === 'refill') {
+                  return a.timestamp - b.timestamp; // Oldest refill first
+              }
+
+              let timeA = a.type === 'online' ? a.pickupTime : a.time;
+              let timeB = b.type === 'online' ? b.pickupTime : b.time;
+              return timeA.localeCompare(timeB);
+          });
+
+          if (ticketsToDisplay.length === 0) {
+              container.innerHTML = '<div class="col-12 text-center mt-5 text-muted"><i class="fa-solid fa-mug-hot fa-3x mb-3 opacity-50"></i><h4>No active orders. Kitchen is clear!</h4></div>';
+              return;
+          }
+
+          // Generate HTML for each ticket
+          for (let i = 0; i < ticketsToDisplay.length; i++) {
+              let ticket = ticketsToDisplay[i];
+              let html = "";
+
+              if (ticket.type === "refill") {
+                  let actionBtn = ticket.status === "preparing" 
+                    ? `<button onclick="updateRefill('${ticket.id}', 'serving')" class="btn-done w-100" >Serve to Table</button>`
+                    : `<button onclick="updateRefill('${ticket.id}', 'served')" class="btn-done w-100 bg-success">Done (Served)</button>`;
+                  
+                  html = `
+                    <div class="col-md-4 col-lg-3">
+                        <div class="ticket refill shadow-lg">
+                            <div class="ticket-header">
+                                <div>
+                                    <span class="badge mb-1" style="background-color: #ff9800; color: #000;">Table Refill</span><br>
+                                    <small class="fw-bold ticket-customer">Table ${ticket.tableNum}</small>
+                                </div>
+                                <div class="ticket-time" style="color: #ff9800;">${new Date(ticket.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                            </div>
+                            <div class="ticket-items">${ticket.items.replace(/, /g, '<br>')}</div>
+                            ${actionBtn}
+                        </div>
+                    </div>
+                  `;
+              } else if (ticket.type === "online") {
+                  html = `
+                    <div class="col-md-4 col-lg-3">
+                        <div class="ticket online shadow-lg">
+                            <div class="ticket-header">
+                                <div>
+                                    <span class="badge bg-primary mb-1">Pickup</span><br>
+                                    <small class="fw-bold ticket-customer">${ticket.customerName}</small>
+                                </div>
+                                <div class="ticket-time text-primary">${ticket.pickupTime}</div>
+                            </div>
+                            <div class="ticket-items">${ticket.items.replace(/, /g, '<br>')}</div>
+                            <button onclick="markOnlineDone('${ticket.id}')" class="btn-done w-100">Ready for Pickup</button>
+                        </div>
+                    </div>
+                  `;
+              } else {
+                  html = `
+                    <div class="col-md-4 col-lg-3">
+                        <div class="ticket reservation shadow-lg">
+                            <div class="ticket-header">
+                                <div>
+                                    <span class="badge bg-success mb-1">Advance Order</span><br>
+                                    <small class="ticket-customer fw-bold">${ticket.name} - ${ticket.tableSize.split(',')[0]}</small>
+                                </div>
+                                <div class="ticket-time text-success">${ticket.time}</div>
+                            </div>
+                            <div class="ticket-items">${ticket.notes}</div>
+                            <button onclick="markReservationServed('${ticket.id}')" class="btn-done w-100">Mark as Served</button>
+                        </div>
+                    </div>
+                  `;
+              }
+              container.innerHTML += html;
+          }
+      }
+
+      setInterval(renderKitchen, 30000);
+
+      // BUTTON ACTIONS
+      window.updateRefill = async function(id, status) {
+          await update(ref(db, "refills/" + id), { status: status });
+      };
+
+      window.markOnlineDone = async function(id) {
+          if (confirm("Mark this online order as ready for pickup?")) {
+              await update(ref(db, "orders/" + id), { status: "done" });
+          }
+      };
+
+      window.markReservationServed = async function(id) {
+          if (confirm("Mark this advance order as served to the table?")) {
+              await update(ref(db, "reservations/" + id), { foodStatus: "served" });
+          }
+      };
+
+      // Logout
+      document.getElementById("adminLogoutBtn").addEventListener("click", () => {
+        signOut(auth).then(() => { window.location.href = "login.html"; });
+      });
+    </script>
+  </body>
+</html>
