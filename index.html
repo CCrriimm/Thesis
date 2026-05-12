@@ -124,7 +124,7 @@
         <div class="modal-body text-center py-4">
           <i class="fa-solid fa-user-lock fs-1 mb-3" style="color: #f57d10ff"></i>
           <p class="mb-1 fw-bold">You must be logged in to book a table.</p>
-          <small class="text-muted">Please sign in to continue with your reservation.</small>
+          <small class="text-muted">Please sign in to continue with your</small>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -147,7 +147,7 @@
             <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item"><a class="nav-link active" href="index.html">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="menu.html">Menu</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="checkMenuAuth()">Menu</a></li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="checkReservationAuth()">Reservation</a>
                     </li>
@@ -174,7 +174,7 @@
             <h1 class="display-2 fw-bold mb-3">UNLIMITED HAPPINESS</h1>
             <p class="lead mb-4 fs-4">Experience the best wings in town. Crispy, spicy, and refillable.</p>
             <div class="d-flex justify-content-center gap-3">
-                <a href="menu.html" class="btn btn-orange btn-lg px-4">View Menu</a>
+                <a onclick="checkMenuAuth()" class="btn btn-orange btn-lg px-4">View Menu</a>
                 <button onclick="checkReservationAuth()" class="btn btn-outline-light btn-lg px-4 rounded-pill fw-bold">Book a Table</button>
             </div>
         </div>
@@ -275,6 +275,15 @@
             const user = auth.currentUser;
             if (user) {
                 window.location.href = "reservation.html";
+            } else {
+                authModal.show();
+            }
+        }
+
+        window.checkMenuAuth = function() {
+            const user = auth.currentUser;
+            if (user) {
+                window.location.href = "menu.html";
             } else {
                 authModal.show();
             }
