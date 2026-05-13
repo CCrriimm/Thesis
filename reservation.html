@@ -366,10 +366,10 @@
             1: {
                 bg: "Media/1st_Floor2.png",
                 tables: [
-                    { id: 1, seats: 6, left: 12, top: 48.8, w: 16.6, h: 16 },
+                    { id: 1, seats: 6, left: 12, top: 48.3, w: 16.6, h: 17 },
                     { id: 2, seats: 4, left: 12.3, top: 86, w: 15.8, h: 11 },
                     { id: 3, seats: 4, left: 76.8, top: 84.6, w: 15.8, h: 11 },
-                    { id: 4, seats: 6, left: 12, top: 67.4, w: 16.6, h: 16 },
+                    { id: 4, seats: 6, left: 12, top: 67.2, w: 16.6, h: 17 },
                     { id: 5, seats: 4, left: 76.8, top: 70, w: 15.8, h: 11 },
                     { id: 6, seats: 15, left: 76.6, top: 24.4, w: 16, h: 43 },
                 ]
@@ -377,7 +377,7 @@
             2: {
                 bg: "Media/2nd_Floor2.png",
                 tables: [
-                    { id: 7, seats: 6, left: 8.6, top: 68.4, w: 16.6, h: 16 },
+                    { id: 7, seats: 6, left: 8.6, top: 68.2, w: 16.6, h: 17 },
                     { id: 8, seats: 4, left: 46.5, top: 19, w: 15.8, h: 11 },
                     { id: 9, seats: 15, left: 9, top: 9, w: 16, h: 43 },
                     { id: 10, seats: 4, left: 46.5, top: 43, w: 15.8, h: 11 },
@@ -409,7 +409,7 @@
                 let textShadow = "none";
                 
                 if (isSelected) {
-                    bgStyle = `background-color: transparent; background-image: url('Media/${table.seats}packs.png'); background-size: 100%; background-repeat: no-repeat; background-position: center;`;
+                    bgStyle = `background-color: transparent; background-image: url('Media/${table.seats}packs.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;`;
                     borderColor = "#28a745";
                     textColor = "#000";
                     textShadow = "1px 1px 3px #fff"; 
