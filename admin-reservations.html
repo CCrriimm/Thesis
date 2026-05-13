@@ -115,7 +115,9 @@
           >
         </li>
         <li>
-          <a href="kitchen.html"><i class="fa-solid fa-fire-burner"></i> Kitchen</a>
+          <a href="kitchen.html"
+            ><i class="fa-solid fa-fire-burner"></i> Kitchen</a
+          >
         </li>
         <li>
           <a href="admin-users.html"
@@ -323,21 +325,24 @@
               </div>
             </div>
 
-            <!-- Canvas -->
-            <div class="text-center">
-              <canvas
-                id="restaurantCanvas"
+            <div class="mt-3 mb-3">
+              <div
+                id="floorPlanContainer"
+                class="shadow-sm"
                 style="
-                  max-width: 100%;
-                  height: auto;
+                  position: relative;
+                  width: 100%;
+                  max-width: 600px;
+                  padding-bottom: 83.33%;
+                  background-size: 100% 100%;
+                  background-repeat: no-repeat;
+                  background-color: #e9ecef;
                   border: 2px solid #ddd;
                   border-radius: 10px;
-                  background: #f9f9f9;
-                  cursor: pointer;
-                  display: block;
                   margin: 0 auto;
+                  overflow: hidden;
                 "
-              ></canvas>
+              ></div>
             </div>
 
             <!-- Selected Table Info -->
@@ -625,258 +630,149 @@
           });
         });
 
-      // TABLE SELECTION CANVAS
-      const canvas = document.getElementById("restaurantCanvas");
-      const ctx = canvas.getContext("2d");
+      // =========================================================
+      // --- RESPONSIVE TABLE SELECTION (Grid Button Version) ---
+      // =========================================================
+
       let selectedTable = null;
       let tableSelectionModal = null;
 
-      // DECIDES WHICH TABLE THEY ARE ALLOWED TO USE
+      // 1. DECIDE WHICH TABLE SIZE IS ALLOWED
       function getAllowedTableSize(peopleCount) {
-        if (peopleCount <= 4) {
-          return 4; // 1-4 people get 4-pax table
-        } else if (peopleCount <= 6) {
-          return 6; // 5-6 people get 6-pax table
-        } else {
-          return 15; // 7+ people get 15-pax table
-        }
+        if (peopleCount <= 4) return 4;
+        else if (peopleCount <= 6) return 6;
+        else return 15;
       }
 
-      // Define table layouts for each floor
+      // 2. FLOOR PLAN DATA (Mapped to Percentages)
       const floorLayouts = {
-        1: [
-          { id: 1, x: 72, y: 244, seats: 6, color: "#FF6B6B" },
-          { id: 2, x: 74, y: 430, seats: 4, color: "#4ECDC4" },
-          { id: 3, x: 461, y: 423, seats: 4, color: "#4ECDC4" },
-          { id: 4, x: 72, y: 337, seats: 6, color: "#FF6B6B" },
-          { id: 5, x: 461, y: 350, seats: 4, color: "#4ECDC4" },
-          { id: 6, x: 460, y: 122, seats: 15, color: "#45B7D1" },
-        ],
-        2: [
-          { id: 7, x: 52, y: 342, seats: 6, color: "#FF6B6B" },
-          { id: 8, x: 279, y: 95, seats: 4, color: "#4ECDC4" },
-          { id: 9, x: 54, y: 45, seats: 15, color: "#45B7D1" },
-          { id: 10, x: 279, y: 215, seats: 4, color: "#FF6B6B" },
-          { id: 11, x: 463, y: 40, seats: 4, color: "#4ECDC4" },
-          { id: 12, x: 463, y: 149, seats: 4, color: "#45B7D1" },
-          { id: 13, x: 463, y: 257, seats: 4, color: "#FF6B6B" },
-        ],
+        1: {
+          bg: "Media/1st_Floor2.png",
+          tables: [
+            { id: 1, seats: 6, left: 12, top: 48.8, w: 16.6, h: 16 },
+            { id: 2, seats: 4, left: 12.3, top: 86, w: 15.8, h: 11 },
+            { id: 3, seats: 4, left: 76.8, top: 84.6, w: 15.8, h: 11 },
+            { id: 4, seats: 6, left: 12, top: 67.4, w: 16.6, h: 16 },
+            { id: 5, seats: 4, left: 76.8, top: 70, w: 15.8, h: 11 },
+            { id: 6, seats: 15, left: 76.6, top: 24.4, w: 16, h: 43 },
+          ],
+        },
+        2: {
+          bg: "Media/2nd_Floor2.png",
+          tables: [
+            { id: 7, seats: 6, left: 8.6, top: 68.4, w: 16.6, h: 16 },
+            { id: 8, seats: 4, left: 46.5, top: 19, w: 15.8, h: 11 },
+            { id: 9, seats: 15, left: 9, top: 9, w: 16, h: 43 },
+            { id: 10, seats: 4, left: 46.5, top: 43, w: 15.8, h: 11 },
+            { id: 11, seats: 4, left: 77.1, top: 8, w: 15.8, h: 11 },
+            { id: 12, seats: 4, left: 77.1, top: 29.8, w: 15.8, h: 11 },
+            { id: 13, seats: 4, left: 77.1, top: 51.4, w: 15.8, h: 11 },
+          ],
+        },
       };
 
-      // Table dimensions
-      const tableSize = {
-        6: { width: 100, height: 80 },
-        4: { width: 95, height: 55 },
-        15: { width: 96, height: 215 },
-      };
+      // 3. GENERATE THE INTERACTIVE MAP
+      function renderTableGrid(floorNum) {
+        const container = document.getElementById("floorPlanContainer");
+        const floorData = floorLayouts[floorNum];
 
-      const selectedTableImages = {
-        6: new Image(),
-        4: new Image(),
-        15: new Image(),
-      };
+        // Set the actual floor image as the background
+        container.style.backgroundImage = `url('${floorData.bg}')`;
+        container.innerHTML = "";
 
-      selectedTableImages[6].src = "Media/6packs.png";
-      selectedTableImages[4].src = "Media/4packs.png";
-      selectedTableImages[15].src = "Media/15packs.png";
+        let currentPax = parseInt(document.getElementById("wiPax").value);
+        if (isNaN(currentPax)) currentPax = 1;
+        let allowedSize = getAllowedTableSize(currentPax);
 
-      // Background image for canvas
-      const backgroundImage = new Image();
-      backgroundImage.src = "Media/1st_Floor2.png";
-      backgroundImage.onload = function () {
-        // Image loaded successfully
-        console.log("Background image loaded");
-      };
+        floorData.tables.forEach((table) => {
+          let isAllowed = table.seats === allowedSize;
+          let isSelected = selectedTable && selectedTable.id === table.id;
 
-      const backgroundImage2 = new Image();
-      backgroundImage2.src = "Media/2nd_Floor2.png";
-      backgroundImage2.onload = function () {
-        // Image loaded successfully
-        console.log("2nd floor background image loaded");
-      };
+          let bgStyle = "background-color: rgba(200, 200, 200, 0.4);";
+          let borderColor = "transparent";
+          let textColor = "#555";
+          let textShadow = "none";
 
-      function setCanvasSize() {
-        const container = canvas.parentElement;
-        const width = Math.min(container.clientWidth - 20, 600);
-        canvas.width = width;
-        canvas.height = (width / 600) * 500;
-      }
+          if (isSelected) {
+            // SELECTED: Blank background + Specific Table Image + Orange Border
+            bgStyle = `background-color: transparent; background-image: url('Media/${table.seats}packs.png'); background-size: 100%; background-repeat: no-repeat; background-position: center;`;
+            borderColor = "#28a745";
+            textColor = "#000";
+            textShadow = "1px 1px 3px #fff"; // White glow so the text is readable over the green image
+          } else if (isAllowed) {
+            // AVAILABLE: Blank background + Green Border
+            bgStyle = "background-color: transparent;";
+            borderColor = "#000"; // Bootstrap Success Green
+            textColor = "#000";
+            textShadow = "1px 1px 3px #fff"; // White glow so the text is readable over the floor plan
+          }
 
-      function drawFloor(floorNum) {
-        // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+          let opacity = isAllowed ? "1" : "0.4"; // Dims out the wrong sized tables
+          let disabledAttr = isAllowed ? "" : "disabled";
 
-        // Select the correct background image based on floor
-        const bgImage = floorNum === 1 ? backgroundImage : backgroundImage2;
-
-        // Draw background image (if loaded)
-        if (bgImage.complete && bgImage.naturalWidth > 0) {
-          ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
-        } else {
-          // Fallback background color if image not loaded
-          ctx.fillStyle = "#f9f9f9";
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
-        ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Draw title
-        ctx.fillStyle = "#333";
-        ctx.font = "bold 18px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText(`Floor ${floorNum} Layout`, canvas.width / 2, 30);
-
-        // Draw tables
-        const tables = floorLayouts[floorNum];
-        tables.forEach((table) => {
-          drawTable(table);
+          // Inject absolute positioned buttons over the background image
+          container.innerHTML += `
+            <button type="button" class="fw-bold"
+                    style="position: absolute; left: ${table.left}%; top: ${table.top}%; width: ${table.w}%; height: ${table.h}%;
+                           ${bgStyle} border: 2px solid ${borderColor}; 
+                           border-radius: 6px; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+                           opacity: ${opacity}; transition: 0.2s; text-shadow: ${textShadow}; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"
+                    onclick="selectTable(${table.id}, ${table.seats}, ${floorNum})" ${disabledAttr}>
+              <span style="font-size: clamp(0.7rem, 3vw, 1rem); line-height: 1;">T${table.id}</span>
+              <small style="font-size: clamp(0.5rem, 2vw, 0.75rem);">${table.seats}pax</small>
+            </button>
+          `;
         });
       }
 
-      function drawTable(table) {
-        let currentPax = parseInt(document.getElementById("wiPax").value);
-        if (isNaN(currentPax)) {
-          currentPax = 1;
-        }
-        let allowedSize = getAllowedTableSize(currentPax);
+      // 4. HANDLE BUTTON CLICKS
+      window.selectTable = function (id, seats, floor) {
+        selectedTable = { id: id, seats: seats };
+        renderTableGrid(floor); // Re-draw to show the orange selection color
 
-        if (table.seats !== allowedSize) {
-          return;
-        }
-
-        const size = tableSize[table.seats];
-        const { width, height } = size;
-
-        // Determine if table is selected
-        const isSelected = selectedTable?.id === table.id;
-
-        let imageDrawn = false;
-        if (isSelected) {
-          const img = selectedTableImages[table.seats];
-          if (img && img.complete && img.naturalWidth > 0) {
-            ctx.drawImage(img, table.x, table.y, width, height);
-            imageDrawn = true;
-          } else {
-            // Fallback if image is not loaded: draw a solid box
-            ctx.fillStyle = "#9edfba";
-            ctx.fillRect(table.x, table.y, width, height);
-            imageDrawn = true;
-          }
-        }
-
-        if (!imageDrawn) {
-          const hex = table.color.replace("#", "");
-          const r = parseInt(hex.substring(0, 2), 16);
-          const g = parseInt(hex.substring(2, 4), 16);
-          const b = parseInt(hex.substring(4, 6), 16);
-          const bgColor = `rgba(${r}, ${g}, ${b}, 0.0)`;
-
-          ctx.fillStyle = bgColor;
-          ctx.strokeStyle = "#999";
-          ctx.lineWidth = 2;
-          ctx.fillRect(table.x, table.y, width, height);
-          ctx.strokeRect(table.x, table.y, width, height);
-        } else {
-          // Draw orange border on top of the selected image
-          ctx.strokeStyle = "#f57d10ff";
-          ctx.lineWidth = 3;
-          ctx.strokeRect(table.x, table.y, width, height);
-        }
-
-        // Draw table info text
-        let textColor = "";
-        if (isSelected) {
-          textColor = "#FFFFFF";
-        } else {
-          textColor = "#333";
-        }
-
-        ctx.fillStyle = textColor;
-        ctx.font = "bold 13px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-
-        const centerX = table.x + width / 2;
-        const centerY = table.y + height / 2;
-
-        ctx.fillText(`Table ${table.id}`, centerX, centerY - 10);
-        ctx.font = "12px Arial";
-        ctx.fillText(`${table.seats} Seater`, centerX, centerY + 10);
-      }
-
-      function isPointInTable(x, y, table) {
-        const size = tableSize[table.seats];
-        const { width, height } = size;
-        return (
-          x >= table.x &&
-          x <= table.x + width &&
-          y >= table.y &&
-          y <= table.y + height
-        );
-      }
-
-      // Canvas click handler
-      canvas.addEventListener("click", (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
-
-        const currentFloor = parseInt(
-          document.querySelector('input[name="floorSelect"]:checked').value,
-        );
-        const tables = floorLayouts[currentFloor];
-        let currentPax = parseInt(document.getElementById("wiPax").value);
-        if (isNaN(currentPax)) {
-          currentPax = 1;
-        }
-        let allowedSize = getAllowedTableSize(currentPax);
-
-        tables.forEach((table) => {
-          if (isPointInTable(clickX, clickY, table)) {
-            // NEW LOGIC: Only allow selection if the size is correct
-            if (table.seats === allowedSize) {
-              selectedTable = table;
-              drawFloor(currentFloor);
-              updateTableInfo(table, currentFloor);
-              document.getElementById("confirmTableBtn").disabled = false;
-            } else {
-              // Show an error if they try to click the invisible area of a wrong table
-              const info = document.getElementById("selectedTableInfo");
-              info.innerHTML =
-                '<div class="alert alert-warning m-0 p-2 fw-bold">Wrong Size! Please select a ' +
-                allowedSize +
-                "-seater table.</div>";
-            }
-          }
-        });
-      });
-
-      function updateTableInfo(table, floor) {
+        // Update the text at the bottom of the modal
         const info = document.getElementById("selectedTableInfo");
         info.innerHTML = `
           <strong style="color: var(--toms-orange);">
             <i class="fa-solid fa-check-circle"></i> 
-            Table ${table.id} (${table.seats} Seater) - Floor ${floor} selected
+            Table ${id} (${seats} Seater) - Floor ${floor} selected
           </strong>
         `;
-      }
+        document.getElementById("confirmTableBtn").disabled = false;
+      };
 
-      // Floor selector change
+      // 5. AUTO-REFRESH WHEN PAX CHANGES
+      document.getElementById("wiPax").addEventListener("input", () => {
+        if (
+          document
+            .getElementById("tableSelectionModal")
+            .classList.contains("show")
+        ) {
+          const floor = parseInt(
+            document.querySelector('input[name="floorSelect"]:checked').value,
+          );
+          selectedTable = null;
+          document.getElementById("confirmTableBtn").disabled = true;
+          document.getElementById("selectedTableInfo").innerHTML =
+            '<small class="text-muted">Click on a table to select</small>';
+          renderTableGrid(floor);
+        }
+      });
+
+      // 6. FLOOR RADIO BUTTONS LOGIC
       document
         .querySelectorAll('input[name="floorSelect"]')
         .forEach((radio) => {
           radio.addEventListener("change", (e) => {
             selectedTable = null;
             document.getElementById("confirmTableBtn").disabled = true;
-            const floor = parseInt(e.target.value); // Convert to number
-            drawFloor(floor);
             document.getElementById("selectedTableInfo").innerHTML =
               '<small class="text-muted">Click on a table to select</small>';
+            renderTableGrid(parseInt(e.target.value));
           });
         });
 
-      // Confirm table selection
+      // 7. CONFIRM SELECTION BUTTON
       document
         .getElementById("confirmTableBtn")
         .addEventListener("click", () => {
@@ -884,45 +780,27 @@
             const floor = document.querySelector(
               'input[name="floorSelect"]:checked',
             ).value;
-
-            let floorText = "";
-            if (floor === "1") {
-              floorText = "1st Floor";
-            } else {
-              floorText = "2nd Floor";
-            }
-
+            let floorText = floor === "1" ? "1st Floor" : "2nd Floor";
             document.getElementById("wiTableSize").value =
               `Table ${selectedTable.id}, ${floorText}, ${selectedTable.seats} Seater`;
-
-            // Close table selection modal
-            if (tableSelectionModal) {
-              tableSelectionModal.hide();
-            }
+            if (tableSelectionModal) tableSelectionModal.hide();
           }
         });
 
-      // Initialize table selection modal
+      // 8. MODAL INITIALIZATION
       const tableModalElement = document.getElementById("tableSelectionModal");
       tableSelectionModal = new bootstrap.Modal(tableModalElement, {
         backdrop: "static",
         keyboard: false,
       });
 
-      // Use 'shown' instead of 'show' so it waits for the animation to finish!
       tableModalElement.addEventListener("shown.bs.modal", () => {
         selectedTable = null;
         document.getElementById("confirmTableBtn").disabled = true;
-
-        // No timeout needed anymore!
-        setCanvasSize();
-
-        // Checks which floor is currently selected before drawing
         const floor = parseInt(
           document.querySelector('input[name="floorSelect"]:checked').value,
         );
-        drawFloor(floor);
-
+        renderTableGrid(floor); // Draw the grid when modal opens
         document.getElementById("selectedTableInfo").innerHTML =
           '<small class="text-muted">Click on a table to select</small>';
       });
@@ -932,23 +810,11 @@
         document.getElementById("confirmTableBtn").disabled = true;
       });
 
-      // Handle table selection button click - manually show modal without Bootstrap data attributes
       document
         .getElementById("openTableSelectionBtn")
         .addEventListener("click", () => {
           tableSelectionModal.show();
         });
-
-      // Handle window resize for canvas responsiveness
-      window.addEventListener("resize", () => {
-        if (tableModalElement.classList.contains("show")) {
-          setCanvasSize();
-          const floor = document.querySelector(
-            'input[name="floorSelect"]:checked',
-          ).value;
-          drawFloor(floor);
-        }
-      });
     </script>
   </body>
 </html>
