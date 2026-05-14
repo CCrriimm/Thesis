@@ -76,7 +76,7 @@
       }
       .ticket.reservation { border-top-color: #4caf50; } 
       .ticket.online { border-top-color: #2196f3; } 
-      .ticket.refill { border-top-color: #ff9800; } /* Added Refill Color */
+      .ticket.refill { border-top-color: #ff9800; } 
       
       .ticket-header { display: flex; justify-content: space-between; border-bottom: 1px dashed #444; padding-bottom: 10px; margin-bottom: 10px; }
       .ticket-time { font-size: 1.5rem; font-weight: bold; color: #fff; }
@@ -85,10 +85,11 @@
       
       .btn-done { background-color: var(--toms-orange); color: white; border: none; font-weight: bold; padding: 10px; font-size: 1.1rem; margin-top: 15px; border-radius: 5px; }
       .btn-done:hover { background-color: #d1660a; color: white; }
+      .btn-orange { background-color: var(--toms-orange); color: white; border: none; }
+      .btn-orange:hover { background-color: #d1660a; color: white; }
     </style>
   </head>
   <body>
-    <!-- ADMIN SIDEBAR -->
     <nav class="sidebar">
       <div class="sidebar-header">
         <h4 class="mb-0 fw-bold">Tom's Admin</h4>
@@ -118,7 +119,6 @@
       </ul>
     </nav>
 
-    <!-- MAIN KITCHEN CONTENT -->
     <div class="main-content">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold"><i class="fa-solid fa-fire-burner" style="color: var(--toms-orange);"></i> Chef Dashboard</h2>
@@ -134,10 +134,27 @@
       </div>
 
       <div class="row g-4" id="ticketsContainer">
-        <!-- Tickets will be injected here -->
         <div class="col-12 text-center mt-5 text-muted">
             <i class="fa-solid fa-spinner fa-spin fa-3x mb-3"></i>
             <h4>Loading active orders...</h4>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="confirmActionModal" tabindex="-1" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title fw-bold"><i class="fa-solid fa-bell-concierge" style="color: var(--toms-orange);"></i> Confirm Action</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center py-4">
+            <p class="fs-5 fw-bold mb-0" id="confirmActionText">Are you sure?</p>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-orange fw-bold px-4" id="executeActionBtn">Confirm</button>
+          </div>
         </div>
       </div>
     </div>
@@ -203,7 +220,6 @@
           if (snapshot.exists()) {
               snapshot.forEach((child) => {
                   let data = child.val();
-                  // Show if it's preparing OR currently being served by the waiter
                   if (data.status === "preparing" || data.status === "serving") {
                       activeRefills.push({ id: child.key, type: 'refill', ...data });
                   }
@@ -238,15 +254,11 @@
               }
           }
 
-          // Sort tickets: Refills always jump to the front of the line. Everything else sorted by time.
+          // Sort tickets
           ticketsToDisplay.sort((a, b) => {
               if (a.type === 'refill' && b.type !== 'refill') return -1;
               if (a.type !== 'refill' && b.type === 'refill') return 1;
-              
-              if (a.type === 'refill' && b.type === 'refill') {
-                  return a.timestamp - b.timestamp; // Oldest refill first
-              }
-
+              if (a.type === 'refill' && b.type === 'refill') return a.timestamp - b.timestamp; 
               let timeA = a.type === 'online' ? a.pickupTime : a.time;
               let timeB = b.type === 'online' ? b.pickupTime : b.time;
               return timeA.localeCompare(timeB);
@@ -264,8 +276,8 @@
 
               if (ticket.type === "refill") {
                   let actionBtn = ticket.status === "preparing" 
-                    ? `<button onclick="updateRefill('${ticket.id}', 'serving')" class="btn-done w-100" >Serve to Table</button>`
-                    : `<button onclick="updateRefill('${ticket.id}', 'served')" class="btn-done w-100 bg-success">Done (Served)</button>`;
+                    ? `<button onclick="triggerAction('refill', '${ticket.id}', 'serving', 'Mark this refill as \\'Serving to Table\\'?')" class="btn-done w-100" style="background-color: #ff9800; color: #000;">Serve to Table</button>`
+                    : `<button onclick="triggerAction('refill', '${ticket.id}', 'served', 'Mark this refill as \\'Done\\' (Completed)?')" class="btn-done w-100 bg-success">Done (Served)</button>`;
                   
                   html = `
                     <div class="col-md-4 col-lg-3">
@@ -294,7 +306,7 @@
                                 <div class="ticket-time text-primary">${ticket.pickupTime}</div>
                             </div>
                             <div class="ticket-items">${ticket.items.replace(/, /g, '<br>')}</div>
-                            <button onclick="markOnlineDone('${ticket.id}')" class="btn-done w-100">Ready for Pickup</button>
+                            <button onclick="triggerAction('online', '${ticket.id}', null, 'Mark this online order as ready for pickup?')" class="btn-done w-100">Ready for Pickup</button>
                         </div>
                     </div>
                   `;
@@ -310,7 +322,7 @@
                                 <div class="ticket-time text-success">${ticket.time}</div>
                             </div>
                             <div class="ticket-items">${ticket.notes}</div>
-                            <button onclick="markReservationServed('${ticket.id}')" class="btn-done w-100">Mark as Served</button>
+                            <button onclick="triggerAction('reservation', '${ticket.id}', null, 'Mark this advance order as served to the table?')" class="btn-done w-100">Mark as Served</button>
                         </div>
                     </div>
                   `;
@@ -321,22 +333,50 @@
 
       setInterval(renderKitchen, 30000);
 
-      // BUTTON ACTIONS
-      window.updateRefill = async function(id, status) {
-          await update(ref(db, "refills/" + id), { status: status });
+      // ==========================================
+      // NEW: MODAL BUTTON ACTIONS
+      // ==========================================
+      let pendingAction = null; // Stores what the user clicked
+      let confirmModal = null;
+
+      // Initialize the modal
+      window.addEventListener('DOMContentLoaded', () => {
+          confirmModal = new bootstrap.Modal(document.getElementById('confirmActionModal'));
+      });
+
+      // 1. Opens the Modal and saves the action info
+      window.triggerAction = function(type, id, status, message) {
+          pendingAction = { type: type, id: id, status: status };
+          document.getElementById('confirmActionText').innerText = message;
+          confirmModal.show();
       };
 
-      window.markOnlineDone = async function(id) {
-          if (confirm("Mark this online order as ready for pickup?")) {
-              await update(ref(db, "orders/" + id), { status: "done" });
-          }
-      };
+      // 2. Executes the action when they click "Confirm" inside the modal
+      document.getElementById('executeActionBtn').addEventListener('click', async () => {
+          if (!pendingAction) return;
 
-      window.markReservationServed = async function(id) {
-          if (confirm("Mark this advance order as served to the table?")) {
-              await update(ref(db, "reservations/" + id), { foodStatus: "served" });
+          const btn = document.getElementById('executeActionBtn');
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+          btn.disabled = true;
+
+          try {
+              if (pendingAction.type === 'refill') {
+                  await update(ref(db, "refills/" + pendingAction.id), { status: pendingAction.status });
+              } else if (pendingAction.type === 'online') {
+                  await update(ref(db, "orders/" + pendingAction.id), { status: "done" });
+              } else if (pendingAction.type === 'reservation') {
+                  await update(ref(db, "reservations/" + pendingAction.id), { foodStatus: "served" });
+              }
+          } catch (error) {
+              console.error(error);
+              alert("Error updating order.");
+          } finally {
+              btn.innerHTML = 'Confirm';
+              btn.disabled = false;
+              confirmModal.hide();
+              pendingAction = null; // Reset
           }
-      };
+      });
 
       // Logout
       document.getElementById("adminLogoutBtn").addEventListener("click", () => {

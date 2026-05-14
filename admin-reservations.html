@@ -296,7 +296,6 @@
             ></button>
           </div>
           <div class="modal-body">
-            <!-- Floor Selector -->
             <div class="mb-4">
               <label class="fw-bold small mb-2">Select Floor:</label>
               <div class="btn-group w-100" role="group">
@@ -345,7 +344,6 @@
               ></div>
             </div>
 
-            <!-- Selected Table Info -->
             <div class="mt-3 p-2 bg-light rounded" id="selectedTableInfo">
               <small class="text-muted">Click on a table to select</small>
             </div>
@@ -366,6 +364,24 @@
             >
               Confirm Selection
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="confirmActionModal" tabindex="-1" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title fw-bold"><i class="fa-solid fa-triangle-exclamation" style="color: var(--toms-orange);"></i> Confirm Action</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center py-4">
+            <p class="fs-5 fw-bold mb-0" id="confirmActionText">Are you sure?</p>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-orange fw-bold px-4" id="executeActionBtn">Confirm</button>
           </div>
         </div>
       </div>
@@ -396,58 +412,40 @@
           window.location.href = "login.html";
           return;
         }
-        currentUserUid = user.uid;
+        let currentUserUid = user.uid;
         const snap = await get(ref(db, "users/" + user.uid));
         if (!snap.exists() || snap.val().role !== "admin") {
           window.location.href = "login.html";
         }
       });
 
-      // for default date and time
       window.setDefaultDateTime = function () {
-        // Clear everything in the form first
         document.getElementById("walkInForm").reset();
 
-        // Get the current date and time
         let today = new Date();
 
-        // format the date (YYYY-MM-DD)
         let year = today.getFullYear();
-        let month = today.getMonth() + 1; // month of javascript starts at 0 so we add 1
+        let month = today.getMonth() + 1; 
         let day = today.getDate();
 
-        // Add a zero in front if the month or day is a single digit (like '03' instead of '3')
-        if (month < 10) {
-          month = "0" + month;
-        }
-        if (day < 10) {
-          day = "0" + day;
-        }
+        if (month < 10) month = "0" + month;
+        if (day < 10) day = "0" + day;
 
         let formattedDate = year + "-" + month + "-" + day;
         document.getElementById("wiDate").value = formattedDate;
 
-        // format the time (HH:MM)
         let hours = today.getHours();
         let minutes = today.getMinutes();
 
-        // Add a zero if the hour or minute is a single digit
-        if (hours < 10) {
-          hours = "0" + hours;
-        }
-        if (minutes < 10) {
-          minutes = "0" + minutes;
-        }
+        if (hours < 10) hours = "0" + hours;
+        if (minutes < 10) minutes = "0" + minutes;
 
         let formattedTime = hours + ":" + minutes;
         document.getElementById("wiTime").value = formattedTime;
 
-        // Reset the table size dropdown to default and unhide all options
-        // Manually reset the values
         document.getElementById("wiPax").value = "1";
         document.getElementById("wiTableSize").value = "--, --, --";
 
-        // Unhide all options in the dropdown using a simple loop
         let select = document.getElementById("wiTableSize");
         for (let i = 0; i < select.options.length; i++) {
           select.options[i].disabled = false;
@@ -455,19 +453,17 @@
         }
       };
 
-      // 3. DYNAMIC TABLE SIZE LOGIC (Locks out tables that are too small)
       document.getElementById("wiPax").addEventListener("input", function () {
         const pax = parseInt(this.value) || 1;
         const select = document.getElementById("wiTableSize");
 
         Array.from(select.options).forEach((option) => {
-          let capacity = 10; // default for 10+
+          let capacity = 10;
           if (option.value === "2-Person") capacity = 2;
           else if (option.value === "4-Person") capacity = 4;
           else if (option.value === "6-Person") capacity = 6;
           else if (option.value === "8-Person") capacity = 8;
 
-          // If people > capacity, disable that option
           if (pax > capacity) {
             option.disabled = true;
             option.hidden = true;
@@ -477,14 +473,12 @@
           }
         });
 
-        // Auto-select the first available valid option so the user doesn't get stuck
         const firstAvailable = Array.from(select.options).find(
           (opt) => !opt.disabled,
         );
         if (firstAvailable) select.value = firstAvailable.value;
       });
 
-      // load reservations and listen for changes
       onValue(ref(db, "reservations"), (snapshot) => {
         allRes = [];
         if (snapshot.exists()) {
@@ -495,16 +489,14 @@
         renderTable();
       });
 
-      // table rendering with dynamic actions based on status and view
       function renderTable() {
         const tbody = document.getElementById("resTableBody");
         tbody.innerHTML = "";
 
         let filtered = allRes.filter((r) => {
           if (currentView === "upcoming") {
-            // --- NEW RULE: Hide Online Reservations if they are still pending payment! ---
             if (r.type === "online" && r.status === "pending") {
-              return false; // Skip this one, do not show it!
+              return false; 
             }
             return (
               r.status === "pending" ||
@@ -551,7 +543,6 @@
               actions = `<button onclick="updateStatus('${r.id}', 'approved')" class="btn btn-sm btn-success w-100 mb-1 fw-bold">Approve</button>
                          <button onclick="updateStatus('${r.id}', 'cancelled')" class="btn btn-sm btn-outline-danger w-100">Cancel</button>`;
             } else if (r.status === "approved") {
-              // --- ADDED THE CANCEL BUTTON HERE ---
               actions = `<button onclick="updateStatus('${r.id}', 'seated')" class="btn btn-sm bg-success w-100 fw-bold text-white mb-1">Check In</button>
                          <button onclick="updateStatus('${r.id}', 'cancelled')" class="btn btn-sm btn-outline-danger w-100">Cancel</button>`;
             } else if (r.status === "seated") {
@@ -559,7 +550,6 @@
             }
           }
 
-          // Advance Order Display
           let notesHTML = r.notes
             ? `<div class="order-note"><i class="fa-solid fa-utensils"></i> <b>Order Notes:</b><br>${r.notes}</div>`
             : "";
@@ -595,11 +585,48 @@
         renderTable();
       };
 
-      window.updateStatus = async function (id, newStatus) {
-        if (confirm(`Update this reservation to ${newStatus.toUpperCase()}?`)) {
-          await update(ref(db, "reservations/" + id), { status: newStatus });
-        }
+      // ==========================================
+      // NEW: REUSABLE MODAL ACTION LOGIC
+      // ==========================================
+      let pendingResId = null;
+      let pendingResStatus = null;
+      let confirmActionModal = null;
+
+      window.addEventListener('DOMContentLoaded', () => {
+          confirmActionModal = new bootstrap.Modal(document.getElementById('confirmActionModal'));
+      });
+
+      window.updateStatus = function (id, newStatus) {
+        pendingResId = id;
+        pendingResStatus = newStatus;
+        
+        let actionText = newStatus.toUpperCase();
+        if (newStatus === "seated") actionText = "CHECK IN";
+        if (newStatus === "completed") actionText = "END SESSION";
+
+        document.getElementById('confirmActionText').innerText = `Update this reservation to ${actionText}?`;
+        confirmActionModal.show();
       };
+
+      document.getElementById('executeActionBtn').addEventListener('click', async () => {
+          if (!pendingResId) return;
+
+          const btn = document.getElementById('executeActionBtn');
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+          btn.disabled = true;
+
+          try {
+              await update(ref(db, "reservations/" + pendingResId), { status: pendingResStatus });
+          } catch (error) {
+              console.error(error);
+          } finally {
+              btn.innerHTML = 'Confirm';
+              btn.disabled = false;
+              confirmActionModal.hide();
+              pendingResId = null;
+              pendingResStatus = null;
+          }
+      });
 
       // SUBMIT FORM
       document
@@ -615,7 +642,7 @@
             tableSize: document.getElementById("wiTableSize").value,
             notes: document.getElementById("wiNotes").value,
             type: "walk-in",
-            status: "approved", // Defaulting to seated for admin manual entry
+            status: "approved", 
           });
 
           document.getElementById("walkInForm").reset();
@@ -637,14 +664,12 @@
       let selectedTable = null;
       let tableSelectionModal = null;
 
-      // 1. DECIDE WHICH TABLE SIZE IS ALLOWED
       function getAllowedTableSize(peopleCount) {
         if (peopleCount <= 4) return 4;
         else if (peopleCount <= 6) return 6;
         else return 15;
       }
 
-      // 2. FLOOR PLAN DATA (Mapped to Percentages)
       const floorLayouts = {
         1: {
           bg: "Media/1st_Floor2.png",
@@ -671,12 +696,10 @@
         },
       };
 
-      // 3. GENERATE THE INTERACTIVE MAP
       function renderTableGrid(floorNum) {
         const container = document.getElementById("floorPlanContainer");
         const floorData = floorLayouts[floorNum];
 
-        // Set the actual floor image as the background
         container.style.backgroundImage = `url('${floorData.bg}')`;
         container.innerHTML = "";
 
@@ -694,23 +717,20 @@
           let textShadow = "none";
 
           if (isSelected) {
-            // SELECTED: Blank background + Specific Table Image + Orange Border
-            bgStyle = `background-color: transparent; background-image: url('Media/${table.seats}packs.png'); background-size: 100%; background-repeat: no-repeat; background-position: center;`;
+            bgStyle = `background-color: transparent; background-image: url('Media/${table.seats}packs.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;`;
             borderColor = "#28a745";
             textColor = "#000";
-            textShadow = "1px 1px 3px #fff"; // White glow so the text is readable over the green image
+            textShadow = "1px 1px 3px #fff"; 
           } else if (isAllowed) {
-            // AVAILABLE: Blank background + Green Border
             bgStyle = "background-color: transparent;";
-            borderColor = "#000"; // Bootstrap Success Green
+            borderColor = "#000"; 
             textColor = "#000";
-            textShadow = "1px 1px 3px #fff"; // White glow so the text is readable over the floor plan
+            textShadow = "1px 1px 3px #fff"; 
           }
 
-          let opacity = isAllowed ? "1" : "0.4"; // Dims out the wrong sized tables
+          let opacity = isAllowed ? "1" : "0.4"; 
           let disabledAttr = isAllowed ? "" : "disabled";
 
-          // Inject absolute positioned buttons over the background image
           container.innerHTML += `
             <button type="button" class="fw-bold"
                     style="position: absolute; left: ${table.left}%; top: ${table.top}%; width: ${table.w}%; height: ${table.h}%;
@@ -725,12 +745,10 @@
         });
       }
 
-      // 4. HANDLE BUTTON CLICKS
       window.selectTable = function (id, seats, floor) {
         selectedTable = { id: id, seats: seats };
-        renderTableGrid(floor); // Re-draw to show the orange selection color
+        renderTableGrid(floor); 
 
-        // Update the text at the bottom of the modal
         const info = document.getElementById("selectedTableInfo");
         info.innerHTML = `
           <strong style="color: var(--toms-orange);">
@@ -741,7 +759,6 @@
         document.getElementById("confirmTableBtn").disabled = false;
       };
 
-      // 5. AUTO-REFRESH WHEN PAX CHANGES
       document.getElementById("wiPax").addEventListener("input", () => {
         if (
           document
@@ -759,7 +776,6 @@
         }
       });
 
-      // 6. FLOOR RADIO BUTTONS LOGIC
       document
         .querySelectorAll('input[name="floorSelect"]')
         .forEach((radio) => {
@@ -772,7 +788,6 @@
           });
         });
 
-      // 7. CONFIRM SELECTION BUTTON
       document
         .getElementById("confirmTableBtn")
         .addEventListener("click", () => {
@@ -787,7 +802,6 @@
           }
         });
 
-      // 8. MODAL INITIALIZATION
       const tableModalElement = document.getElementById("tableSelectionModal");
       tableSelectionModal = new bootstrap.Modal(tableModalElement, {
         backdrop: "static",
@@ -800,7 +814,7 @@
         const floor = parseInt(
           document.querySelector('input[name="floorSelect"]:checked').value,
         );
-        renderTableGrid(floor); // Draw the grid when modal opens
+        renderTableGrid(floor); 
         document.getElementById("selectedTableInfo").innerHTML =
           '<small class="text-muted">Click on a table to select</small>';
       });
