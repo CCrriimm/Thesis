@@ -20,8 +20,6 @@
         overflow-x: hidden;
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       }
-      
-      /* --- ADMIN SIDEBAR STYLES --- */
       .sidebar {
         width: var(--sidebar-width);
         height: 100vh;
@@ -62,8 +60,6 @@
         padding: 30px;
         min-height: 100vh;
       }
-
-      /* --- KITCHEN TICKET STYLES --- */
       .ticket {
         background-color: #000000e0;
         border: 1px solid #333;
@@ -74,19 +70,70 @@
         display: flex;
         flex-direction: column;
       }
-      .ticket.reservation { border-top-color: #4caf50; } 
-      .ticket.online { border-top-color: #2196f3; } 
-      .ticket.refill { border-top-color: #ff9800; } 
-      
-      .ticket-header { display: flex; justify-content: space-between; border-bottom: 1px dashed #444; padding-bottom: 10px; margin-bottom: 10px; }
-      .ticket-time { font-size: 1.5rem; font-weight: bold; color: #fff; }
-      .ticket-items { flex-grow: 1; font-size: 1.2rem; font-family: monospace; white-space: pre-wrap; color: #ccc; }
-      .ticket-customer { color: #ccc; font-size: 1.1rem; margin-top: 5px; }
-      
-      .btn-done { background-color: var(--toms-orange); color: white; border: none; font-weight: bold; padding: 10px; font-size: 1.1rem; margin-top: 15px; border-radius: 5px; }
-      .btn-done:hover { background-color: #d1660a; color: white; }
-      .btn-orange { background-color: var(--toms-orange); color: white; border: none; }
-      .btn-orange:hover { background-color: #d1660a; color: white; }
+      .ticket.reservation {
+        border-top-color: #4caf50;
+      }
+      .ticket.online {
+        border-top-color: #2196f3;
+      }
+      .ticket.refill {
+        border-top-color: #ff9800;
+      }
+      .ticket-header {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px dashed #444;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+      }
+      .ticket-time {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #fff;
+      }
+      .ticket-items {
+        flex-grow: 1;
+        font-size: 1.2rem;
+        font-family: monospace;
+        white-space: pre-wrap;
+        color: #ccc;
+      }
+      .ticket-customer {
+        color: #ccc;
+        font-size: 1.1rem;
+        margin-top: 5px;
+      }
+      .btn-done {
+        background-color: var(--toms-orange);
+        color: white;
+        border: none;
+        font-weight: bold;
+        padding: 10px;
+        font-size: 1.1rem;
+        margin-top: 15px;
+        border-radius: 5px;
+      }
+      .btn-done:hover {
+        background-color: #d1660a;
+        color: white;
+      }
+      .btn-orange {
+        background-color: var(--toms-orange);
+        color: white;
+        border: none;
+      }
+      .btn-orange:hover {
+        background-color: #d1660a;
+        color: white;
+      }
+      .countdown-timer {
+        font-size: 0.8rem;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 2px 8px;
+        border-radius: 20px;
+        margin-top: 5px;
+        display: inline-block;
+      }
     </style>
   </head>
   <body>
@@ -96,73 +143,148 @@
       </div>
       <ul class="sidebar-menu">
         <li>
-          <a href="admin.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+          <a href="admin.html"
+            ><i class="fa-solid fa-gauge-high"></i> Dashboard</a
+          >
         </li>
         <li>
-          <a href="admin-payments.html"><i class="fa-solid fa-money-bill-wave"></i> Payments</a>
+          <a href="admin-payments.html"
+            ><i class="fa-solid fa-money-bill-wave"></i> Payments</a
+          >
         </li>
         <li>
-          <a href="admin-tables.html"><i class="fa-solid fa-chair"></i> Tables</a>
+          <a href="admin-tables.html"
+            ><i class="fa-solid fa-chair"></i> Tables</a
+          >
         </li>
         <li>
-          <a href="admin-reservations.html"><i class="fa-solid fa-calendar-check"></i> Reservations</a>
+          <a href="admin-reservations.html"
+            ><i class="fa-solid fa-calendar-check"></i> Reservations</a
+          >
         </li>
         <li>
-          <a href="kitchen.html" class="active"><i class="fa-solid fa-fire-burner"></i> Kitchen</a>
+          <a href="kitchen.html" class="active"
+            ><i class="fa-solid fa-fire-burner"></i> Kitchen</a
+          >
         </li>
         <li>
-          <a href="admin-users.html"><i class="fa-solid fa-user-shield"></i> Admins</a>
+          <a href="admin-users.html"
+            ><i class="fa-solid fa-user-shield"></i> Admins</a
+          >
         </li>
         <li class="mt-5">
-          <a href="#" id="adminLogoutBtn" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+          <a href="#" id="adminLogoutBtn" class="text-danger"
+            ><i class="fa-solid fa-right-from-bracket"></i> Logout</a
+          >
         </li>
       </ul>
     </nav>
 
     <div class="main-content">
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold"><i class="fa-solid fa-fire-burner" style="color: var(--toms-orange);"></i> Chef Dashboard</h2>
-        <span class="fs-4 fw-bold text-muted" id="liveClock" style="letter-spacing: 2px;">00:00:00</span>
+        <h2 class="fw-bold">
+          <i
+            class="fa-solid fa-fire-burner"
+            style="color: var(--toms-orange)"
+          ></i>
+          Chef Dashboard
+        </h2>
+        <span
+          class="fs-4 fw-bold text-muted"
+          id="liveClock"
+          style="letter-spacing: 2px"
+          >00:00:00</span
+        >
       </div>
 
       <div class="row mb-3">
         <div class="col-12 d-flex gap-3">
-            <span class="badge px-3 py-2" style="background-color: #ff9800; font-size: 0.9rem;"><i class="fa-solid fa-rotate"></i> Table Refill</span>
-            <span class="badge px-3 py-2" style="background-color: #2196f3; font-size: 0.9rem;"><i class="fa-solid fa-bag-shopping"></i> Online Pickup</span>
-            <span class="badge px-3 py-2" style="background-color: #4caf50; font-size: 0.9rem;"><i class="fa-solid fa-calendar-check"></i> Reservation (Advance)</span>
+          <span
+            class="badge px-3 py-2"
+            style="background-color: #ff9800; font-size: 0.9rem"
+            ><i class="fa-solid fa-rotate"></i> Table Refill</span
+          >
+          <span
+            class="badge px-3 py-2"
+            style="background-color: #2196f3; font-size: 0.9rem"
+            ><i class="fa-solid fa-bag-shopping"></i> Online Pickup</span
+          >
+          <span
+            class="badge px-3 py-2"
+            style="background-color: #4caf50; font-size: 0.9rem"
+            ><i class="fa-solid fa-calendar-check"></i> Reservation
+            (Advance)</span
+          >
         </div>
       </div>
 
       <div class="row g-4" id="ticketsContainer">
         <div class="col-12 text-center mt-5 text-muted">
-            <i class="fa-solid fa-spinner fa-spin fa-3x mb-3"></i>
-            <h4>Loading active orders...</h4>
+          <i class="fa-solid fa-spinner fa-spin fa-3x mb-3"></i>
+          <h4>Loading active orders...</h4>
         </div>
       </div>
     </div>
 
-    <div class="modal fade" id="confirmActionModal" tabindex="-1" data-bs-backdrop="static">
+    <div
+      class="modal fade"
+      id="confirmActionModal"
+      tabindex="-1"
+      data-bs-backdrop="static"
+    >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header bg-dark text-white">
-            <h5 class="modal-title fw-bold"><i class="fa-solid fa-bell-concierge" style="color: var(--toms-orange);"></i> Confirm Action</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <h5 class="modal-title fw-bold">
+              <i
+                class="fa-solid fa-bell-concierge"
+                style="color: var(--toms-orange)"
+              ></i>
+              Confirm Action
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
           </div>
           <div class="modal-body text-center py-4">
-            <p class="fs-5 fw-bold mb-0" id="confirmActionText">Are you sure?</p>
+            <p class="fs-5 fw-bold mb-0" id="confirmActionText">
+              Are you sure?
+            </p>
           </div>
           <div class="modal-footer justify-content-center">
-            <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-orange fw-bold px-4" id="executeActionBtn">Confirm</button>
+            <button
+              type="button"
+              class="btn btn-secondary px-4"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn btn-orange fw-bold px-4"
+              id="executeActionBtn"
+            >
+              Confirm
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <script type="module">
-      import { auth, db, ref, get, onValue, update, onAuthStateChanged, signOut } from "./js/firebase-config.js";
+      import {
+        auth,
+        db,
+        ref,
+        get,
+        onValue,
+        update,
+        onAuthStateChanged,
+        signOut,
+      } from "./js/firebase-config.js";
 
-      // SECURITY: Ensure user is admin
       onAuthStateChanged(auth, async (user) => {
         if (!user) {
           window.location.href = "login.html";
@@ -174,214 +296,335 @@
         }
       });
 
-      // LIVE CLOCK LOGIC
       setInterval(() => {
-          document.getElementById('liveClock').innerText = new Date().toLocaleTimeString();
+        document.getElementById("liveClock").innerText =
+          new Date().toLocaleTimeString();
       }, 1000);
 
-      // DATA STORAGE
       let activeOrders = [];
       let activeReservations = [];
       let activeRefills = [];
 
-      // 1. LISTEN TO ONLINE ORDERS
+      // Function to check if time is within 1 hour before the scheduled time
+      function isWithinOneHourBefore(dateStr, timeStr) {
+        if (!dateStr || !timeStr) return false;
+
+        let now = new Date();
+
+        // Parse the time string (supports both "HH:MM" and "8:00 AM - 11:00 AM" formats)
+        let targetTime = timeStr;
+        if (timeStr.includes(" - ")) {
+          targetTime = timeStr.split(" - ")[0]; // Take the start time
+        }
+
+        let resTime = new Date(dateStr + "T" + targetTime);
+
+        // If the date is invalid, try parsing differently
+        if (isNaN(resTime.getTime())) {
+          // Try parsing with timezone
+          resTime = new Date(dateStr + " " + targetTime);
+        }
+
+        if (isNaN(resTime.getTime())) return false;
+
+        let diffInMinutes = (resTime - now) / (1000 * 60);
+
+        // Show in kitchen if within 1 hour before OR up to 2 hours after
+        return diffInMinutes <= 60 && diffInMinutes >= -120;
+      }
+
+      // For online orders with pickupTime (format like "14:30")
+      function isOrderWithinOneHourBefore(pickupTimeStr) {
+        if (!pickupTimeStr) return false;
+
+        let now = new Date();
+        let [hours, minutes] = pickupTimeStr.split(":");
+        let orderTime = new Date();
+        orderTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+        let diffInMinutes = (orderTime - now) / (1000 * 60);
+
+        // Show in kitchen if within 1 hour before pickup time
+        return diffInMinutes <= 60 && diffInMinutes >= -120;
+      }
+
+      // 1. LISTEN TO ONLINE ORDERS (Remove time filter here)
       onValue(ref(db, "orders"), (snapshot) => {
-          activeOrders = [];
-          if (snapshot.exists()) {
-              snapshot.forEach((child) => {
-                  let data = child.val();
-                  if (data.status === "preparing") {
-                      activeOrders.push({ id: child.key, type: 'online', ...data });
-                  }
-              });
-          }
-          renderKitchen();
+        activeOrders = [];
+        if (snapshot.exists()) {
+          snapshot.forEach((child) => {
+            let data = child.val();
+            if (data.status === "preparing" && data.pickupTime) {
+              activeOrders.push({ id: child.key, type: "online", ...data });
+            }
+          });
+        }
+        renderKitchen();
       });
 
-      // 2. LISTEN TO RESERVATIONS (For Advance Orders)
+      // 2. LISTEN TO RESERVATIONS (Remove time filter here)
       onValue(ref(db, "reservations"), (snapshot) => {
-          activeReservations = [];
-          if (snapshot.exists()) {
-              snapshot.forEach((child) => {
-                  let data = child.val();
-                  if ((data.status === "approved" || data.status === "seated") && 
-                      data.notes && data.notes.trim() !== "" && 
-                      data.foodStatus !== "served") {
-                      activeReservations.push({ id: child.key, type: 'reservation', ...data });
-                  }
+        activeReservations = [];
+        if (snapshot.exists()) {
+          snapshot.forEach((child) => {
+            let data = child.val();
+            if (
+              (data.status === "approved" || data.status === "seated") &&
+              data.notes &&
+              data.notes.trim() !== "" &&
+              data.foodStatus !== "served"
+            ) {
+              activeReservations.push({
+                id: child.key,
+                type: "reservation",
+                ...data,
               });
-          }
-          renderKitchen();
+            }
+          });
+        }
+        renderKitchen();
       });
 
       // 3. LISTEN TO REFILLS
       onValue(ref(db, "refills"), (snapshot) => {
-          activeRefills = [];
-          if (snapshot.exists()) {
-              snapshot.forEach((child) => {
-                  let data = child.val();
-                  if (data.status === "preparing" || data.status === "serving") {
-                      activeRefills.push({ id: child.key, type: 'refill', ...data });
-                  }
-              });
-          }
-          renderKitchen();
+        activeRefills = [];
+        if (snapshot.exists()) {
+          snapshot.forEach((child) => {
+            let data = child.val();
+            if (data.status === "preparing" || data.status === "serving") {
+              activeRefills.push({ id: child.key, type: "refill", ...data });
+            }
+          });
+        }
+        renderKitchen();
       });
 
-      // TIME CHECKER: Is it within 60 minutes?
-      function isWithinOneHour(dateStr, timeStr) {
-          let now = new Date();
-          let resTime = new Date(dateStr + "T" + timeStr);
-          let diffInMinutes = (resTime - now) / (1000 * 60);
-          if (diffInMinutes <= 60 && diffInMinutes >= -120) {
-              return true;
-          }
-          return false;
-      }
-
-      // RENDER THE TICKETS
       function renderKitchen() {
-          const container = document.getElementById("ticketsContainer");
-          container.innerHTML = "";
-          let ticketsToDisplay = [];
+        const container = document.getElementById("ticketsContainer");
+        container.innerHTML = "";
+        let ticketsToDisplay = [];
 
-          for (let i = 0; i < activeOrders.length; i++) { ticketsToDisplay.push(activeOrders[i]); }
-          for (let i = 0; i < activeRefills.length; i++) { ticketsToDisplay.push(activeRefills[i]); }
-          for (let i = 0; i < activeReservations.length; i++) {
-              let res = activeReservations[i];
-              if (isWithinOneHour(res.date, res.time)) {
-                  ticketsToDisplay.push(res);
-              }
-          }
+        for (let i = 0; i < activeOrders.length; i++) { 
+            if (isOrderWithinOneHourBefore(activeOrders[i].pickupTime)) {
+                ticketsToDisplay.push(activeOrders[i]); 
+            }
+        }
+        for (let i = 0; i < activeRefills.length; i++) { 
+            ticketsToDisplay.push(activeRefills[i]); 
+        }
+        for (let i = 0; i < activeReservations.length; i++) { 
+            if (isWithinOneHourBefore(activeReservations[i].date, activeReservations[i].time)) {
+                ticketsToDisplay.push(activeReservations[i]); 
+            }
+        }
 
-          // Sort tickets
-          ticketsToDisplay.sort((a, b) => {
-              if (a.type === 'refill' && b.type !== 'refill') return -1;
-              if (a.type !== 'refill' && b.type === 'refill') return 1;
-              if (a.type === 'refill' && b.type === 'refill') return a.timestamp - b.timestamp; 
-              let timeA = a.type === 'online' ? a.pickupTime : a.time;
-              let timeB = b.type === 'online' ? b.pickupTime : b.time;
-              return timeA.localeCompare(timeB);
-          });
+        ticketsToDisplay.sort((a, b) => {
+          if (a.type === "refill" && b.type !== "refill") return -1;
+          if (a.type !== "refill" && b.type === "refill") return 1;
+          if (a.type === "refill" && b.type === "refill")
+            return a.timestamp - b.timestamp;
+          return 0;
+        });
 
-          if (ticketsToDisplay.length === 0) {
-              container.innerHTML = '<div class="col-12 text-center mt-5 text-muted"><i class="fa-solid fa-mug-hot fa-3x mb-3 opacity-50"></i><h4>No active orders. Kitchen is clear!</h4></div>';
-              return;
-          }
+        if (ticketsToDisplay.length === 0) {
+          container.innerHTML =
+            '<div class="col-12 text-center mt-5 text-muted"><i class="fa-solid fa-mug-hot fa-3x mb-3 opacity-50"></i><h4>No active orders. Kitchen is clear!</h4></div>';
+          return;
+        }
 
-          // Generate HTML for each ticket
-          for (let i = 0; i < ticketsToDisplay.length; i++) {
-              let ticket = ticketsToDisplay[i];
-              let html = "";
+        for (let i = 0; i < ticketsToDisplay.length; i++) {
+          let ticket = ticketsToDisplay[i];
+          let html = "";
 
-              if (ticket.type === "refill") {
-                  let actionBtn = ticket.status === "preparing" 
-                    ? `<button onclick="triggerAction('refill', '${ticket.id}', 'serving', 'Mark this refill as \\'Serving to Table\\'?')" class="btn-done w-100" style="background-color: #ff9800; color: #000;">Serve to Table</button>`
-                    : `<button onclick="triggerAction('refill', '${ticket.id}', 'served', 'Mark this refill as \\'Done\\' (Completed)?')" class="btn-done w-100 bg-success">Done (Served)</button>`;
-                  
-                  html = `
-                    <div class="col-md-4 col-lg-3">
-                        <div class="ticket refill shadow-lg">
-                            <div class="ticket-header">
-                                <div>
-                                    <span class="badge mb-1" style="background-color: #ff9800; color: #000;">Table Refill</span><br>
-                                    <small class="fw-bold ticket-customer">Table ${ticket.tableNum}</small>
-                                </div>
-                                <div class="ticket-time" style="color: #ff9800;">${new Date(ticket.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
-                            </div>
-                            <div class="ticket-items">${ticket.items.replace(/, /g, '<br>')}</div>
-                            ${actionBtn}
-                        </div>
+          if (ticket.type === "refill") {
+            let actionBtn =
+              ticket.status === "preparing"
+                ? `<button onclick="triggerAction('refill', '${ticket.id}', 'serving', 'Mark this refill as \\'Serving to Table\\'?')" class="btn-done w-100" style="background-color: #ff9800; color: #000;">Serve to Table</button>`
+                : `<button onclick="triggerAction('refill', '${ticket.id}', 'served', 'Mark this refill as \\'Done\\' (Completed)?')" class="btn-done w-100 bg-success">Done (Served)</button>`;
+
+            html = `
+              <div class="col-md-4 col-lg-3">
+                <div class="ticket refill shadow-lg">
+                  <div class="ticket-header">
+                    <div>
+                      <span class="badge mb-1" style="background-color: #ff9800; color: #000;">Table Refill</span><br>
+                      <small class="fw-bold ticket-customer">Table ${ticket.tableNum}</small>
                     </div>
-                  `;
-              } else if (ticket.type === "online") {
-                  html = `
-                    <div class="col-md-4 col-lg-3">
-                        <div class="ticket online shadow-lg">
-                            <div class="ticket-header">
-                                <div>
-                                    <span class="badge bg-primary mb-1">Pickup</span><br>
-                                    <small class="fw-bold ticket-customer">${ticket.customerName}</small>
-                                </div>
-                                <div class="ticket-time text-primary">${ticket.pickupTime}</div>
-                            </div>
-                            <div class="ticket-items">${ticket.items.replace(/, /g, '<br>')}</div>
-                            <button onclick="triggerAction('online', '${ticket.id}', null, 'Mark this online order as ready for pickup?')" class="btn-done w-100">Ready for Pickup</button>
-                        </div>
+                    <div class="ticket-time" style="color: #ff9800;">${new Date(ticket.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</div>
+                  </div>
+                  <div class="ticket-items">${ticket.items.replace(/, /g, "<br>")}</div>
+                  ${actionBtn}
+                </div>
+              </div>
+            `;
+          } else if (ticket.type === "online") {
+            html = `
+              <div class="col-md-4 col-lg-3">
+                <div class="ticket online shadow-lg">
+                  <div class="ticket-header">
+                    <div>
+                      <span class="badge bg-primary mb-1">Pickup Order</span><br>
+                      <small class="fw-bold ticket-customer">${ticket.customerName}</small>
                     </div>
-                  `;
-              } else {
-                  html = `
-                    <div class="col-md-4 col-lg-3">
-                        <div class="ticket reservation shadow-lg">
-                            <div class="ticket-header">
-                                <div>
-                                    <span class="badge bg-success mb-1">Advance Order</span><br>
-                                    <small class="ticket-customer fw-bold">${ticket.name} - ${ticket.tableSize.split(',')[0]}</small>
-                                </div>
-                                <div class="ticket-time text-success">${ticket.time}</div>
-                            </div>
-                            <div class="ticket-items">${ticket.notes}</div>
-                            <button onclick="triggerAction('reservation', '${ticket.id}', null, 'Mark this advance order as served to the table?')" class="btn-done w-100">Mark as Served</button>
-                        </div>
+                    <div class="ticket-time text-primary">${ticket.pickupTime}</div>
+                  </div>
+                  <div class="ticket-items">${ticket.items.replace(/, /g, "<br>")}</div>
+                  <div class="countdown-timer text-center mb-2" id="countdown_${ticket.id}">Loading...</div>
+                  <button onclick="triggerAction('online', '${ticket.id}', null, 'Mark this online order as ready for pickup?')" class="btn-done w-100">Ready for Pickup</button>
+                </div>
+              </div>
+            `;
+          } else {
+            // Calculate display time for reservation
+            let displayTime = ticket.time;
+            if (displayTime && displayTime.includes(" - ")) {
+              displayTime = displayTime.split(" - ")[0];
+            }
+
+            html = `
+              <div class="col-md-4 col-lg-3">
+                <div class="ticket reservation shadow-lg">
+                  <div class="ticket-header">
+                    <div>
+                      <span class="badge bg-success mb-1">Advance Order</span><br>
+                      <small class="ticket-customer fw-bold">${ticket.name || ticket.customerName} - ${ticket.tableSize ? ticket.tableSize.split(",")[0] : "Table"}</small>
                     </div>
-                  `;
-              }
-              container.innerHTML += html;
+                    <div class="ticket-time text-success">${displayTime}</div>
+                  </div>
+                  <div class="ticket-items">${ticket.notes || ticket.items || "No notes"}</div>
+                  <div class="countdown-timer text-center mb-2" id="countdown_${ticket.id}">Loading...</div>
+                  <button onclick="triggerAction('reservation', '${ticket.id}', null, 'Mark this advance order as served to the table?')" class="btn-done w-100">Mark as Served</button>
+                </div>
+              </div>
+            `;
           }
+          container.innerHTML += html;
+        }
+
+        // Start countdown timers for each ticket
+        startCountdowns();
       }
 
-      setInterval(renderKitchen, 30000);
+      function startCountdowns() {
+        const now = new Date();
 
-      // ==========================================
-      // NEW: MODAL BUTTON ACTIONS
-      // ==========================================
-      let pendingAction = null; // Stores what the user clicked
+        activeReservations.forEach((res) => {
+          const countdownEl = document.getElementById(`countdown_${res.id}`);
+          if (countdownEl) {
+            let targetTime = res.time;
+            if (targetTime && targetTime.includes(" - ")) {
+              targetTime = targetTime.split(" - ")[0];
+            }
+            const targetDate = new Date(res.date + "T" + targetTime);
+            const diffMs = targetDate - now;
+            if (diffMs > 0) {
+              const minutesLeft = Math.floor(diffMs / (1000 * 60));
+              const hoursLeft = Math.floor(minutesLeft / 60);
+              const minsLeft = minutesLeft % 60;
+              if (hoursLeft > 0) {
+                countdownEl.innerHTML = `⏱️ Prep starts in: ${hoursLeft}h ${minsLeft}m`;
+              } else {
+                countdownEl.innerHTML = `⏱️ Prep starts in: ${minutesLeft} minutes`;
+              }
+              countdownEl.style.backgroundColor =
+                minutesLeft <= 30 ? "#ff9800" : "#4caf50";
+              countdownEl.style.color = "white";
+              countdownEl.style.padding = "4px 8px";
+              countdownEl.style.borderRadius = "20px";
+            } else {
+              countdownEl.innerHTML = "🔔 Ready for preparation!";
+              countdownEl.style.backgroundColor = "#f44336";
+              countdownEl.style.color = "white";
+              countdownEl.style.padding = "4px 8px";
+              countdownEl.style.borderRadius = "20px";
+            }
+          }
+        });
+
+        activeOrders.forEach((order) => {
+          const countdownEl = document.getElementById(`countdown_${order.id}`);
+          if (countdownEl && order.pickupTime) {
+            const [hours, minutes] = order.pickupTime.split(":");
+            const pickupDate = new Date();
+            pickupDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+            const diffMs = pickupDate - now;
+            if (diffMs > 0) {
+              const minutesLeft = Math.floor(diffMs / (1000 * 60));
+              countdownEl.innerHTML = `⏱️ Pickup in: ${minutesLeft} minutes`;
+              countdownEl.style.backgroundColor =
+                minutesLeft <= 30 ? "#ff9800" : "#4caf50";
+            } else {
+              countdownEl.innerHTML = "⚠️ Overdue for pickup!";
+              countdownEl.style.backgroundColor = "#f44336";
+            }
+            countdownEl.style.color = "white";
+            countdownEl.style.padding = "4px 8px";
+            countdownEl.style.borderRadius = "20px";
+          }
+        });
+      }
+
+      setInterval(() => {
+        renderKitchen();
+      }, 60000);
+
+      let pendingAction = null;
       let confirmModal = null;
 
-      // Initialize the modal
-      window.addEventListener('DOMContentLoaded', () => {
-          confirmModal = new bootstrap.Modal(document.getElementById('confirmActionModal'));
+      window.addEventListener("DOMContentLoaded", () => {
+        confirmModal = new bootstrap.Modal(
+          document.getElementById("confirmActionModal"),
+        );
       });
 
-      // 1. Opens the Modal and saves the action info
-      window.triggerAction = function(type, id, status, message) {
-          pendingAction = { type: type, id: id, status: status };
-          document.getElementById('confirmActionText').innerText = message;
-          confirmModal.show();
+      window.triggerAction = function (type, id, status, message) {
+        pendingAction = { type: type, id: id, status: status };
+        document.getElementById("confirmActionText").innerText = message;
+        confirmModal.show();
       };
 
-      // 2. Executes the action when they click "Confirm" inside the modal
-      document.getElementById('executeActionBtn').addEventListener('click', async () => {
+      document
+        .getElementById("executeActionBtn")
+        .addEventListener("click", async () => {
           if (!pendingAction) return;
 
-          const btn = document.getElementById('executeActionBtn');
-          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+          const btn = document.getElementById("executeActionBtn");
+          btn.innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
           btn.disabled = true;
 
           try {
-              if (pendingAction.type === 'refill') {
-                  await update(ref(db, "refills/" + pendingAction.id), { status: pendingAction.status });
-              } else if (pendingAction.type === 'online') {
-                  await update(ref(db, "orders/" + pendingAction.id), { status: "done" });
-              } else if (pendingAction.type === 'reservation') {
-                  await update(ref(db, "reservations/" + pendingAction.id), { foodStatus: "served" });
-              }
+            if (pendingAction.type === "refill") {
+              await update(ref(db, "refills/" + pendingAction.id), {
+                status: pendingAction.status,
+              });
+            } else if (pendingAction.type === "online") {
+              await update(ref(db, "orders/" + pendingAction.id), {
+                status: "done",
+              });
+            } else if (pendingAction.type === "reservation") {
+              await update(ref(db, "reservations/" + pendingAction.id), {
+                foodStatus: "served",
+              });
+            }
           } catch (error) {
-              console.error(error);
-              alert("Error updating order.");
+            console.error(error);
+            alert("Error updating order.");
           } finally {
-              btn.innerHTML = 'Confirm';
-              btn.disabled = false;
-              confirmModal.hide();
-              pendingAction = null; // Reset
+            btn.innerHTML = "Confirm";
+            btn.disabled = false;
+            confirmModal.hide();
+            pendingAction = null;
           }
-      });
+        });
 
-      // Logout
-      document.getElementById("adminLogoutBtn").addEventListener("click", () => {
-        signOut(auth).then(() => { window.location.href = "login.html"; });
-      });
+      document
+        .getElementById("adminLogoutBtn")
+        .addEventListener("click", () => {
+          signOut(auth).then(() => {
+            window.location.href = "login.html";
+          });
+        });
     </script>
   </body>
 </html>

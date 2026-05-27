@@ -1,429 +1,855 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Tom's Chicken - Book a Table</title>
-    
-    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
 
     <style>
-        :root { --toms-orange: #f57d10ff; --toms-dark: #212529; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; padding-bottom: 90px; }
-        .navbar { box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .mobile-container { max-width: 600px; margin: 0 auto; padding: 15px; }
+      :root {
+        --toms-orange: #f57d10ff;
+        --toms-dark: #212529;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+        padding-bottom: 90px;
+      }
+      .navbar {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+      .mobile-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 15px;
+      }
 
-        /* CALENDAR STYLES */
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; }
-        .day-name { font-weight: bold; color: #6c757d; font-size: 0.8rem; padding-bottom: 10px; }
-        .cal-day { padding: 10px 2px; border-radius: 6px; border: 1px solid #dee2e6; cursor: pointer; transition: 0.2s; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; overflow: hidden; }
-        .cal-day.empty { background: transparent; border: none; cursor: default; }
-        .cal-day.past { background: #f1f3f5; color: #adb5bd; cursor: not-allowed; }
-        .cal-day.available { border-color: #28a745; color: #28a745; }
-        .cal-day.available:hover { background-color: #28a745; color: white; }
-        .cal-day.full { background-color: #ffebee; border-color: #dc3545; color: #dc3545; cursor: not-allowed; opacity: 0.7; }
-        .cal-day-label { font-size: 0.6rem; margin-top: 4px; letter-spacing: -0.5px; }
+      /* CALENDAR STYLES */
+      .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        font-weight: bold;
+      }
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        text-align: center;
+      }
+      .day-name {
+        font-weight: bold;
+        color: #6c757d;
+        font-size: 0.8rem;
+        padding-bottom: 10px;
+      }
+      .cal-day {
+        padding: 10px 2px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        cursor: pointer;
+        transition: 0.2s;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        overflow: hidden;
+      }
+      .cal-day.empty {
+        background: transparent;
+        border: none;
+        cursor: default;
+      }
+      .cal-day.past {
+        background: #f1f3f5;
+        color: #adb5bd;
+        cursor: not-allowed;
+      }
+      .cal-day.available {
+        border-color: #28a745;
+        color: #28a745;
+      }
+      .cal-day.available:hover {
+        background-color: #28a745;
+        color: white;
+      }
+      .cal-day.full {
+        background-color: #ffebee;
+        border-color: #dc3545;
+        color: #dc3545;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+      .cal-day-label {
+        font-size: 0.6rem;
+        margin-top: 4px;
+        letter-spacing: -0.5px;
+      }
 
-        /* FORM CARDS */
-        .booking-card { background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 20px; }
-        .card-header-orange { background-color: var(--toms-orange); color: white; padding: 15px; text-align: center; }
-        
-        /* MENU & CART (Advance Order) */
-        .menu-card { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
-        .menu-card:last-child { border-bottom: none; }
-        .qty-btn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--toms-orange); background: white; color: var(--toms-orange); font-weight: bold; }
-        
-        /* TOGGLE SWITCH */
-        .form-check-input:checked { background-color: var(--toms-orange); border-color: var(--toms-orange); }
+      /* FORM CARDS */
+      .booking-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+      .card-header-orange {
+        background-color: var(--toms-orange);
+        color: white;
+        padding: 15px;
+        text-align: center;
+      }
 
-        .payment-box { background: #fff3cd; border: 1px solid #ffe69c; border-radius: 10px; padding: 15px; text-align: center; }
-        .qr-placeholder { width: 150px; height: 150px; background: white; border: 2px dashed #ffc107; margin: 10px auto; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
-        
-        .floating-bottom { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); z-index: 1000; }
-        .btn-orange { background-color: var(--toms-orange); color: white; border-radius: 50px; font-weight: bold; width: 100%; padding: 12px; border: none; transition: 0.2s; }
-        .btn-orange:hover { background-color: #d1660a; color: white; }
+      /* MENU & CART (Advance Order) */
+      .menu-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+      }
+      .menu-card:last-child {
+        border-bottom: none;
+      }
+      .qty-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid var(--toms-orange);
+        background: white;
+        color: var(--toms-orange);
+        font-weight: bold;
+      }
+
+      /* TOGGLE SWITCH */
+      .form-check-input:checked {
+        background-color: var(--toms-orange);
+        border-color: var(--toms-orange);
+      }
+
+      .payment-box {
+        background: #fff3cd;
+        border: 1px solid #ffe69c;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+      }
+      .qr-placeholder {
+        width: 150px;
+        height: 150px;
+        background: white;
+        border: 2px dashed #ffc107;
+        margin: 10px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+      }
+
+      .floating-bottom {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: white;
+        padding: 15px;
+        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
+      .btn-orange {
+        background-color: var(--toms-orange);
+        color: white;
+        border-radius: 50px;
+        font-weight: bold;
+        width: 100%;
+        padding: 12px;
+        border: none;
+        transition: 0.2s;
+      }
+      .btn-orange:hover {
+        background-color: #d1660a;
+        color: white;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
-        <div class="container mobile-container py-0">
-            <a class="navbar-brand fw-bold fs-4" href="index.html" style="color: var(--toms-orange);">
-                <i class="fa-solid fa-arrow-left text-dark me-2" onclick="history.back(); return false;"></i> 
-                Tom's<span class="text-dark">Chicken</span>
-            </a>
-        </div>
+      <div class="container mobile-container py-0">
+        <a
+          class="navbar-brand fw-bold fs-4"
+          href="index.html"
+          style="color: var(--toms-orange)"
+        >
+          <i
+            class="fa-solid fa-arrow-left text-dark me-2"
+            onclick="
+              history.back();
+              return false;
+            "
+          ></i>
+          Tom's<span class="text-dark">Chicken</span>
+        </a>
+      </div>
     </nav>
 
     <div class="container mobile-container mt-3">
-        
-        <div id="step1-calendar" class="booking-card p-3">
-            <h4 class="fw-bold mb-1 text-center">Select a Date</h4>
-            <p class="text-muted small text-center mb-4">Choose an available day for your reservation.</p>
-            
-            <div class="calendar-header">
-                <button class="btn btn-sm btn-outline-dark" id="prevMonth"><i class="fa-solid fa-chevron-left"></i></button>
-                <h5 class="mb-0" id="monthYearDisplay">Month Year</h5>
-                <button class="btn btn-sm btn-outline-dark" id="nextMonth"><i class="fa-solid fa-chevron-right"></i></button>
-            </div>
+      <div id="step1-calendar" class="booking-card p-3">
+        <h4 class="fw-bold mb-1 text-center">Select a Date</h4>
+        <p class="text-muted small text-center mb-4">
+          Choose an available day for your reservation.
+        </p>
 
-            <div class="calendar-grid mb-2">
-                <div class="day-name">Sun</div><div class="day-name">Mon</div><div class="day-name">Tue</div>
-                <div class="day-name">Wed</div><div class="day-name">Thu</div><div class="day-name">Fri</div><div class="day-name">Sat</div>
-            </div>
-            
-            <div class="calendar-grid" id="calendarDays">
-                <div class="col-12 text-center py-5"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
-            </div>
+        <div class="calendar-header">
+          <button class="btn btn-sm btn-outline-dark" id="prevMonth">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <h5 class="mb-0" id="monthYearDisplay">Month Year</h5>
+          <button class="btn btn-sm btn-outline-dark" id="nextMonth">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
         </div>
 
-        <form id="reservationForm" class="d-none">
-            
-            <div class="booking-card">
-                <div class="card-header-orange d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-calendar-check"></i> Details</h5>
-                    <button type="button" class="btn btn-sm btn-light text-dark fw-bold py-0" onclick="changeDate()">Change Date</button>
-                </div>
-                <div class="card-body p-3">
-                    <h4 class="fw-bold text-center mb-3" id="displaySelectedDate" style="color: var(--toms-orange);">YYYY-MM-DD</h4>
-                    <input type="hidden" id="resDate">
-                    
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <label class="form-label fw-bold small text-muted">Arrival Time</label>
-                            <input type="time" id="resTime" class="form-control" required>
-                        </div>
-                        <div class="col-6">
-                            <label class="form-label fw-bold small text-muted">No. of People</label>
-                            <input type="number" id="resPax" class="form-control" min="1" value="2" required>
-                        </div>
-                        
-                        <div class="col-12 mt-3">
-                            <label class="form-label fw-bold small text-muted">Table Selection</label>
-                            <div class="input-group">
-                                <input type="text" id="resTableSize" class="form-control" placeholder="Select a table..." readonly required>
-                                <button type="button" class="btn text-white fw-bold" style="background-color: var(--toms-orange);" id="openTableSelectionBtn">
-                                    <i class="fa-solid fa-map"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="calendar-grid mb-2">
+          <div class="day-name">Sun</div>
+          <div class="day-name">Mon</div>
+          <div class="day-name">Tue</div>
+          <div class="day-name">Wed</div>
+          <div class="day-name">Thu</div>
+          <div class="day-name">Fri</div>
+          <div class="day-name">Sat</div>
+        </div>
 
-            <div class="booking-card mb-5">
-                <div class="card-body p-3">
-                    <div class="form-check form-switch d-flex justify-content-between align-items-center mb-2 px-0">
-                        <label class="form-check-label fw-bold fs-5" for="advanceOrderToggle">Advance Order Food?</label>
-                        <input class="form-check-input fs-4" type="checkbox" id="advanceOrderToggle" style="margin-right: 0;">
-                    </div>
-                    <p class="text-muted small mb-0">Skip the wait! Order Unli-Promos or Barkada sets now. You will be asked to pay 50% of your food downpayment today.</p>
-                </div>
-                
-                <div id="advanceMenuSection" class="d-none bg-light border-top">
-                    <div id="menuContainer">
-                        <p class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin"></i> Loading Menu...</p>
-                    </div>
-                    <div class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 fw-bold">Food Total:</h6>
-                        <h5 class="mb-0 fw-bold">₱<span id="cartTotal">0.00</span></h5>
-                    </div>
-                </div>
-            </div>
+        <div class="calendar-grid" id="calendarDays">
+          <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+          </div>
+        </div>
+      </div>
 
-            <div class="floating-bottom">
-                <button type="submit" class="btn btn-orange shadow fs-5"><i class="fa-solid fa-arrow-right"></i> Proceed to Checkout</button>
+      <form id="reservationForm" class="d-none">
+        <div class="booking-card">
+          <div
+            class="card-header-orange d-flex justify-content-between align-items-center"
+          >
+            <h5 class="mb-0 fw-bold">
+              <i class="fa-solid fa-calendar-check"></i> Details
+            </h5>
+            <button
+              type="button"
+              class="btn btn-sm btn-light text-dark fw-bold py-0"
+              onclick="changeDate()"
+            >
+              Change Date
+            </button>
+          </div>
+          <div class="card-body p-3">
+            <h4
+              class="fw-bold text-center mb-3"
+              id="displaySelectedDate"
+              style="color: var(--toms-orange)"
+            >
+              YYYY-MM-DD
+            </h4>
+            <input type="hidden" id="resDate" />
+
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label fw-bold small text-muted"
+                  >Arrival Time Slot</label
+                >
+                <select id="resTime" class="form-select fw-bold" required>
+                  <option value="" disabled selected>
+                    Select an available slot...
+                  </option>
+                  <option value="8:00 AM - 11:00 AM">8:00 AM - 11:00 AM</option>
+                  <option value="11:00 AM - 2:00 PM">11:00 AM - 2:00 PM</option>
+                  <option value="2:00 PM - 5:00 PM">2:00 PM - 5:00 PM</option>
+                  <option value="5:00 PM - 8:00 PM">5:00 PM - 8:00 PM</option>
+                </select>
+                <small class="text-muted" style="font-size: 0.7rem"
+                  >Limited to 2 reservations per time slot.</small
+                >
+              </div>
+
+              <div class="col-12 mt-3">
+                <label class="form-label fw-bold small text-muted"
+                  >No. of People</label
+                >
+                <input
+                  type="number"
+                  id="resPax"
+                  class="form-control"
+                  min="1"
+                  value="2"
+                  required
+                />
+              </div>
+
+              <div class="col-12 mt-3">
+                <label class="form-label fw-bold small text-muted"
+                  >Table Selection</label
+                >
+                <div class="input-group">
+                  <input
+                    type="text"
+                    id="resTableSize"
+                    class="form-control"
+                    placeholder="Select a table..."
+                    readonly
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="btn text-white fw-bold"
+                    style="background-color: var(--toms-orange)"
+                    id="openTableSelectionBtn"
+                  >
+                    <i class="fa-solid fa-map"></i> Map
+                  </button>
+                </div>
+              </div>
             </div>
-        </form>
+          </div>
+        </div>
+
+        <div class="booking-card mb-5">
+          <div class="card-body p-3">
+            <div
+              class="form-check form-switch d-flex justify-content-between align-items-center mb-2 px-0"
+            >
+              <label
+                class="form-check-label fw-bold fs-5"
+                for="advanceOrderToggle"
+                >Advance Order Food?</label
+              >
+              <input
+                class="form-check-input fs-4"
+                type="checkbox"
+                id="advanceOrderToggle"
+                style="margin-right: 0"
+              />
+            </div>
+            <p class="text-muted small mb-0">
+              Skip the wait! Order Unli-Promos or Barkada sets now. You will be
+              asked to pay 50% of your food downpayment today.
+            </p>
+          </div>
+
+          <div id="advanceMenuSection" class="d-none bg-light border-top">
+            <div id="menuContainer">
+              <p class="text-center text-muted py-4">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading Menu...
+              </p>
+            </div>
+            <div
+              class="p-3 bg-dark text-white d-flex justify-content-between align-items-center"
+            >
+              <h6 class="mb-0 fw-bold">Food Total:</h6>
+              <h5 class="mb-0 fw-bold">₱<span id="cartTotal">0.00</span></h5>
+            </div>
+          </div>
+        </div>
+
+        <div class="floating-bottom">
+          <button type="submit" class="btn btn-orange shadow fs-5">
+            <i class="fa-solid fa-arrow-right"></i> Proceed to Checkout
+          </button>
+        </div>
+      </form>
     </div>
 
-    <div class="modal fade" id="paymentModal" tabindex="-1" data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title fw-bold">Checkout Summary</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    
-                    <div class="mb-4 p-3 bg-light rounded border">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted small">Reservation Fee:</span>
-                            <span class="fw-bold">₱70.00</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom" id="advancePaymentRow">
-                            <span class="text-muted small">Advance Order Downpayment (50%):</span>
-                            <span class="fw-bold" id="advanceDownpaymentDisplay">₱0.00</span>
-                        </div>
-                        <div class="d-flex justify-content-between mt-2">
-                            <span class="fw-bold fs-5">Amount to Pay:</span>
-                            <span class="fw-bold fs-5" style="color: var(--toms-orange);">₱<span id="finalTotalDisplay">70.00</span></span>
-                        </div>
-                    </div>
-
-                    <div class="payment-box mb-4 text-center">
-                        <h6 class="fw-bold text-dark mb-1">GCash / PayMaya</h6>
-                        <p class="mb-2 small">Send to: <b>0912 345 6789</b></p>
-                        <div class="qr-placeholder mx-auto">
-                            <i class="fa-solid fa-qrcode fa-3x text-muted opacity-50"></i>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small text-muted">Upload Payment Receipt</label>
-                        <input type="file" id="resReceipt" class="form-control" accept="image/*" required>
-                        <input type="hidden" id="receiptBase64">
-                    </div>
-                </div>
-                <div class="modal-footer d-flex">
-                    <button type="button" class="btn btn-secondary me-auto" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" id="confirmPayBtn" class="btn btn-orange px-4 fw-bold shadow-sm">Confirm & Pay</button>
-                </div>
+    <div
+      class="modal fade"
+      id="paymentModal"
+      tabindex="-1"
+      data-bs-backdrop="static"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title fw-bold">Checkout Summary</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body p-4">
+            <div class="mb-4 p-3 bg-light rounded border">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted small">Reservation Fee:</span>
+                <span class="fw-bold">₱70.00</span>
+              </div>
+              <div
+                class="d-flex justify-content-between mb-2 pb-2 border-bottom"
+                id="advancePaymentRow"
+              >
+                <span class="text-muted small"
+                  >Advance Order Downpayment (50%):</span
+                >
+                <span class="fw-bold" id="advanceDownpaymentDisplay"
+                  >₱0.00</span
+                >
+              </div>
+              <div class="d-flex justify-content-between mt-2">
+                <span class="fw-bold fs-5">Amount to Pay:</span>
+                <span class="fw-bold fs-5" style="color: var(--toms-orange)"
+                  >₱<span id="finalTotalDisplay">70.00</span></span
+                >
+              </div>
             </div>
+
+            <div class="payment-box mb-4 text-center">
+              <h6 class="fw-bold text-dark mb-1">GCash / PayMaya</h6>
+              <p class="mb-2 small">Send to: <b>0912 345 6789</b></p>
+              <div class="qr-placeholder mx-auto">
+                <i class="fa-solid fa-qrcode fa-3x text-muted opacity-50"></i>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold small text-muted"
+                >Upload Payment Receipt</label
+              >
+              <input
+                type="file"
+                id="resReceipt"
+                class="form-control"
+                accept="image/*"
+                required
+              />
+              <input type="hidden" id="receiptBase64" />
+            </div>
+          </div>
+          <div class="modal-footer d-flex">
+            <button
+              type="button"
+              class="btn btn-secondary me-auto"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              id="confirmPayBtn"
+              class="btn btn-orange px-4 fw-bold shadow-sm"
+            >
+              Confirm & Pay
+            </button>
+          </div>
         </div>
+      </div>
     </div>
 
     <div class="modal fade" id="ReservSuccessModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header text-white" style="background-color: var(--toms-orange)">
-                    <h5 class="modal-title fw-bold">🎉 Reservation Confirmed</h5>
-                </div>
-                <div class="modal-body text-center py-4">
-                    <i class="fa-solid fa-clipboard-check fs-1 mb-3" style="color: var(--toms-orange)"></i>
-                    <p class="mb-1 fw-bold">Your reservation is under review.</p>
-                    <small class="text-muted">Please wait for the admin to verify your payment.</small>
-                </div>
-                <div class="modal-footer">
-                    <a href="profile.html" class="btn text-white fw-bold w-100" style="background-color: var(--toms-orange)">View My Reservations</a>
-                </div>
-            </div>
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div
+            class="modal-header text-white"
+            style="background-color: var(--toms-orange)"
+          >
+            <h5 class="modal-title fw-bold">🎉 Reservation Confirmed</h5>
+          </div>
+          <div class="modal-body text-center py-4">
+            <i
+              class="fa-solid fa-clipboard-check fs-1 mb-3"
+              style="color: var(--toms-orange)"
+            ></i>
+            <p class="mb-1 fw-bold">Your reservation is under review.</p>
+            <small class="text-muted"
+              >Please wait for the admin to verify your payment.</small
+            >
+          </div>
+          <div class="modal-footer">
+            <a
+              href="profile.html"
+              class="btn text-white fw-bold w-100"
+              style="background-color: var(--toms-orange)"
+              >View My Reservations</a
+            >
+          </div>
         </div>
+      </div>
     </div>
 
     <div class="modal fade" id="tableSelectionModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title fw-bold">Select Table</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-4">
-                        <label class="fw-bold small mb-2">Select Floor:</label>
-                        <div class="btn-group w-100" role="group">
-                            <input type="radio" class="btn-check" name="floorSelect" id="floor1" value="1" checked>
-                            <label class="btn btn-outline-dark fw-bold" for="floor1">1st Floor</label>
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title fw-bold">Select Table</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-4">
+              <label class="fw-bold small mb-2">Select Floor:</label>
+              <div class="btn-group w-100" role="group">
+                <input
+                  type="radio"
+                  class="btn-check"
+                  name="floorSelect"
+                  id="floor1"
+                  value="1"
+                  checked
+                />
+                <label class="btn btn-outline-dark fw-bold" for="floor1"
+                  >1st Floor</label
+                >
 
-                            <input type="radio" class="btn-check" name="floorSelect" id="floor2" value="2">
-                            <label class="btn btn-outline-dark fw-bold" for="floor2">2nd Floor</label>
-                        </div>
-                    </div>
-
-                    <div class="mt-3 mb-3">
-                        <div id="floorPlanContainer" class="shadow-sm" style="position: relative; width: 100%; max-width: 600px; padding-bottom: 83.33%; background-size: 100% 100%; background-repeat: no-repeat; background-color: #e9ecef; border: 2px solid #ddd; border-radius: 10px; margin: 0 auto; overflow: hidden;">
-                            </div>
-                    </div>
-
-                    <div class="mt-3 p-2 bg-light rounded text-center" id="selectedTableInfo">
-                        <small class="text-muted">Click on a table to select</small>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn text-white fw-bold" style="background-color: var(--toms-orange);" id="confirmTableBtn" disabled>Confirm Selection</button>
-                </div>
+                <input
+                  type="radio"
+                  class="btn-check"
+                  name="floorSelect"
+                  id="floor2"
+                  value="2"
+                />
+                <label class="btn btn-outline-dark fw-bold" for="floor2"
+                  >2nd Floor</label
+                >
+              </div>
             </div>
+
+            <div class="mt-3 mb-3">
+              <div
+                id="floorPlanContainer"
+                class="shadow-sm"
+                style="
+                  position: relative;
+                  width: 100%;
+                  max-width: 600px;
+                  padding-bottom: 83.33%;
+                  background-size: 100% 100%;
+                  background-repeat: no-repeat;
+                  background-color: #e9ecef;
+                  border: 2px solid #ddd;
+                  border-radius: 10px;
+                  margin: 0 auto;
+                  overflow: hidden;
+                "
+              ></div>
+            </div>
+
+            <div
+              class="mt-3 p-2 bg-light rounded text-center"
+              id="selectedTableInfo"
+            >
+              <small class="text-muted">Click on a table to select</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn text-white fw-bold"
+              style="background-color: var(--toms-orange)"
+              id="confirmTableBtn"
+              disabled
+            >
+              Confirm Selection
+            </button>
+          </div>
         </div>
+      </div>
     </div>
 
     <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
     <script type="module">
-        import { auth, db, ref, get, push, set, onValue, onAuthStateChanged } from "./js/firebase-config.js";
+      import {
+        auth,
+        db,
+        ref,
+        get,
+        push,
+        set,
+        onValue,
+        onAuthStateChanged,
+        storage,
+        storageRef,
+        uploadBytes,
+        getDownloadURL,
+      } from "./js/firebase-config.js";
 
-        let currentUserName = "Unknown Customer";
-        
-        // Fix the toggle bug on page refresh!
-        window.addEventListener('DOMContentLoaded', () => {
-            const toggle = document.getElementById("advanceOrderToggle");
-            toggle.checked = false;
-            document.getElementById("advanceMenuSection").classList.add("d-none");
-        });
+      let currentUserName = "Unknown Customer";
 
-        // 1. SECURITY
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                alert("Please login to book a table.");
-                window.location.href = "login.html";
-            } else {
-                const snap = await get(ref(db, 'users/' + user.uid));
-                if (snap.exists()) { currentUserName = `${snap.val().firstName} ${snap.val().lastName}`; }
+      window.addEventListener("DOMContentLoaded", () => {
+        const toggle = document.getElementById("advanceOrderToggle");
+        toggle.checked = false;
+        document.getElementById("advanceMenuSection").classList.add("d-none");
+      });
+
+      // 1. SECURITY
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          alert("Please login to book a table.");
+          window.location.href = "login.html";
+        } else {
+          const snap = await get(ref(db, "users/" + user.uid));
+          if (snap.exists()) {
+            currentUserName = `${snap.val().firstName} ${snap.val().lastName}`;
+          }
+        }
+      });
+
+      // ==========================================
+      // 2. CALENDAR & SLOT TRACKING LOGIC
+      // ==========================================
+      let currentDate = new Date();
+      let currentMonth = currentDate.getMonth();
+      let currentYear = currentDate.getFullYear();
+
+      // This object will track limits: reservationData["2026-05-27"]["8:00 AM - 11:00 AM"] = count
+      let reservationData = {};
+      const TOTAL_TABLES = 13;
+
+      onValue(ref(db, "reservationSlots"), (snapshot) => {
+        reservationData = snapshot.exists() ? snapshot.val() : {};
+        renderCalendar(currentMonth, currentYear);
+      });
+
+      function renderCalendar(month, year) {
+        const daysContainer = document.getElementById("calendarDays");
+        daysContainer.innerHTML = "";
+
+        const monthNames = [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ];
+        document.getElementById("monthYearDisplay").innerText =
+          `${monthNames[month]} ${year}`;
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        for (let i = 0; i < firstDay; i++) {
+          daysContainer.innerHTML += `<div class="cal-day empty"></div>`;
+        }
+
+        for (let i = 1; i <= daysInMonth; i++) {
+          let cellDate = new Date(year, month, i);
+          let dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
+
+          let dayData = reservationData[dateStr] || {};
+
+          let occupiedCount = 0;
+
+          Object.values(dayData).forEach((slot) => {
+            if (slot.tables) {
+              occupiedCount += Object.keys(slot.tables).length;
             }
-        });
+          });
 
-        // ==========================================
-        // 2. CALENDAR LOGIC
-        // ==========================================
-        let currentDate = new Date();
-        let currentMonth = currentDate.getMonth();
-        let currentYear = currentDate.getFullYear();
-        let reservationData = {}; 
+          let statusClass = "available";
+          let statusText = "Available";
 
-        onValue(ref(db, 'reservations'), (snapshot) => {
-            reservationData = {};
-            if (snapshot.exists()) {
-                snapshot.forEach(child => {
-                    let r = child.val();
-                    if(r.status !== 'cancelled' && r.status !== 'completed') {
-                        if(reservationData[r.date]) { reservationData[r.date]++; } 
-                        else { reservationData[r.date] = 1; }
-                    }
-                });
-            }
-            renderCalendar(currentMonth, currentYear);
-        });
+          if (cellDate < today) {
+            statusClass = "past";
+            statusText = "-";
+          } else if (occupiedCount >= TOTAL_TABLES * 4) {
+            statusClass = "full";
+            statusText = "Full";
+          } else if (occupiedCount >= TOTAL_TABLES * 4 * 0.7) {
+            statusText = "Limited";
+          }
 
-        function renderCalendar(month, year) {
-            const daysContainer = document.getElementById("calendarDays");
-            daysContainer.innerHTML = "";
-            
-            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            document.getElementById("monthYearDisplay").innerText = `${monthNames[month]} ${year}`;
+          let onclick =
+            statusClass === "available"
+              ? `onclick="selectDate('${dateStr}')"`
+              : "";
 
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const today = new Date();
-            today.setHours(0,0,0,0);
-
-            for (let i = 0; i < firstDay; i++) { daysContainer.innerHTML += `<div class="cal-day empty"></div>`; }
-
-            for (let i = 1; i <= daysInMonth; i++) {
-                let cellDate = new Date(year, month, i);
-                let dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                
-                let resCount = reservationData[dateStr] || 0;
-                const MAX_RESERVATIONS_PER_DAY = 15;
-                
-                let statusClass = "available";
-                let statusText = "Open";
-
-                if (cellDate < today) {
-                    statusClass = "past";
-                    statusText = "-";
-                } else if (resCount >= MAX_RESERVATIONS_PER_DAY) {
-                    statusClass = "full";
-                    statusText = "Full";
-                }
-
-                let onclick = (statusClass === 'available') ? `onclick="selectDate('${dateStr}')"` : "";
-
-                daysContainer.innerHTML += `
+          daysContainer.innerHTML += `
                     <div class="cal-day ${statusClass}" ${onclick}>
                         <span>${i}</span>
                         <span class="cal-day-label">${statusText}</span>
                     </div>
                 `;
-            }
         }
+      }
 
-        document.getElementById("prevMonth").addEventListener("click", () => {
-            currentMonth--; if(currentMonth < 0) { currentMonth = 11; currentYear--; }
-            renderCalendar(currentMonth, currentYear);
+      document.getElementById("prevMonth").addEventListener("click", () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+          currentMonth = 11;
+          currentYear--;
+        }
+        renderCalendar(currentMonth, currentYear);
+      });
+      document.getElementById("nextMonth").addEventListener("click", () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+          currentMonth = 0;
+          currentYear++;
+        }
+        renderCalendar(currentMonth, currentYear);
+      });
+
+      // Date selection - Updates dropdown dynamically
+      window.selectDate = function (dateStr) {
+        document.getElementById("step1-calendar").classList.add("d-none");
+        document.getElementById("reservationForm").classList.remove("d-none");
+        document.getElementById("resDate").value = dateStr;
+
+        let d = new Date(dateStr);
+        document.getElementById("displaySelectedDate").innerText =
+          d.toLocaleDateString("en-US", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+
+        // Check specific time slots for that day and disable full ones
+        let dayData = reservationData[dateStr] || {};
+        const select = document.getElementById("resTime");
+
+        Array.from(select.options).forEach((opt) => {
+          if (opt.value === "") return; // Skip the placeholder
+          let slotData = dayData[opt.value] || {};
+          let occupiedTables = slotData.tables
+            ? Object.keys(slotData.tables).length
+            : 0;
+
+          if (occupiedTables >= TOTAL_TABLES) {
+            opt.disabled = true;
+            opt.text = opt.value + " (FULL)";
+          } else {
+            opt.disabled = false;
+            opt.text =
+              opt.value + ` (${TOTAL_TABLES - occupiedTables} tables left)`;
+          }
         });
-        document.getElementById("nextMonth").addEventListener("click", () => {
-            currentMonth++; if(currentMonth > 11) { currentMonth = 0; currentYear++; }
-            renderCalendar(currentMonth, currentYear);
-        });
+        select.value = ""; // Force them to pick a new valid time
+      };
 
-        window.selectDate = function(dateStr) {
-            document.getElementById("step1-calendar").classList.add("d-none");
-            document.getElementById("reservationForm").classList.remove("d-none");
-            document.getElementById("resDate").value = dateStr;
-            let d = new Date(dateStr);
-            document.getElementById("displaySelectedDate").innerText = d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      window.changeDate = function () {
+        document.getElementById("reservationForm").classList.add("d-none");
+        document.getElementById("step1-calendar").classList.remove("d-none");
+      };
+
+      // =========================================================
+      // --- 3. VISUAL TABLE SELECTION LOGIC
+      // =========================================================
+      let selectedTable = null;
+      let tableSelectionModal = null;
+
+      function getAllowedTableSize(peopleCount) {
+        if (peopleCount <= 4) return 4;
+        else if (peopleCount <= 6) return 6;
+        else return 15;
+      }
+
+      const floorLayouts = {
+        1: {
+          bg: "Media/1st_Floor2.png",
+          tables: [
+            { id: 1, seats: 6, left: 12, top: 48.8, w: 16.6, h: 16 },
+            { id: 2, seats: 4, left: 12.3, top: 86, w: 15.8, h: 11 },
+            { id: 3, seats: 4, left: 76.8, top: 84.6, w: 15.8, h: 11 },
+            { id: 4, seats: 6, left: 12, top: 67.4, w: 16.6, h: 16 },
+            { id: 5, seats: 4, left: 76.8, top: 70, w: 15.8, h: 11 },
+            { id: 6, seats: 15, left: 76.6, top: 24.4, w: 16, h: 43 },
+          ],
+        },
+        2: {
+          bg: "Media/2nd_Floor2.png",
+          tables: [
+            { id: 7, seats: 6, left: 8.6, top: 68.4, w: 16.6, h: 16 },
+            { id: 8, seats: 4, left: 46.5, top: 19, w: 15.8, h: 11 },
+            { id: 9, seats: 15, left: 9, top: 9, w: 16, h: 43 },
+            { id: 10, seats: 4, left: 46.5, top: 43, w: 15.8, h: 11 },
+            { id: 11, seats: 4, left: 77.1, top: 8, w: 15.8, h: 11 },
+            { id: 12, seats: 4, left: 77.1, top: 29.8, w: 15.8, h: 11 },
+            { id: 13, seats: 4, left: 77.1, top: 51.4, w: 15.8, h: 11 },
+          ],
+        },
+      };
+
+      function renderTableGrid(floorNum) {
+        const container = document.getElementById("floorPlanContainer");
+        const floorData = floorLayouts[floorNum];
+        const selectedDate = document.getElementById("resDate").value;
+        const selectedTime = document.getElementById("resTime").value;
+
+        let occupiedTables = {};
+
+        if (
+          reservationData[selectedDate] &&
+          reservationData[selectedDate][selectedTime] &&
+          reservationData[selectedDate][selectedTime].tables
+        ) {
+          occupiedTables = reservationData[selectedDate][selectedTime].tables;
         }
 
-        window.changeDate = function() {
-            document.getElementById("reservationForm").classList.add("d-none");
-            document.getElementById("step1-calendar").classList.remove("d-none");
-        }
+        container.style.backgroundImage = `url('${floorData.bg}')`;
+        container.innerHTML = "";
 
-        // =========================================================
-        // --- 3. VISUAL TABLE SELECTION LOGIC
-        // =========================================================
-        let selectedTable = null;
-        let tableSelectionModal = null;
+        let currentPax = parseInt(document.getElementById("resPax").value);
+        if (isNaN(currentPax)) currentPax = 1;
+        let allowedSize = getAllowedTableSize(currentPax);
 
-        function getAllowedTableSize(peopleCount) {
-            if (peopleCount <= 4) return 4;
-            else if (peopleCount <= 6) return 6;
-            else return 15;
-        }
+        floorData.tables.forEach((table) => {
+          let isAllowed = table.seats === allowedSize;
+          let isOccupied = occupiedTables[table.id] === true;
+          let isSelected = selectedTable && selectedTable.id === table.id;
 
-        const floorLayouts = {
-            1: {
-                bg: "Media/1st_Floor2.png",
-                tables: [
-                    { id: 1, seats: 6, left: 12, top: 48.3, w: 16.6, h: 17 },
-                    { id: 2, seats: 4, left: 12.3, top: 86, w: 15.8, h: 11 },
-                    { id: 3, seats: 4, left: 76.8, top: 84.6, w: 15.8, h: 11 },
-                    { id: 4, seats: 6, left: 12, top: 67.2, w: 16.6, h: 17 },
-                    { id: 5, seats: 4, left: 76.8, top: 70, w: 15.8, h: 11 },
-                    { id: 6, seats: 15, left: 76.6, top: 24.4, w: 16, h: 43 },
-                ]
-            },
-            2: {
-                bg: "Media/2nd_Floor2.png",
-                tables: [
-                    { id: 7, seats: 6, left: 8.6, top: 68.2, w: 16.6, h: 17 },
-                    { id: 8, seats: 4, left: 46.5, top: 19, w: 15.8, h: 11 },
-                    { id: 9, seats: 15, left: 9, top: 9, w: 16, h: 43 },
-                    { id: 10, seats: 4, left: 46.5, top: 43, w: 15.8, h: 11 },
-                    { id: 11, seats: 4, left: 77.1, top: 8, w: 15.8, h: 11 },
-                    { id: 12, seats: 4, left: 77.1, top: 29.8, w: 15.8, h: 11 },
-                    { id: 13, seats: 4, left: 77.1, top: 51.4, w: 15.8, h: 11 },
-                ]
-            }
-        };
+          let bgStyle = "background-color: rgba(200, 200, 200, 0.4);";
+          let borderColor = "transparent";
+          let textColor = "#555";
+          let textShadow = "none";
 
-        function renderTableGrid(floorNum) {
-            const container = document.getElementById("floorPlanContainer");
-            const floorData = floorLayouts[floorNum];
-            
-            container.style.backgroundImage = `url('${floorData.bg}')`;
-            container.innerHTML = "";
+          if (isSelected) {
+            bgStyle = `background-color: transparent; background-image: url('Media/${table.seats}packs.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;`;
+            borderColor = "#28a745";
+            textColor = "#000";
+            textShadow = "1px 1px 3px #fff";
+          } else if (isOccupied) {
+            bgStyle = "background-color: rgba(220,53,69,0.3);";
+            borderColor = "#dc3545";
+            textColor = "#dc3545";
+          } else if (isAllowed) {
+            bgStyle = "background-color: transparent;";
+            borderColor = "#000";
+            textColor = "#000";
+            textShadow = "1px 1px 3px #fff";
+          }
 
-            let currentPax = parseInt(document.getElementById("resPax").value);
-            if (isNaN(currentPax)) currentPax = 1;
-            let allowedSize = getAllowedTableSize(currentPax);
+          let opacity = isAllowed && !isOccupied ? "1" : "0.4";
+          let disabledAttr = isAllowed && !isOccupied ? "" : "disabled";
 
-            floorData.tables.forEach((table) => {
-                let isAllowed = table.seats === allowedSize;
-                let isSelected = selectedTable && selectedTable.id === table.id;
-
-                let bgStyle = "background-color: rgba(200, 200, 200, 0.4);"; 
-                let borderColor = "transparent";
-                let textColor = "#555";
-                let textShadow = "none";
-                
-                if (isSelected) {
-                    bgStyle = `background-color: transparent; background-image: url('Media/${table.seats}packs.png'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center;`;
-                    borderColor = "#28a745";
-                    textColor = "#000";
-                    textShadow = "1px 1px 3px #fff"; 
-                } else if (isAllowed) {
-                    bgStyle = "background-color: transparent;";
-                    borderColor = "#000"; 
-                    textColor = "#000";
-                    textShadow = "1px 1px 3px #fff"; 
-                }
-
-                let opacity = isAllowed ? "1" : "0.4"; 
-                let disabledAttr = isAllowed ? "" : "disabled";
-
-                container.innerHTML += `
+          container.innerHTML += `
                     <button type="button" class="fw-bold"
                             style="position: absolute; left: ${table.left}%; top: ${table.top}%; width: ${table.w}%; height: ${table.h}%;
                                    ${bgStyle} border: 2px solid ${borderColor}; 
@@ -434,96 +860,125 @@
                         <small style="font-size: clamp(0.5rem, 2vw, 0.75rem);">${table.seats}pax</small>
                     </button>
                 `;
-            });
-        }
+        });
+      }
 
-        window.selectTable = function(id, seats, floor) {
-            selectedTable = { id: id, seats: seats };
-            renderTableGrid(floor); 
-            
-            const info = document.getElementById("selectedTableInfo");
-            info.innerHTML = `
+      window.selectTable = function (id, seats, floor) {
+        selectedTable = { id: id, seats: seats };
+        renderTableGrid(floor);
+
+        const info = document.getElementById("selectedTableInfo");
+        info.innerHTML = `
                 <strong style="color: var(--toms-orange);">
                     <i class="fa-solid fa-check-circle"></i> 
                     Table ${id} (${seats} Seater) - Floor ${floor} selected
                 </strong>
             `;
-            document.getElementById("confirmTableBtn").disabled = false;
-        };
+        document.getElementById("confirmTableBtn").disabled = false;
+      };
 
-        document.getElementById("resPax").addEventListener("input", () => {
-            selectedTable = null;
-            document.getElementById("resTableSize").value = "";
-            document.getElementById("confirmTableBtn").disabled = true;
-            document.getElementById("selectedTableInfo").innerHTML = '<small class="text-muted">Click on a table to select</small>';
-            
-            if (document.getElementById("tableSelectionModal").classList.contains("show")) {
-                const floor = parseInt(document.querySelector('input[name="floorSelect"]:checked').value);
-                renderTableGrid(floor);
-            }
-        });
+      document.getElementById("resPax").addEventListener("input", () => {
+        selectedTable = null;
+        document.getElementById("resTableSize").value = "";
+        document.getElementById("confirmTableBtn").disabled = true;
+        document.getElementById("selectedTableInfo").innerHTML =
+          '<small class="text-muted">Click on a table to select</small>';
 
-        document.querySelectorAll('input[name="floorSelect"]').forEach((radio) => {
-            radio.addEventListener("change", (e) => {
-                selectedTable = null;
-                document.getElementById("confirmTableBtn").disabled = true;
-                document.getElementById("selectedTableInfo").innerHTML = '<small class="text-muted">Click on a table to select</small>';
-                renderTableGrid(parseInt(e.target.value));
-            });
-        });
+        if (
+          document
+            .getElementById("tableSelectionModal")
+            .classList.contains("show")
+        ) {
+          const floor = parseInt(
+            document.querySelector('input[name="floorSelect"]:checked').value,
+          );
+          renderTableGrid(floor);
+        }
+      });
 
-        document.getElementById("confirmTableBtn").addEventListener("click", () => {
-            if (selectedTable) {
-                const floor = document.querySelector('input[name="floorSelect"]:checked').value;
-                let floorText = floor === "1" ? "1st Floor" : "2nd Floor";
-                document.getElementById("resTableSize").value = `Table ${selectedTable.id}, ${floorText}, ${selectedTable.seats} Seater`;
-                if (tableSelectionModal) tableSelectionModal.hide();
-            }
-        });
-
-        const tableModalElement = document.getElementById("tableSelectionModal");
-        tableSelectionModal = new bootstrap.Modal(tableModalElement, { backdrop: "static", keyboard: false });
-
-        tableModalElement.addEventListener("shown.bs.modal", () => {
+      document
+        .querySelectorAll('input[name="floorSelect"]')
+        .forEach((radio) => {
+          radio.addEventListener("change", (e) => {
             selectedTable = null;
             document.getElementById("confirmTableBtn").disabled = true;
-            const floor = parseInt(document.querySelector('input[name="floorSelect"]:checked').value);
-            renderTableGrid(floor); 
-            document.getElementById("selectedTableInfo").innerHTML = '<small class="text-muted">Click on a table to select</small>';
+            document.getElementById("selectedTableInfo").innerHTML =
+              '<small class="text-muted">Click on a table to select</small>';
+            renderTableGrid(parseInt(e.target.value));
+          });
         });
 
-        document.getElementById("openTableSelectionBtn").addEventListener("click", () => { tableSelectionModal.show(); });
-
-
-        // ==========================================
-        // 4. ADVANCE ORDER LOGIC
-        // ==========================================
-        let advanceCart = {};
-        let currentMenuData = {};
-
-        document.getElementById("advanceOrderToggle").addEventListener("change", function() {
-            const menuSec = document.getElementById("advanceMenuSection");
-            if(this.checked) { menuSec.classList.remove("d-none"); } 
-            else { menuSec.classList.add("d-none"); }
+      document
+        .getElementById("confirmTableBtn")
+        .addEventListener("click", () => {
+          if (selectedTable) {
+            const floor = document.querySelector(
+              'input[name="floorSelect"]:checked',
+            ).value;
+            let floorText = floor === "1" ? "1st Floor" : "2nd Floor";
+            document.getElementById("resTableSize").value =
+              `Table ${selectedTable.id}, ${floorText}, ${selectedTable.seats} Seater`;
+            if (tableSelectionModal) tableSelectionModal.hide();
+          }
         });
 
-        onValue(ref(db, 'advanceMenu'), (snapshot) => {
-            const container = document.getElementById('menuContainer');
-            container.innerHTML = '';
-            currentMenuData = {};
+      const tableModalElement = document.getElementById("tableSelectionModal");
+      tableSelectionModal = new bootstrap.Modal(tableModalElement, {
+        backdrop: "static",
+        keyboard: false,
+      });
 
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                for (let catKey in data) {
-                    let cat = data[catKey];
-                    let html = `<div class="p-3 bg-white border-bottom"><h6 class="fw-bold mb-0" style="color: var(--toms-orange);"><i class="fa-solid ${cat.icon} me-2"></i> ${cat.title}</h6></div>`;
-                    
-                    for (let itemKey in cat.items) {
-                        let item = cat.items[itemKey];
-                        let uniqueID = `${catKey}_${itemKey}`;
-                        currentMenuData[uniqueID] = item;
+      tableModalElement.addEventListener("shown.bs.modal", () => {
+        selectedTable = null;
+        document.getElementById("confirmTableBtn").disabled = true;
+        const floor = parseInt(
+          document.querySelector('input[name="floorSelect"]:checked').value,
+        );
+        renderTableGrid(floor);
+        document.getElementById("selectedTableInfo").innerHTML =
+          '<small class="text-muted">Click on a table to select</small>';
+      });
 
-                        html += `
+      document
+        .getElementById("openTableSelectionBtn")
+        .addEventListener("click", () => {
+          tableSelectionModal.show();
+        });
+
+      // ==========================================
+      // 4. ADVANCE ORDER LOGIC
+      // ==========================================
+      let advanceCart = {};
+      let currentMenuData = {};
+
+      document
+        .getElementById("advanceOrderToggle")
+        .addEventListener("change", function () {
+          const menuSec = document.getElementById("advanceMenuSection");
+          if (this.checked) {
+            menuSec.classList.remove("d-none");
+          } else {
+            menuSec.classList.add("d-none");
+          }
+        });
+
+      onValue(ref(db, "advanceMenu"), (snapshot) => {
+        const container = document.getElementById("menuContainer");
+        container.innerHTML = "";
+        currentMenuData = {};
+
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          for (let catKey in data) {
+            let cat = data[catKey];
+            let html = `<div class="p-3 bg-white border-bottom"><h6 class="fw-bold mb-0" style="color: var(--toms-orange);"><i class="fa-solid ${cat.icon} me-2"></i> ${cat.title}</h6></div>`;
+
+            for (let itemKey in cat.items) {
+              let item = cat.items[itemKey];
+              let uniqueID = `${catKey}_${itemKey}`;
+              currentMenuData[uniqueID] = item;
+
+              html += `
                             <div class="menu-card bg-white">
                                 <div>
                                     <h6 class="fw-bold mb-1">${item.name}</h6>
@@ -537,136 +992,149 @@
                                 </div>
                             </div>
                         `;
-                    }
-                    container.innerHTML += html;
-                }
-            } else {
-                container.innerHTML = '<p class="text-center text-muted py-3">Menu unavailable.</p>';
             }
-        });
+            container.innerHTML += html;
+          }
+        } else {
+          container.innerHTML =
+            '<p class="text-center text-muted py-3">Menu unavailable.</p>';
+        }
+      });
 
-        window.updateCart = function(id, change) {
-            if(!advanceCart[id]) { advanceCart[id] = { ...currentMenuData[id], qty: 0 }; }
-            
-            let newQty = advanceCart[id].qty + change;
-            if(newQty < 0) newQty = 0;
-            
-            advanceCart[id].qty = newQty;
-            document.getElementById(`qty_${id}`).innerText = newQty;
-            
-            if(newQty === 0) delete advanceCart[id];
-            
-            // Calculate and display live total on the cart
-            let total = 0;
-            for (let item in advanceCart) { total += (advanceCart[item].price * advanceCart[item].qty); }
-            document.getElementById("cartTotal").innerText = total.toFixed(2);
+      window.updateCart = function (id, change) {
+        if (!advanceCart[id]) {
+          advanceCart[id] = { ...currentMenuData[id], qty: 0 };
         }
 
-        // ==========================================
-        // 5. PAYMENT CALCULATION & SUBMISSION LOGIC
-        // ==========================================
+        let newQty = advanceCart[id].qty + change;
+        if (newQty < 0) newQty = 0;
+
+        advanceCart[id].qty = newQty;
+        document.getElementById(`qty_${id}`).innerText = newQty;
+
+        if (newQty === 0) delete advanceCart[id];
+
+        let total = 0;
+        for (let item in advanceCart) {
+          total += advanceCart[item].price * advanceCart[item].qty;
+        }
+        document.getElementById("cartTotal").innerText = total.toFixed(2);
+      };
+
+      // ==========================================
+      // 5. PAYMENT CALCULATION & SUBMISSION LOGIC
+      // ==========================================
+
+      let finalPaymentAmount = 70;
+
+      document
+        .getElementById("reservationForm")
+        .addEventListener("submit", (e) => {
+          e.preventDefault();
+
+          if (!document.getElementById("resTableSize").value) {
+            alert("Please select a table from the map before proceeding.");
+            return;
+          }
+
+          const baseFee = 70;
+          let advanceTotal = 0;
+
+          if (document.getElementById("advanceOrderToggle").checked) {
+            for (let id in advanceCart) {
+              advanceTotal += advanceCart[id].price * advanceCart[id].qty;
+            }
+          }
+
+          let advanceHalf = advanceTotal / 2;
+          finalPaymentAmount = baseFee + advanceHalf;
+
+          document.getElementById("advanceDownpaymentDisplay").innerText =
+            "₱" + advanceHalf.toFixed(2);
+          document.getElementById("finalTotalDisplay").innerText =
+            finalPaymentAmount.toFixed(2);
+
+          if (advanceHalf === 0) {
+            document
+              .getElementById("advancePaymentRow")
+              .classList.add("d-none");
+          } else {
+            document
+              .getElementById("advancePaymentRow")
+              .classList.remove("d-none");
+          }
+
+          const paymentModal = new bootstrap.Modal(
+            document.getElementById("paymentModal"),
+          );
+          paymentModal.show();
+        });
+
+      document.getElementById("confirmPayBtn").addEventListener("click", async () => {
+    const fileInput = document.getElementById("resReceipt").files[0];
+    if (!fileInput) {
+        alert("Please upload your payment receipt first.");
+        return;
+    }
+
+    const btn = document.getElementById("confirmPayBtn");
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+    btn.disabled = true;
+
+    let compiledNotes = "";
+    if (document.getElementById("advanceOrderToggle").checked) {
+        let itemsList = [];
+        for (let id in advanceCart) itemsList.push(`${advanceCart[id].qty}x ${advanceCart[id].name}`);
+        if (itemsList.length > 0) compiledNotes = "[ADVANCE ORDER] " + itemsList.join(", ");
+    }
+
+    try {
+        // Upload Image to Firebase Storage
+        const sRef = storageRef(storage, `receipts/reservations/${Date.now()}_${fileInput.name}`);
+        await uploadBytes(sRef, fileInput);
+        const receiptUrl = await getDownloadURL(sRef);
+
+        const newResRef = push(ref(db, "reservations"));
+        const resId = newResRef.key;
+        const selectedDate = document.getElementById("resDate").value;
+        const selectedTime = document.getElementById("resTime").value;
+
+        const tableMatch = document.getElementById("resTableSize").value.match(/Table (\d+)/);
+        const tableId = tableMatch[1];
+
+        await set(ref(db, `reservationSlots/${selectedDate}/${selectedTime}/tables/${tableId}`), true);
+
+        await set(newResRef, {
+            name: currentUserName,
+            date: selectedDate,
+            time: selectedTime,
+            pax: document.getElementById("resPax").value,
+            tableSize: document.getElementById("resTableSize").value,
+            notes: compiledNotes,
+            type: "online",
+            status: "pending",
+        });
+
+        await push(ref(db, "payments"), {
+            customerName: currentUserName,
+            amount: finalPaymentAmount.toFixed(2),
+            category: "Online Reservation",
+            timestamp: Date.now(),
+            status: "pending",
+            receiptUrl: receiptUrl, // Saving the real Storage URL
+            reservationId: resId,
+        });
+
+        bootstrap.Modal.getInstance(document.getElementById("paymentModal")).hide();
+        new bootstrap.Modal(document.getElementById("ReservSuccessModal")).show();
         
-        let finalPaymentAmount = 70; // Base reservation fee
-
-        // A. Handle Form Submission (Opens Payment Modal)
-        document.getElementById('reservationForm').addEventListener('submit', (e) => {
-            e.preventDefault(); 
-            
-            if (!document.getElementById("resTableSize").value) {
-                alert("Please select a table from the map before proceeding.");
-                return;
-            }
-
-            // Calculate the required downpayment
-            const baseFee = 70;
-            let advanceTotal = 0;
-            
-            if (document.getElementById("advanceOrderToggle").checked) {
-                for (let id in advanceCart) { advanceTotal += (advanceCart[id].price * advanceCart[id].qty); }
-            }
-            
-            // They pay 50% of the advance food order + the 70 base fee
-            let advanceHalf = advanceTotal / 2;
-            finalPaymentAmount = baseFee + advanceHalf;
-
-            // Update the Modal UI with the math
-            document.getElementById("advanceDownpaymentDisplay").innerText = "₱" + advanceHalf.toFixed(2);
-            document.getElementById("finalTotalDisplay").innerText = finalPaymentAmount.toFixed(2);
-            
-            if(advanceHalf === 0) {
-                document.getElementById("advancePaymentRow").classList.add("d-none");
-            } else {
-                document.getElementById("advancePaymentRow").classList.remove("d-none");
-            }
-
-            const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
-            paymentModal.show();
-        });
-
-        // B. Handle File Upload Base64 Conversion
-        document.getElementById('resReceipt').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onloadend = function() { document.getElementById('receiptBase64').value = reader.result; }
-            if (file) { reader.readAsDataURL(file); }
-        });
-
-        // C. Final Confirm & Pay inside the Modal
-        document.getElementById('confirmPayBtn').addEventListener('click', async () => {
-            const receiptData = document.getElementById('receiptBase64').value;
-            if (!receiptData) {
-                alert("Please upload your payment receipt first.");
-                return;
-            }
-
-            const btn = document.getElementById('confirmPayBtn');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-            btn.disabled = true;
-
-            let compiledNotes = "";
-            if (document.getElementById("advanceOrderToggle").checked) {
-                let itemsList = [];
-                for (let id in advanceCart) { itemsList.push(`${advanceCart[id].qty}x ${advanceCart[id].name}`); }
-                if(itemsList.length > 0) compiledNotes = "[ADVANCE ORDER] " + itemsList.join(", ");
-            }
-            
-            try {
-                const newResRef = push(ref(db, 'reservations'));
-                const resId = newResRef.key;
-
-                await set(newResRef, {
-                    name: currentUserName,
-                    date: document.getElementById('resDate').value,
-                    time: document.getElementById('resTime').value,
-                    pax: document.getElementById('resPax').value,
-                    tableSize: document.getElementById('resTableSize').value,
-                    notes: compiledNotes,
-                    type: 'online',
-                    status: 'pending' 
-                });
-
-                await push(ref(db, 'payments'), {
-                    customerName: currentUserName,
-                    amount: finalPaymentAmount.toFixed(2), // Uses the new calculated amount!
-                    category: "Online Reservation",
-                    timestamp: Date.now(),
-                    status: "pending", 
-                    receiptUrl: receiptData,
-                    reservationId: resId 
-                });
-
-                // Hide the payment modal and show success!
-                bootstrap.Modal.getInstance(document.getElementById('paymentModal')).hide();
-                const ReservSuccessModal = new bootstrap.Modal(document.getElementById('ReservSuccessModal'));
-                ReservSuccessModal.show();
-
-            } catch (error) {
-                console.error(error);
-                alert("Error: " + error.message);
-                btn.innerHTML = 'Confirm & Pay';
-                btn.disabled = false;
-            }
-        });
+    } catch (error) {
+        console.error(error);
+        alert("Error: " + error.message);
+        btn.innerHTML = "Confirm & Pay";
+        btn.disabled = false;
+    }
+});
     </script>
-</body>
+  </body>
 </html>

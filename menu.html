@@ -1,359 +1,348 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Tom's Chicken - Menu & Order</title>
-    
-    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 
     <style>
-        :root { --toms-orange: #f57d10ff; --toms-dark: #212529; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; padding-bottom: 90px; }
-        
-        .navbar { box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .mobile-container { max-width: 600px; margin: 0 auto; padding: 15px; }
+      :root { --toms-orange: #f57d10ff; --toms-dark: #212529; }
+      body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; padding-bottom: 90px; }
+      .navbar { box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); }
+      .mobile-container { max-width: 600px; margin: 0 auto; padding: 15px; }
 
-        /* MENU CARDS */
-        .menu-card {
-            background: white; border-radius: 15px; border: none;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); overflow: hidden;
-            display: flex; align-items: center; padding: 10px; margin-bottom: 15px;
-        }
-        .menu-img {
-            width: 80px; height: 80px; border-radius: 10px; object-fit: cover;
-            background-color: #eee;
-        }
-        .menu-info { flex-grow: 1; padding-left: 15px; }
-        .btn-add {
-            background-color: #fff3cd; color: var(--toms-orange); border: 1px solid var(--toms-orange);
-            border-radius: 50px; font-weight: bold; padding: 5px 15px; transition: 0.2s;
-        }
-        .btn-add:hover, .btn-add:active { background-color: var(--toms-orange); color: white; }
+      .category-title { font-weight: 800; font-size: 1.2rem; color: var(--toms-dark); margin-top: 30px; margin-bottom: 15px; border-bottom: 2px solid var(--toms-orange); padding-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+      
+      .menu-card { background: white; border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); overflow: hidden; display: flex; flex-direction: column; padding: 15px; margin-bottom: 15px; }
+      .menu-header-row { display: flex; align-items: center; width: 100%; }
+      
+      .menu-img { width: 60px; height: 60px; border-radius: 10px; flex-shrink: 0; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; }
+      .menu-info { flex-grow: 1; padding-left: 15px; }
+      
+      .btn-add { background-color: #fff3cd; color: var(--toms-orange); border: 1px solid var(--toms-orange); border-radius: 50px; font-weight: bold; padding: 5px 20px; transition: 0.2s; white-space: nowrap; }
+      .btn-add:hover, .btn-add:active { background-color: var(--toms-orange); color: white; }
 
-        /* FLOATING CART BUTTON */
-        .floating-cart {
-            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 500px; background-color: var(--toms-orange); color: white;
-            border-radius: 50px; padding: 15px 20px; display: flex; justify-content: space-between;
-            align-items: center; box-shadow: 0 10px 20px rgba(245, 125, 16, 0.4); z-index: 1000; cursor: pointer;
-        }
-        
-        /* PAYMENT STYLES */
-        .payment-box { background: #fff3cd; border: 1px solid #ffe69c; border-radius: 10px; padding: 15px; text-align: center; }
-        .qr-placeholder { width: 150px; height: 150px; background: white; border: 2px dashed #ffc107; margin: 10px auto; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
-        .btn-orange { background-color: var(--toms-orange); color: white; border-radius: 50px; font-weight: bold; border: none; }
+      .flavor-select { background-color: #f1f3f5; color: var(--toms-dark); border: 1px solid #dee2e6; border-radius: 5px; font-size: 0.8rem; padding: 4px 10px; font-weight: 600; cursor: pointer; flex: 1 1 45%; min-width: 120px; }
+      .flavor-select:focus { outline: none; border-color: var(--toms-orange); }
 
-        /* FLAVOR DROPDOWN (Matches image_5.png) */
-        .flavor-select {
-            background-color: #ced4da; /* Grey background */
-            color: var(--toms-dark);
-            border: none;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            padding: 5px 15px;
-            font-weight: 600;
-            cursor: pointer;
-            width: auto;
-            display: inline-block;
-            margin-right: 10px;
-        }
-        .flavor-select:focus { outline: none; box-shadow: none; }
+      .floating-cart { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background-color: var(--toms-orange); color: white; border-radius: 50px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 20px rgba(245, 125, 16, 0.4); z-index: 1000; cursor: pointer; }
+
+      .payment-box { background: #fff3cd; border: 1px solid #ffe69c; border-radius: 10px; padding: 15px; text-align: center; }
+      .qr-placeholder { width: 150px; height: 150px; background: white; border: 2px dashed #ffc107; margin: 10px auto; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+      .btn-orange { background-color: var(--toms-orange); color: white; border-radius: 50px; font-weight: bold; border: none; }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
-        <div class="container mobile-container py-0">
-            <a class="navbar-brand fw-bold fs-4" href="index.html" style="color: var(--toms-orange);">
-                <i class="fa-solid fa-arrow-left text-dark me-2" onclick="history.back(); return false;"></i> 
-                Tom's<span class="text-dark">Chicken</span>
-            </a>
-        </div>
+      <div class="container mobile-container py-0">
+        <a class="navbar-brand fw-bold fs-4" href="index.html" style="color: var(--toms-orange)">
+          <i class="fa-solid fa-arrow-left text-dark me-2" onclick="history.back(); return false;"></i> Tom's<span class="text-dark">Chicken</span>
+        </a>
+      </div>
     </nav>
 
     <div class="container mobile-container mt-3">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="fw-bold mb-0">Pickup Menu</h4>
-            <span class="badge bg-dark">In-Store Pickup Only</span>
-        </div>
-        <p class="text-muted small mb-4">Select your items. We'll start preparing them once payment is verified.</p>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0">Pickup Menu</h4>
+        <span class="badge bg-dark">In-Store Pickup</span>
+      </div>
+      <p class="text-muted small mb-4">Select your items. We'll prepare them once payment is verified.</p>
 
-        <div id="menuContainer"></div>
+      <div id="menuContainer">
+        <p class="text-center text-muted py-5"><i class="fa-solid fa-spinner fa-spin fa-2x mb-3"></i><br>Loading Menu...</p>
+      </div>
     </div>
 
     <div class="floating-cart d-none" id="cartBtn" data-bs-toggle="modal" data-bs-target="#cartModal">
-        <div class="fw-bold"><i class="fa-solid fa-cart-shopping me-2"></i> <span id="cartCount">0</span> Items</div>
-        <div class="fw-bold fs-5">₱<span id="cartTotalBtn">0.00</span></div>
+      <div class="fw-bold"><i class="fa-solid fa-cart-shopping me-2"></i> <span id="cartCount">0</span> Items</div>
+      <div class="fw-bold fs-5">₱<span id="cartTotalBtn">0.00</span></div>
+    </div>
+
+    <div class="modal fade" id="orderSuccessModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body text-center p-4">
+            <i class="fa-solid fa-check-circle fa-3x text-success mb-3"></i>
+            <h5 class="fw-bold mb-2">Order Placed Successfully!</h5>
+            <p class="text-muted mb-4">We will prepare your order once payment is verified. Thank you for choosing Tom's Chicken!</p>
+            <button class="btn btn-orange px-4" data-bs-dismiss="modal">View My Orders</button>
+          </div>  
+        </div>
+      </div>
     </div>
 
     <div class="modal fade" id="cartModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
-            <div class="modal-content">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title fw-bold">Your Order</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="cartItemsList" class="mb-4">
-                        </div>
-                    
-                    <h4 class="fw-bold text-end border-top pt-3 mb-4">Total: ₱<span id="cartTotalModal">0.00</span></h4>
+      <div class="modal-dialog modal-dialog-scrollable modal-fullscreen-sm-down">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title fw-bold">Your Order</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div id="cartItemsList" class="mb-4"></div>
+            <h4 class="fw-bold text-end border-top pt-3 mb-4">Total: ₱<span id="cartTotalModal">0.00</span></h4>
 
-                    <form id="checkoutForm">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold small">Pickup Time (Approximate)</label>
-                            <input type="time" id="pickupTime" class="form-control" required>
-                        </div>
-
-                        <div class="payment-box mb-4">
-                            <h6 class="fw-bold text-dark mb-1">Pay via GCash / PayMaya</h6>
-                            <p class="mb-2 small">Send total amount to: <b>0912 345 6789</b></p>
-                            <div class="qr-placeholder">
-                                <i class="fa-solid fa-qrcode fa-3x text-muted opacity-50"></i>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label fw-bold small">Upload Payment Receipt</label>
-                            <input type="file" id="orderReceipt" class="form-control" accept="image/*" required>
-                            <input type="hidden" id="receiptBase64">
-                        </div>
-
-                        <button type="submit" id="submitBtn" class="btn btn-orange w-100 py-3 fs-5 shadow-sm">
-                            <i class="fa-solid fa-check-circle"></i> Confirm Order
-                        </button>
-                    </form>
-                </div>
-            </div>
+            <form id="checkoutForm">
+              <div class="mb-3">
+                <label class="form-label fw-bold small">Pickup Time</label>
+                <input type="time" id="pickupTime" class="form-control" required />
+              </div>
+              <div class="payment-box mb-4">
+                <h6 class="fw-bold text-dark mb-1">Pay via GCash / PayMaya</h6>
+                <p class="mb-2 small">Send total amount to: <b>0912 345 6789</b></p>
+                <div class="qr-placeholder"><i class="fa-solid fa-qrcode fa-3x text-muted opacity-50"></i></div>
+              </div>
+              <div class="mb-4">
+                <label class="form-label fw-bold small">Upload Payment Receipt</label>
+                <input type="file" id="orderReceipt" class="form-control" accept="image/*" required />
+              </div>
+              <button type="submit" id="submitBtn" class="btn btn-orange w-100 py-3 fs-5 shadow-sm">
+                <i class="fa-solid fa-check-circle"></i> Confirm Order
+              </button>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
 
     <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
-    <script type="module">
-        import { auth, db, ref, get, onValue, push, onAuthStateChanged } from "./js/firebase-config.js";
+      <script type="module">
+      import { auth, db, ref, get, onValue, push, onAuthStateChanged, storage, storageRef, uploadBytes, getDownloadURL } from "./js/firebase-config.js";
 
-        let currentUserName = "Unknown Customer";
-        
-        // 1. SECURITY: Must be logged in to order
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                alert("Please login to place an order.");
-                window.location.href = "login.html";
-            } else {
-                const snap = await get(ref(db, 'users/' + user.uid));
-                if (snap.exists()) {
-                    currentUserName = `${snap.val().firstName} ${snap.val().lastName}`;
-                }
-            }
-        });
+      let currentUserName = "Unknown Customer";
+      let currentMenuData = {}; 
+      
+      // LOAD CART FROM LOCAL STORAGE (or initialize empty)
+      let cart = JSON.parse(localStorage.getItem('tomsCart')) || {}; 
 
-        // -------------------------------------------------------------
-        // --- NEW REAL-TIME MENU LOGIC (From Database) ---
-        // -------------------------------------------------------------
+      // Update UI immediately on load in case there are saved items
+      document.addEventListener("DOMContentLoaded", () => {
+          updateCartUI();
+      });
 
-        // We listen to the 'menu' node in real-time
-        const menuRef = ref(db, 'menu');
-        let currentMenuData = {}; // Stores fetched menu data
-        let cart = {}; // Shopping cart
+      // Auth Check
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) { alert("Please login to place an order."); window.location.href = "login.html"; } 
+        else {
+          const snap = await get(ref(db, "users/" + user.uid));
+          if (snap.exists()) currentUserName = `${snap.val().firstName} ${snap.val().lastName}`;
+        }
+      });
 
-        onValue(menuRef, (snapshot) => {
-            const menuContainer = document.getElementById('menuContainer');
-            menuContainer.innerHTML = ''; // Clear loading/old items
-            currentMenuData = {}; // Clear previous data
+      // Render Menu
+      onValue(ref(db, "menu"), (snapshot) => {
+        const container = document.getElementById("menuContainer");
+        container.innerHTML = "";
+        currentMenuData = {};
 
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                
-                // loop through the items from the database (e.g. item_m1, item_m2)
-                for (let dbKey in data) {
-                    let item = data[dbKey];
-                    currentMenuData[dbKey] = item; // Store for cart use
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const categorizedData = {};
 
-                    // 1. Generate Flavor Dropdown HTML if "options" exist in DB
-                    let flavorDropdownHTML = "";
-                    
-                    // Check standard if condition (Thesis friendly)
-                    if (item.options !== undefined && item.options !== null) {
-                        flavorDropdownHTML = `<select class="flavor-select form-select-sm" id="flavor_${dbKey}">`;
-                        // Loop through the options array (e.g. Original, Spicy)
-                        for(let i=0; i < item.options.length; i++) {
-                            flavorDropdownHTML += `<option value="${item.options[i]}">${item.options[i]}</option>`;
-                        }
-                        flavorDropdownHTML += `</select>`;
+          const order = ["Salads", "Burgers & Sandwiches", "Appetizers", "Starters", "Rice Meals", "Pasta", "Wings To-Go", "Barkada Sets"];
+
+          for (let key in data) {
+            let item = data[key];
+            currentMenuData[key] = item;
+            let cat = item.category || "Other";
+            if (!categorizedData[cat]) categorizedData[cat] = {};
+            categorizedData[cat][key] = item;
+          }
+
+          order.forEach(categoryName => {
+            if (categorizedData[categoryName]) {
+              container.innerHTML += `<div class="category-title">${categoryName}</div>`;
+              
+              for (let key in categorizedData[categoryName]) {
+                let item = categorizedData[categoryName][key];
+                let dropdownsHTML = "";
+
+                if (item.options && item.options.length > 0) {
+                    let count = item.optionCount || 1;
+                    dropdownsHTML += `<div class="d-flex flex-wrap gap-2 mt-3 p-2 bg-light rounded w-100 border">`;
+                    dropdownsHTML += `<div class="w-100 small fw-bold text-muted mb-1">Select ${count} Flavor(s):</div>`;
+                    for(let i = 0; i < count; i++) {
+                        dropdownsHTML += `<select class="flavor-select form-select-sm" id="flavor_${key}_${i}">`;
+                        item.options.forEach(opt => {
+                            dropdownsHTML += `<option value="${opt}">${opt}</option>`;
+                        });
+                        dropdownsHTML += `</select>`;
                     }
+                    dropdownsHTML += `</div>`;
+                }
 
-                    // 2. Add Item Card to UI (incorporating flavorDropdownHTML)
-                    menuContainer.innerHTML += `
-                        <div class="menu-card">
-                            <div class="menu-img d-flex align-items-center justify-content-center bg-light">
-                                <i class="fa-solid ${item.icon} fa-2x text-warning"></i>
-                            </div>
+                let descHTML = item.desc ? `<small class="text-muted d-block mt-1" style="font-size: 0.75rem; line-height: 1.2;">${item.desc}</small>` : "";
+
+                container.innerHTML += `
+                    <div class="menu-card">
+                        <div class="menu-header-row">
+                            <div class="menu-img"><i class="fa-solid ${item.icon || 'fa-utensils'} fa-2x text-warning"></i></div>
                             <div class="menu-info">
-                                <h6 class="fw-bold mb-1">${item.name}</h6>
-                                <small class="text-muted d-block mb-1" style="font-size: 0.75rem;">${item.desc}</small>
-                                <div class="d-flex justify-content-between align-items-center mt-2">
-                                    <span class="fw-bold text-success">₱${item.price}</span>
-                                    <div class="d-flex align-items-center">
-                                        <!-- NEW: Injection point for dynamic dropdown -->
-                                        ${flavorDropdownHTML} 
-                                        <!-- Change addToCart to addToCartWithOptions -->
-                                        <button class="btn btn-add btn-sm" onclick="addToCartWithOptions('${dbKey}')">
-                                            <i class="fa-solid fa-plus"></i> Add
-                                        </button>
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="fw-bold mb-0">${item.name}</h6>
+                                        <span class="fw-bold text-success d-block mt-1">₱${item.price}</span>
                                     </div>
+                                    <button class="btn btn-add btn-sm" onclick="addToCartWithOptions('${key}')">
+                                        <i class="fa-solid fa-plus"></i> Add
+                                    </button>
                                 </div>
+                                ${descHTML}
                             </div>
                         </div>
-                    `;
-                }
-            } else {
-                menuContainer.innerHTML = '<p class="text-center text-muted">Menu is currently unavailable.</p>';
+                        ${dropdownsHTML}
+                    </div>`;
+              }
             }
-        });
-
-        // --- NEW ADD TO CART WITH OPTION SUPPORT ---
-        window.addToCartWithOptions = function(dbKey) {
-            const itemData = currentMenuData[dbKey];
-            let selectedFlavor = "";
-
-            // 1. Check if a dropdown exists for this item
-            const flavorSelect = document.getElementById("flavor_" + dbKey);
-            if (flavorSelect) {
-                selectedFlavor = flavorSelect.value; // Capture Original, Spicy, etc.
-            }
-
-            // 2. Create UNIQUE Cart Key: 
-            // This is crucial. A "1pc Chicken (Spicy)" is a different 
-            // cart item than "1pc Chicken (Original)".
-            // Key format: dbKey_SelectedFlavor (e.g., item_m1_Spicy)
-            const cartKey = selectedFlavor ? `${dbKey}_${selectedFlavor}` : dbKey;
-
-            // 3. Simple if logic to add/update qty
-            if (cart[cartKey]) {
-                cart[cartKey].qty++;
-            } else {
-                // We add the chosen flavor string to the cart object so we can show it later
-                cart[cartKey] = { ...itemData, qty: 1, chosenOption: selectedFlavor };
-            }
-            updateCartUI();
+          });
+        } else {
+          container.innerHTML = '<p class="text-center text-muted">Menu is currently unavailable.</p>';
         }
+      });
 
-        // --- REMAINING CART FUNCTIONS (Slightly modified to use cartKey) ---
-        window.changeQty = function(cartKey, amount) {
-            if (cart[cartKey]) {
-                cart[cartKey].qty += amount;
-                if (cart[cartKey].qty <= 0) delete cart[cartKey];
-                updateCartUI();
+      // Save Cart Helper Function
+      function saveCart() {
+          localStorage.setItem('tomsCart', JSON.stringify(cart));
+      }
+
+      // Add to Cart Logic
+      window.addToCartWithOptions = function (dbKey) {
+        const itemData = currentMenuData[dbKey];
+        let selectedOptionsArray = [];
+        let count = itemData.optionCount || 1;
+
+        if (itemData.options) {
+            for(let i = 0; i < count; i++) {
+                let dropdown = document.getElementById(`flavor_${dbKey}_${i}`);
+                if(dropdown) selectedOptionsArray.push(dropdown.value);
             }
         }
 
-        function updateCartUI() {
-            let totalItems = 0;
-            let totalPrice = 0;
-            const cartList = document.getElementById('cartItemsList');
-            cartList.innerHTML = '';
+        let joinedOptions = selectedOptionsArray.join(", ");
+        const cartKey = joinedOptions ? `${dbKey}_${joinedOptions.replace(/[^a-zA-Z0-9]/g, '')}` : dbKey;
 
-            // Using standard for...in loop (Thesis friendly)
-            for (let cartKey in cart) {
-                let item = cart[cartKey];
-                totalItems += item.qty;
-                totalPrice += (item.price * item.qty);
+        if (cart[cartKey]) {
+          cart[cartKey].qty++;
+        } else {
+          cart[cartKey] = { ...itemData, qty: 1, chosenOption: joinedOptions };
+        }
+        
+        saveCart(); // Save immediately
+        updateCartUI();
+      };
 
-                // Show the flavor next to the name in the summary
-                let displayName = item.name;
-                if (item.chosenOption) {
-                    displayName = `${item.name} (${item.chosenOption})`;
-                }
+      // Change Qty inside Modal
+      window.changeQty = function (cartKey, amount) {
+        if (cart[cartKey]) {
+          cart[cartKey].qty += amount;
+          if (cart[cartKey].qty <= 0) delete cart[cartKey];
+          
+          saveCart(); // Save immediately
+          updateCartUI();
+        }
+      };
 
-                cartList.innerHTML += `
-                    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-                        <div>
-                            <h6 class="mb-0 fw-bold">${displayName}</h6>
-                            <small class="text-muted">₱${item.price} x ${item.qty}</small>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <button type="button" class="btn btn-sm btn-outline-danger px-2" onclick="changeQty('${cartKey}', -1)">-</button>
-                            <span class="mx-3 fw-bold">${item.qty}</span>
-                            <button type="button" class="btn btn-sm btn-outline-success px-2" onclick="changeQty('${cartKey}', 1)">+</button>
-                        </div>
-                    </div>
-                `;
-            }
+      // Update Cart UI
+      function updateCartUI() {
+        let totalItems = 0, totalPrice = 0;
+        const cartList = document.getElementById("cartItemsList");
+        cartList.innerHTML = "";
 
-            document.getElementById('cartCount').innerText = totalItems;
-            document.getElementById('cartTotalBtn').innerText = totalPrice.toFixed(2);
-            document.getElementById('cartTotalModal').innerText = totalPrice.toFixed(2);
+        for (let cartKey in cart) {
+          let item = cart[cartKey];
+          totalItems += item.qty;
+          totalPrice += item.price * item.qty;
 
-            const cartBtn = document.getElementById('cartBtn');
-            if (totalItems > 0) {
-                cartBtn.classList.remove('d-none');
-            } else {
-                cartBtn.classList.add('d-none');
-                cartList.innerHTML = '<p class="text-center text-muted my-4">Your cart is empty.</p>';
-            }
+          let displayOpts = item.chosenOption ? `<br><small class="text-orange" style="color:var(--toms-orange); font-size: 0.7rem;">[ ${item.chosenOption} ]</small>` : "";
+
+          cartList.innerHTML += `
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                <div style="flex: 1; padding-right: 10px;">
+                    <h6 class="mb-0 fw-bold" style="line-height: 1.2;">${item.name} ${displayOpts}</h6>
+                    <small class="text-muted fw-bold">₱${item.price} x ${item.qty}</small>
+                </div>
+                <div class="d-flex align-items-center">
+                    <button type="button" class="btn btn-sm btn-outline-danger px-2" onclick="changeQty('${cartKey}', -1)">-</button>
+                    <span class="mx-3 fw-bold">${item.qty}</span>
+                    <button type="button" class="btn btn-sm btn-outline-success px-2" onclick="changeQty('${cartKey}', 1)">+</button>
+                </div>
+            </div>`;
         }
 
-        // 5. IMAGE CONVERTER (Base64 trick)
-        document.getElementById('orderReceipt').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onloadend = function() {
-                document.getElementById('receiptBase64').value = reader.result;
-            }
-            if (file) reader.readAsDataURL(file);
-        });
+        document.getElementById("cartCount").innerText = totalItems;
+        document.getElementById("cartTotalBtn").innerText = totalPrice.toFixed(2);
+        document.getElementById("cartTotalModal").innerText = totalPrice.toFixed(2);
 
-        // 6. SUBMIT ORDER
-        document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('submitBtn');
-            const receiptData = document.getElementById('receiptBase64').value;
-            const totalPrice = document.getElementById('cartTotalModal').innerText;
-            
-            if (!receiptData) return alert("Please upload a receipt.");
+        const cartBtn = document.getElementById("cartBtn");
+        if (totalItems > 0) cartBtn.classList.remove("d-none");
+        else { cartBtn.classList.add("d-none"); cartList.innerHTML = '<p class="text-center text-muted my-4">Your cart is empty.</p>'; }
+      }
 
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-            btn.disabled = true;
+      // Checkout Logic
+      document.getElementById("checkoutForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById("submitBtn");
+        const fileInput = document.getElementById("orderReceipt").files[0];
+        const totalPrice = document.getElementById("cartTotalModal").innerText;
 
-            // Format order summary for admin notes
-            let orderSummary = "";
-            for (let id in cart) {
-                orderSummary += `${cart[id].qty}x ${cart[id].name}, `;
-            }
+        if (!fileInput) return alert("Please upload a receipt.");
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...'; btn.disabled = true;
 
-            try {
-                // A. PUSH TO PAYMENTS TABLE (So Admin can verify it)
-                await push(ref(db, 'payments'), {
-                    customerName: currentUserName,
-                    amount: totalPrice,
-                    category: "Online Order",
-                    timestamp: Date.now(),
-                    status: "pending", 
-                    receiptUrl: receiptData
-                });
+        let orderSummary = "";
+        for (let id in cart) {
+            let opts = cart[id].chosenOption ? ` (${cart[id].chosenOption})` : "";
+            orderSummary += `${cart[id].qty}x ${cart[id].name}${opts}, `;
+        }
 
-                // B. PUSH TO ORDERS TABLE (For kitchen/pickup tracking)
-                await push(ref(db, 'orders'), {
-                    customerName: currentUserName,
-                    items: orderSummary,
-                    total: totalPrice,
-                    pickupTime: document.getElementById('pickupTime').value,
-                    status: 'preparing',
-                    timestamp: Date.now()
-                });
+        try {
+          const sRef = storageRef(storage, `receipts/orders/${Date.now()}_${fileInput.name}`);
+          await uploadBytes(sRef, fileInput);
+          const receiptUrl = await getDownloadURL(sRef);
 
-                alert("Order placed successfully! We will prepare it once payment is verified.");
-                window.location.href = "index.html";
+          const orderRef = await push(ref(db, "orders"), {
+            customerName: currentUserName,
+            items: orderSummary,
+            total: totalPrice,
+            pickupTime: document.getElementById("pickupTime").value,
+            status: "pending",
+            timestamp: Date.now(),
+          });
 
-            } catch (error) {
-                console.error(error);
-                alert("Error: " + error.message);
-                btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Confirm Order';
-                btn.disabled = false;
-            }
-        });
+          await push(ref(db, "payments"), {
+            customerName: currentUserName,
+            amount: totalPrice,
+            category: "Online Order",
+            timestamp: Date.now(),
+            status: "pending",
+            receiptUrl: receiptUrl,
+            orderId: orderRef.key,
+          });
+
+          // CLEAR CART ON SUCCESSFUL ORDER
+          cart = {};
+          saveCart();
+
+          // 1. Hide the Cart Modal
+          bootstrap.Modal.getInstance(document.getElementById("cartModal")).hide();
+
+          // 2. Show the Success Modal
+          const successModalEl = document.getElementById("orderSuccessModal");
+          const successModal = new bootstrap.Modal(successModalEl);
+          successModal.show();
+
+          // 3. Redirect to profile ONLY AFTER they close the modal or click the button
+          successModalEl.addEventListener('hidden.bs.modal', () => {
+              window.location.href = "profile.html";
+          });
+        } catch (error) {
+          console.error(error); alert("Error: " + error.message);
+          btn.innerHTML = '<i class="fa-solid fa-check-circle"></i> Confirm Order'; btn.disabled = false;
+        }
+      });
     </script>
-</body>
+    </script>
+  </body>
 </html>

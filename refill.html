@@ -11,28 +11,17 @@
     <style>
         :root { --toms-orange: #f57d10ff; --toms-dark: #212529; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; padding-bottom: 90px; }
-        
         .navbar { box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .mobile-container { max-width: 600px; margin: 0 auto; padding: 15px; }
-
         .login-card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 30px 20px; text-align: center; }
-
-        .menu-card {
-            background: white; border-radius: 15px; border: none;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); overflow: hidden;
-            display: flex; flex-direction: column; padding: 15px; margin-bottom: 15px;
-        }
-        
+        .menu-card { background: white; border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column; padding: 15px; margin-bottom: 15px; }
         .flavor-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #eee; }
         .flavor-row:last-child { border-bottom: none; padding-bottom: 0; }
-        
         .qty-btn { background: white; border: 1px solid var(--toms-orange); color: var(--toms-orange); width: 32px; height: 32px; border-radius: 50%; font-weight: bold; display: flex; align-items: center; justify-content: center; padding: 0; }
         .qty-btn:active { background: var(--toms-orange); color: white; }
         .qty-display { width: 30px; text-align: center; font-weight: bold; font-size: 1.1rem; }
-
         .status-card { background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); padding: 30px 20px; text-align: center; border-top: 5px solid var(--toms-orange); }
         .active-order-list { background: #f8f9fa; border-radius: 10px; padding: 15px; text-align: left; font-family: monospace; font-size: 1.1rem; color: #555; margin-top: 15px; }
-
         .floating-bottom { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); z-index: 1000; }
         .btn-orange { background-color: var(--toms-orange); color: white; border-radius: 50px; font-weight: bold; border: none; }
         .btn-orange:hover { background-color: #d1660a; color: white; }
@@ -48,7 +37,6 @@
         </div>
     </nav>
 
-    <!-- STEP 1: QR LOGIN -->
     <div id="loginSection" class="container mobile-container mt-4">
         <div class="login-card">
             <i class="fa-solid fa-qrcode fa-4x mb-3" style="color: var(--toms-orange);"></i>
@@ -60,21 +48,19 @@
         </div>
     </div>
 
-    <!-- STEP 2: REFILL MENU -->
     <div id="refillSection" class="container mobile-container mt-3 d-none">
         <div class="d-flex justify-content-between align-items-center mb-3 px-2">
             <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-chair" style="color: var(--toms-orange);"></i> <span id="tableDisplay">Table ?</span></h5>
-            <span class="badge bg-success">Unli-Promo Active</span>
+            <span class="badge bg-dark" id="promoDisplayBadge">Loading...</span>
         </div>
 
         <div id="orderArea">
-            <p class="text-muted small px-2 mb-3">Select your refills below. <br> PS: Please finish your food, leftovers will result in more payments.</p>
+            <p class="text-muted small px-2 mb-3">Select your refills below. <br> Max limit based on party size. Leftovers will be charged.</p>
 
-            <!-- THIS DIV WILL BE POPULATED BY FIREBASE DATABASE -->
             <div id="dynamicMenuArea" class="mb-5">
                 <div class="text-center text-muted py-4">
                     <i class="fa-solid fa-spinner fa-spin fa-2x mb-2"></i>
-                    <p>Loading menu...</p>
+                    <p>Loading your promo menu...</p>
                 </div>
             </div>
 
@@ -83,18 +69,14 @@
             </div>
         </div>
 
-        <!-- STATUS TRACKER AREA -->
         <div id="statusArea" class="status-card d-none mt-4">
             <div id="statusIcon" class="mb-3"></div>
             <h3 id="statusText" class="fw-bold mb-1">Preparing...</h3>
             <p class="text-muted small mb-3">Your refill is currently processing.</p>
-            
-            <!-- Shows the items they are waiting for -->
             <div class="active-order-list" id="currentRefillItems"></div>
         </div>
     </div>
 
-    <!-- BOOTSTRAP TOAST FOR NOTIFICATIONS -->
     <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050; width: 100%; max-width: 400px;">
         <div id="systemToast" class="toast align-items-center text-white border-0 w-100" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
@@ -109,13 +91,14 @@
         import { db, ref, get, push, onValue } from "./js/firebase-config.js";
 
         let myTableNum = null;
-        let myCurrentCode = ""; // Keep track of the code they used
-        let trackedItemsList = []; // Keeps track of all the dynamically generated items
+        let myCurrentCode = ""; 
+        let myPromoType = "";
+        let myPaxCount = 1;
+        let trackedItemsList = []; 
         
         const toastEl = document.getElementById('systemToast');
         const bsToast = new bootstrap.Toast(toastEl, { delay: 3000 });
 
-        // Helper function for Toasts
         function showToast(message, isSuccess = true) {
             document.getElementById('toastMessage').innerText = message;
             if(isSuccess) {
@@ -128,60 +111,75 @@
             bsToast.show();
         }
 
-        // --- NEW: FETCH MENU DYNAMICALLY FROM FIREBASE ---
-        function loadRefillMenu() {
-            onValue(ref(db, 'refillMenu'), (snapshot) => {
-                const menuArea = document.getElementById('dynamicMenuArea');
-                menuArea.innerHTML = '';
-                trackedItemsList = []; // Reset tracked items array
+        // DYNAMICALLY GENERATE THE MENU BASED ON THE SPECIFIC PROMO
+        async function loadSpecificPromoMenu() {
+            const snap = await get(ref(db, `promos/${myPromoType}`));
+            const menuArea = document.getElementById('dynamicMenuArea');
+            menuArea.innerHTML = '';
+            trackedItemsList = []; 
 
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    
-                    // Loop through the categories (cat1_chicken, cat2_sides, etc.)
-                    for (let catKey in data) {
-                        let category = data[catKey];
-                        
-                        // Start building the HTML card for this category
-                        let cardHtml = `
-                        <div class="menu-card">
-                            <h6 class="fw-bold mb-2"><i class="fa-solid ${category.icon} me-2"></i> ${category.title}</h6>
-                        `;
+            if (snap.exists()) {
+                const promoData = snap.val();
+                document.getElementById('promoDisplayBadge').innerText = `${myPromoType} (${myPaxCount} Pax)`;
 
-                        // Loop through the items in this category's array
-                        for (let i = 0; i < category.items.length; i++) {
-                            let itemName = category.items[i];
-                            
-                            // Create a safe, unique HTML ID by removing spaces and special characters
-                            let safeId = "qty_" + itemName.replace(/[^a-zA-Z0-9]/g, "");
-                            
-                            // Save this to our array so the Submit button knows what to look for
-                            trackedItemsList.push({ id: safeId, name: itemName });
+                // Dynamic Sides Limit (1 limit per 2 pax. If 1 pax, minimum is still 1)
+                let sidesLimit = Math.max(1, Math.floor(myPaxCount / 2));
 
-                            // Add the row HTML
-                            cardHtml += `
-                            <div class="flavor-row">
-                                <span class="fw-bold text-dark">${itemName}</span>
-                                <div class="d-flex align-items-center">
-                                    <button class="btn qty-btn" onclick="updateQty('${safeId}', -1)">-</button>
-                                    <span class="qty-display" id="${safeId}">0</span>
-                                    <button class="btn qty-btn" onclick="updateQty('${safeId}', 1)">+</button>
-                                </div>
-                            </div>
-                            `;
-                        }
-                        
-                        cardHtml += `</div>`; // Close card
-                        menuArea.innerHTML += cardHtml; // Inject to screen
-                    }
-                } else {
-                    menuArea.innerHTML = '<p class="text-muted text-center py-4">No menu available. Admin needs to set up the database.</p>';
+                // 1. Mains (Category Limit = Pax Count)
+                if (promoData.mains) {
+                    menuArea.innerHTML += buildCategoryCard("Chicken Flavors", "fa-drumstick-bite text-warning", promoData.mains, myPaxCount, "mains", true);
                 }
-            });
+                
+                // 2. Rice & Dip (Item Limit = Pax Count - kept exactly as it was)
+                if (promoData.riceAndDip) {
+                    menuArea.innerHTML += buildCategoryCard("Rice & Dip", "fa-bowl-rice text-muted", promoData.riceAndDip, myPaxCount, "riceAndDip", false);
+                }
+                
+                // 3. Sides (Item Limit = Dynamic Sides Limit) -- Changed to FALSE
+                if (promoData.sides) {
+                    menuArea.innerHTML += buildCategoryCard("Sides", "fa-utensils text-secondary", promoData.sides, sidesLimit, "sides", false);
+                }
+
+                // 4. Drinks (Category Limit = Pax Count)
+                if (promoData.drinks) {
+                    menuArea.innerHTML += buildCategoryCard("Drinks", "fa-glass-water text-info", promoData.drinks, myPaxCount, "drinks", true);
+                }
+
+            } else {
+                menuArea.innerHTML = '<p class="text-danger fw-bold text-center py-4">Error loading promo data. Ask admin to configure DB.</p>';
+            }
         }
 
+        function buildCategoryCard(title, iconClass, itemsArray, limit, categoryId, isCategoryLimit) {
+            let cardHtml = `<div class="menu-card"><h6 class="fw-bold mb-2"><i class="fa-solid ${iconClass} me-2"></i> ${title} <small class="text-muted fw-normal fs-6">(Max: ${limit})</small></h6>`;
+            
+            for (let i = 0; i < itemsArray.length; i++) {
+                let itemName = itemsArray[i];
+                let safeId = "qty_" + categoryId + "_" + itemName.replace(/[^a-zA-Z0-9]/g, "");
+                
+                // We save the category configuration to check logic on every click
+                trackedItemsList.push({ 
+                    id: safeId, 
+                    name: itemName, 
+                    maxLimit: limit, 
+                    category: categoryId, 
+                    isCatLimit: isCategoryLimit 
+                });
 
-        // 1. VERIFY UNLI CODE
+                cardHtml += `
+                <div class="flavor-row">
+                    <span class="fw-bold text-dark">${itemName}</span>
+                    <div class="d-flex align-items-center">
+                        <button class="btn qty-btn" onclick="updateQty('${safeId}', -1)">-</button>
+                        <span class="qty-display" id="${safeId}">0</span>
+                        <button class="btn qty-btn" onclick="updateQty('${safeId}', 1)">+</button>
+                    </div>
+                </div>`;
+            }
+            return cardHtml + `</div>`;
+        }
+
+        // VERIFY UNLI CODE & GRAB TABLE CONTEXT
         document.getElementById('verifyBtn').addEventListener('click', async () => {
             const codeInput = document.getElementById('unliCode').value.trim().toUpperCase();
             const btn = document.getElementById('verifyBtn');
@@ -199,21 +197,22 @@
                     let data = child.val();
                     if (data.code === codeInput && data.status === 'occupied') {
                         myTableNum = child.key;
+                        myPromoType = data.promo || "TM1"; 
+                        myPaxCount = data.pax || 1; 
                         found = true;
                     }
                 });
             }
 
             if (found) {
-                myCurrentCode = codeInput; // Save the exact code they used
+                myCurrentCode = codeInput; 
                 document.getElementById('loginSection').classList.add('d-none');
                 document.getElementById('refillSection').classList.remove('d-none');
                 document.getElementById('tableDisplay').innerText = "Table " + myTableNum;
                 
-                loadRefillMenu(); // Fetch the dynamic menu!
+                loadSpecificPromoMenu(); 
                 listenToMyRefills(); 
                 listenToAdminKick(); 
-
             } else {
                 showToast("Invalid or expired code.", false);
                 btn.innerText = "Start Refilling";
@@ -221,7 +220,6 @@
             }
         });
 
-        // KICK USER OUT IF ADMIN ENDS SESSION
         function listenToAdminKick() {
             onValue(ref(db, 'tables/' + myTableNum), (snapshot) => {
                 if (snapshot.exists()) {
@@ -234,20 +232,50 @@
             });
         }
 
-        // 2. COUNTER LOGIC
+        // DYNAMIC COUNTER LOGIC (Category-wide Limits vs Item Limits)
         window.updateQty = function(elementId, change) {
+            let itemIndex = trackedItemsList.findIndex(i => i.id === elementId);
+            if (itemIndex === -1) return;
+            
+            let itemData = trackedItemsList[itemIndex];
             let el = document.getElementById(elementId);
             let current = parseInt(el.innerText);
             let newVal = current + change;
-            if (newVal >= 0 && newVal <= 5) { el.innerText = newVal; }
+            
+            if (newVal < 0) return; // Can't order negative amounts
+
+            // Check if this item is part of a Category-wide Limit (Chicken, Sides, Drinks)
+            if (itemData.isCatLimit) {
+                let currentCategoryTotal = 0;
+                
+                // Count how many items from this specific category are currently selected
+                trackedItemsList.forEach(tItem => {
+                    if (tItem.category === itemData.category) {
+                        currentCategoryTotal += parseInt(document.getElementById(tItem.id).innerText);
+                    }
+                });
+
+                if (change > 0 && currentCategoryTotal >= itemData.maxLimit) {
+                    showToast(`Category limit reached (${itemData.maxLimit} total)`, false);
+                    return; // Stop them from adding more
+                }
+                
+                el.innerText = newVal;
+            } 
+            // Else, use the Standard Item Limit (Rice & Dip)
+            else {
+                if (newVal <= itemData.maxLimit) {
+                    el.innerText = newVal;
+                } else {
+                    showToast(`Maximum limit reached (${itemData.maxLimit})`, false);
+                }
+            }
         }
 
-        // 3. SUBMIT REFILL REQUEST
         document.getElementById('submitRefillBtn').addEventListener('click', async () => {
             let itemsString = "";
             let totalItemsCount = 0;
 
-            // Loop through all dynamically tracked items to see what was ordered
             trackedItemsList.forEach(item => {
                 let currentQty = parseInt(document.getElementById(item.id).innerText);
                 if (currentQty > 0) {
@@ -256,10 +284,7 @@
                 }
             });
 
-            // Prevent empty submissions
-            if (totalItemsCount === 0) {
-                return showToast("Please add at least one item.", false);
-            }
+            if (totalItemsCount === 0) return showToast("Please add at least one item.", false);
             
             const btn = document.getElementById('submitRefillBtn');
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
@@ -275,7 +300,6 @@
 
                 showToast("Order sent to the kitchen!", true);
 
-                // Reset all counters dynamically
                 trackedItemsList.forEach(item => {
                     document.getElementById(item.id).innerText = "0";
                 });
@@ -288,7 +312,6 @@
             }
         });
 
-        // 4. REAL-TIME STATUS LISTENER
         function listenToMyRefills() {
             onValue(ref(db, 'refills'), (snapshot) => {
                 let hasActive = false;

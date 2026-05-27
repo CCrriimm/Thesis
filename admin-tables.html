@@ -6,87 +6,23 @@
     <title>Admin - Tables</title>
     <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet" />
     <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <style>
-      :root {
-        --toms-orange: #f57d10ff;
-        --sidebar-width: 250px;
-      }
-      body {
-        background-color: #f8f9fa;
-        overflow-x: hidden;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      }
-      .sidebar {
-        width: var(--sidebar-width);
-        height: 100vh;
-        position: fixed;
-        background: #212529;
-        color: white;
-        z-index: 999;
-      }
-      .sidebar-header {
-        padding: 20px;
-        background: var(--toms-orange);
-      }
-      .sidebar-menu {
-        padding: 20px 0;
-        list-style: none;
-        margin: 0;
-      }
-      .sidebar-menu li a {
-        display: block;
-        padding: 15px 25px;
-        color: #adb5bd;
-        text-decoration: none;
-        border-left: 4px solid transparent;
-      }
-      .sidebar-menu li a:hover,
-      .sidebar-menu li a.active {
-        color: white;
-        background: rgba(255, 255, 255, 0.1);
-        border-left-color: var(--toms-orange);
-      }
-      .sidebar-menu i {
-        margin-right: 10px;
-        width: 20px;
-        text-align: center;
-      }
-      .main-content {
-        margin-left: var(--sidebar-width);
-        padding: 30px;
-      }
-
-      /* TABLE CARDS */
-      .table-card {
-        border: none;
-        border-radius: 15px;
-        transition: transform 0.2s;
-        text-align: center;
-      }
-      .table-card:hover {
-        transform: scale(1.03);
-      }
-      .status-available {
-        background-color: #e8f5e9;
-        border: 2px solid #4caf50;
-      }
-      .status-occupied {
-        background-color: #ffebee;
-        border: 2px solid #f44336;
-      }
-      .unli-code {
-        font-size: 1.5rem;
-        letter-spacing: 2px;
-        color: #d32f2f;
-      }
-      .btn-orange {
-        background-color: var(--toms-orange);
-        color: white;
-      }
+      :root { --toms-orange: #f57d10ff; --sidebar-width: 250px; }
+      body { background-color: #f8f9fa; overflow-x: hidden; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
+      .sidebar { width: var(--sidebar-width); height: 100vh; position: fixed; background: #212529; color: white; z-index: 999; }
+      .sidebar-header { padding: 20px; background: var(--toms-orange); }
+      .sidebar-menu { padding: 20px 0; list-style: none; margin: 0; }
+      .sidebar-menu li a { display: block; padding: 15px 25px; color: #adb5bd; text-decoration: none; border-left: 4px solid transparent; }
+      .sidebar-menu li a:hover, .sidebar-menu li a.active { color: white; background: rgba(255, 255, 255, 0.1); border-left-color: var(--toms-orange); }
+      .sidebar-menu i { margin-right: 10px; width: 20px; text-align: center; }
+      .main-content { margin-left: var(--sidebar-width); padding: 30px; }
+      .table-card { border: none; border-radius: 15px; transition: transform 0.2s; text-align: center; }
+      .table-card:hover { transform: scale(1.03); }
+      .status-available { background-color: #e8f5e9; border: 2px solid #4caf50; }
+      .status-occupied { background-color: #ffebee; border: 2px solid #f44336; }
+      .unli-code { font-size: 1.5rem; letter-spacing: 2px; color: #d32f2f; }
+      .btn-orange { background-color: var(--toms-orange); color: white; }
     </style>
   </head>
   <body>
@@ -95,39 +31,13 @@
         <h4 class="mb-0 fw-bold">Tom's Admin</h4>
       </div>
       <ul class="sidebar-menu">
-        <li>
-          <a href="admin.html"
-            ><i class="fa-solid fa-gauge-high"></i> Dashboard</a
-          >
-        </li>
-        <li>
-          <a href="admin-payments.html"
-            ><i class="fa-solid fa-money-bill-wave"></i> Payments</a
-          >
-        </li>
-        <li>
-          <a href="admin-tables.html" class="active"
-            ><i class="fa-solid fa-chair"></i> Tables</a
-          >
-        </li>
-        <li>
-          <a href="admin-reservations.html"
-            ><i class="fa-solid fa-calendar-check"></i> Reservations</a
-          >
-        </li>
-        <li>
-          <a href="kitchen.html"><i class="fa-solid fa-fire-burner"></i> Kitchen</a>
-        </li>
-        <li>
-          <a href="admin-users.html"
-            ><i class="fa-solid fa-user-shield"></i> Admins</a
-          >
-        </li>
-        <li class="mt-5">
-          <a href="#" id="adminLogoutBtn" class="text-danger"
-            ><i class="fa-solid fa-right-from-bracket"></i> Logout</a
-          >
-        </li>
+        <li><a href="admin.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+        <li><a href="admin-payments.html"><i class="fa-solid fa-money-bill-wave"></i> Payments</a></li>
+        <li><a href="admin-tables.html" class="active"><i class="fa-solid fa-chair"></i> Tables</a></li>
+        <li><a href="admin-reservations.html"><i class="fa-solid fa-calendar-check"></i> Reservations</a></li>
+        <li><a href="kitchen.html"><i class="fa-solid fa-fire-burner"></i> Kitchen</a></li>
+        <li><a href="admin-users.html"><i class="fa-solid fa-user-shield"></i> Admins</a></li>
+        <li class="mt-5"><a href="#" id="adminLogoutBtn" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
       </ul>
     </nav>
 
@@ -137,120 +47,90 @@
         <span class="badge bg-dark fs-6" id="activeCount">0 / 10 Active</span>
       </div>
 
-      <!-- Confirm End Session Modal -->
-      <div
-        class="modal fade"
-        id="confirmEndModal"
-        tabindex="-1"
-        data-bs-backdrop="static"
-      >
+      <div class="modal fade" id="promoSelectModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
-            <div
-              class="modal-header text-white"
-              style="background-color: #dc3545"
-            >
-              <h5 class="modal-title fw-bold">
-                <i class="fa-solid fa-triangle-exclamation"></i> End Session
-              </h5>
+            <div class="modal-header bg-dark text-white">
+              <h5 class="modal-title fw-bold"><i class="fa-solid fa-ticket"></i> Set Up Unli Refill</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+              <h5 class="fw-bold text-center mb-4" id="setupTableTitle" style="color: var(--toms-orange);">Table ?</h5>
+              
+              <div class="mb-3">
+                <label class="form-label fw-bold small text-muted">Select Promo</label>
+                <select id="promoSelect" class="form-select fw-bold">
+                  <option value="TM1">TM1 — ₱239 (Original, Rice, Gravy)</option>
+                  <option value="TM2">TM2 — ₱319 (Wings, Rice, Isaw)</option>
+                  <option value="TM3">TM3 — ₱369 (Wings, Rice, Isaw, Sisig, Fries, Dip)</option>
+                  <option value="TM4">TM4 — ₱379 (+ Lumpia, Pasta)</option>
+                  <option value="TM5">TM5 — ₱399 (+ Nachos)</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold small text-muted">Number of People (Pax)</label>
+                <input type="number" id="paxCount" class="form-control fw-bold" min="1" value="1" />
+                <small class="text-muted d-block mt-1">This limits how many chickens/drinks they can order per refill request.</small>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-orange fw-bold" id="confirmGenerateBtn">Generate Code</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="confirmEndModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header text-white" style="background-color: #dc3545">
+              <h5 class="modal-title fw-bold"><i class="fa-solid fa-triangle-exclamation"></i> End Session</h5>
             </div>
             <div class="modal-body text-center py-4">
               <i class="fa-solid fa-chair fs-1 mb-3 text-danger"></i>
-              <p class="fw-bold mb-1">
-                Are you sure you want to end this session?
-              </p>
-              <small class="text-muted"
-                >This will disable the refill code for
-                <span id="endTableName" class="fw-bold text-danger"></span
-                >.</small
-              >
+              <p class="fw-bold mb-1">Are you sure you want to end this session?</p>
+              <small class="text-muted">This will disable the refill code for <span id="endTableName" class="fw-bold text-danger"></span>.</small>
             </div>
             <div class="modal-footer justify-content-center">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                class="btn btn-danger fw-bold"
-                id="confirmEndBtn"
-              >
-                Yes, End Session
-              </button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-danger fw-bold" id="confirmEndBtn">Yes, End Session</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Success Modal -->
       <div class="modal fade" id="successModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
-            <div
-              class="modal-header text-white"
-              style="background-color: var(--toms-orange)"
-            >
-              <h5 class="modal-title fw-bold">
-                <i class="fa-solid fa-circle-check"></i> Success
-              </h5>
+            <div class="modal-header text-white" style="background-color: var(--toms-orange)">
+              <h5 class="modal-title fw-bold"><i class="fa-solid fa-circle-check"></i> Success</h5>
             </div>
             <div class="modal-body text-center py-4">
-              <i
-                class="fa-solid fa-circle-check fs-1 mb-3"
-                style="color: var(--toms-orange)"
-              ></i>
+              <i class="fa-solid fa-circle-check fs-1 mb-3" style="color: var(--toms-orange)"></i>
               <p class="fw-bold mb-0" id="successMessage"></p>
             </div>
             <div class="modal-footer justify-content-center">
-              <button
-                type="button"
-                class="btn text-white fw-bold"
-                style="background-color: var(--toms-orange)"
-                data-bs-dismiss="modal"
-              >
-                OK
-              </button>
+              <button type="button" class="btn text-white fw-bold" style="background-color: var(--toms-orange)" data-bs-dismiss="modal">OK</button>
             </div>
           </div>
         </div>
       </div>
 
-      <p class="text-muted mb-4">
-        Generate access codes for Unlimited Chicken Promo Customers
-      </p>
-
+      <p class="text-muted mb-4">Generate access codes for Unlimited Chicken Promo Customers</p>
       <div class="row g-4" id="tableGrid"></div>
     </div>
 
     <script type="module">
-      import {
-        auth,
-        db,
-        ref,
-        get,
-        onAuthStateChanged,
-        onValue,
-        update,
-        signOut,
-      } from "./js/firebase-config.js";
+      import { auth, db, ref, get, onAuthStateChanged, onValue, update, signOut } from "./js/firebase-config.js";
 
-      // checks if user is admin
       onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-          window.location.href = "index.html";
-          return;
-        }
-        currentUserUid = user.uid;
+        if (!user) { window.location.href = "index.html"; return; }
         const snap = await get(ref(db, "users/" + user.uid));
-        if (!snap.exists() || snap.val().role !== "admin") {
-          window.location.href = "login.html";
-        }
+        if (!snap.exists() || snap.val().role !== "admin") { window.location.href = "login.html"; }
       });
 
-      // Display tables
       const TOTAL_TABLES = 10;
       const tablesRef = ref(db, "tables");
 
@@ -258,51 +138,29 @@
         const tableGrid = document.getElementById("tableGrid");
         tableGrid.innerHTML = "";
         let activeCount = 0;
-
-        let dbData = {};
-        if (snapshot.exists()) {
-          dbData = snapshot.val();
-        }
+        let dbData = snapshot.exists() ? snapshot.val() : {};
 
         for (let i = 1; i <= TOTAL_TABLES; i++) {
-          let tableInfo = {};
-          if (dbData[i]) {
-            tableInfo = dbData[i];
-          } else {
-            tableInfo = { status: "available", code: "" };
-          }
-
+          let tableInfo = dbData[i] || { status: "available", code: "" };
           const isOccupied = tableInfo.status === "occupied";
-          if (isOccupied) {
-            activeCount++;
-          }
+          if (isOccupied) activeCount++;
 
-          let cardClass = "";
-          if (isOccupied) {
-            cardClass = "status-occupied";
-          } else {
-            cardClass = "status-available";
-          }
-
-          let statusText = "";
-          if (isOccupied) {
-            statusText =
-              '<span class="text-danger fw-bold"><i class="fa-solid fa-user-check"></i> Occupied (Unli)</span>';
-          } else {
-            statusText =
-              '<span class="text-success fw-bold"><i class="fa-solid fa-check-circle"></i> Available</span>';
-          }
+          let cardClass = isOccupied ? "status-occupied" : "status-available";
+          let statusText = isOccupied 
+            ? '<span class="text-danger fw-bold"><i class="fa-solid fa-user-check"></i> Occupied (Unli)</span>'
+            : '<span class="text-success fw-bold"><i class="fa-solid fa-check-circle"></i> Available</span>';
 
           let codeHTML = "";
           if (isOccupied) {
             codeHTML = `
-              <h4 class="unli-code fw-bold my-3">${tableInfo.code}</h4>
+              <h4 class="unli-code fw-bold my-2">${tableInfo.code}</h4>
+              <div class="badge bg-dark mb-3">${tableInfo.promo} | ${tableInfo.pax} Pax</div>
               <button onclick="clearTable(${i})" class="btn btn-outline-danger btn-sm w-100 fw-bold">End Session</button>
             `;
           } else {
             codeHTML = `
               <div class="my-4 text-muted small">No active code</div>
-              <button onclick="activateTable(${i})" class="btn btn-orange btn-sm w-100 fw-bold">Generate Unli Code</button>
+              <button onclick="openPromoModal(${i})" class="btn btn-orange btn-sm w-100 fw-bold">Generate Code</button>
             `;
           }
 
@@ -318,79 +176,69 @@
             </div>
           `;
         }
-
-        document.getElementById("activeCount").innerText =
-          activeCount + " / " + TOTAL_TABLES + " Active";
+        document.getElementById("activeCount").innerText = activeCount + " / " + TOTAL_TABLES + " Active";
       });
 
-      // Code Generator
-      window.activateTable = async function (tableNum) {
+      let pendingTableNum = null;
+      let promoModal = null;
+
+      window.addEventListener('DOMContentLoaded', () => {
+          promoModal = new bootstrap.Modal(document.getElementById('promoSelectModal'));
+      });
+
+      window.openPromoModal = function(tableNum) {
+          pendingTableNum = tableNum;
+          document.getElementById('setupTableTitle').innerText = "Table " + tableNum;
+          document.getElementById('paxCount').value = 1; 
+          document.getElementById('promoSelect').value = "TM1"; 
+          promoModal.show();
+      };
+
+      document.getElementById('confirmGenerateBtn').addEventListener('click', async () => {
+        if(!pendingTableNum) return;
+        
+        const selectedPromo = document.getElementById('promoSelect').value;
+        const pax = parseInt(document.getElementById('paxCount').value) || 1;
         const randomCode = "UNLI-" + Math.floor(1000 + Math.random() * 9000);
-        await update(ref(db, "tables/" + tableNum), {
+        
+        const btn = document.getElementById('confirmGenerateBtn');
+        btn.innerHTML = "Generating..."; btn.disabled = true;
+
+        await update(ref(db, "tables/" + pendingTableNum), {
           status: "occupied",
           code: randomCode,
           startTime: Date.now(),
+          promo: selectedPromo,
+          pax: pax
         });
 
-        // Show success modal
-        document.getElementById("successMessage").textContent =
-          "Table " + tableNum + " is now active! Code: " + randomCode;
-        const successModal = new bootstrap.Modal(
-          document.getElementById("successModal"),
-        );
-        successModal.show();
-      };
+        promoModal.hide();
+        btn.innerHTML = "Generate Code"; btn.disabled = false;
+        
+        document.getElementById("successMessage").textContent = `Table ${pendingTableNum} is active!\nCode: ${randomCode}\nPromo: ${selectedPromo} (${pax} Pax)`;
+        new bootstrap.Modal(document.getElementById("successModal")).show();
+      });
 
-      // End the table
       let tableToEnd = null;
-
       window.clearTable = function (tableNum) {
         tableToEnd = tableNum;
-        document.getElementById("endTableName").textContent =
-          "Table " + tableNum;
-        const confirmModal = new bootstrap.Modal(
-          document.getElementById("confirmEndModal"),
-        );
-        confirmModal.show();
+        document.getElementById("endTableName").textContent = "Table " + tableNum;
+        new bootstrap.Modal(document.getElementById("confirmEndModal")).show();
       };
 
-      // End the table - Confirm Button
-      document
-        .getElementById("confirmEndBtn")
-        .addEventListener("click", async function () {
-          const confirmModal = bootstrap.Modal.getInstance(
-            document.getElementById("confirmEndModal"),
-          );
-          confirmModal.hide();
+      document.getElementById("confirmEndBtn").addEventListener("click", async function () {
+        bootstrap.Modal.getInstance(document.getElementById("confirmEndModal")).hide();
+        if (tableToEnd !== null) {
+          await update(ref(db, "tables/" + tableToEnd), { status: "available", code: "", startTime: null, promo: null, pax: null });
+          document.getElementById("successMessage").textContent = "Session for Table " + tableToEnd + " ended.";
+          new bootstrap.Modal(document.getElementById("successModal")).show();
+          tableToEnd = null;
+        }
+      });
 
-          if (tableToEnd !== null) {
-            await update(ref(db, "tables/" + tableToEnd), {
-              status: "available",
-              code: "",
-              startTime: null,
-            });
-
-            // Show success modal
-            document.getElementById("successMessage").textContent =
-              "Session for Table " +
-              tableToEnd +
-              " has been ended successfully.";
-            const successModal = new bootstrap.Modal(
-              document.getElementById("successModal"),
-            );
-            successModal.show();
-
-            tableToEnd = null;
-          }
-        });
-
-      document
-        .getElementById("adminLogoutBtn")
-        .addEventListener("click", () => {
-          signOut(auth).then(() => {
-            window.location.href = "login.html";
-          });
-        });
+      document.getElementById("adminLogoutBtn").addEventListener("click", () => {
+        signOut(auth).then(() => { window.location.href = "login.html"; });
+      });
     </script>
   </body>
 </html>

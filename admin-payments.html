@@ -89,69 +89,27 @@
         <h4 class="mb-0 fw-bold">Tom's Admin</h4>
       </div>
       <ul class="sidebar-menu">
-        <li>
-          <a href="admin.html"
-            ><i class="fa-solid fa-gauge-high"></i> Dashboard</a
-          >
-        </li>
-        <li>
-          <a href="admin-payments.html" class="active"
-            ><i class="fa-solid fa-money-bill-wave"></i> Payments</a
-          >
-        </li>
-        <li>
-          <a href="admin-tables.html"
-            ><i class="fa-solid fa-chair"></i> Tables</a
-          >
-        </li>
-        <li>
-          <a href="admin-reservations.html"
-            ><i class="fa-solid fa-calendar-check"></i> Reservations</a
-          >
-        </li>
-        <li>
-          <a href="kitchen.html"><i class="fa-solid fa-fire-burner"></i> Kitchen</a>
-        </li>
-        <li>
-          <a href="admin-users.html"
-            ><i class="fa-solid fa-user-shield"></i> Admins</a
-          >
-        </li>
-        <li class="mt-5">
-          <a href="#" id="adminLogoutBtn" class="text-danger"
-            ><i class="fa-solid fa-right-from-bracket"></i> Logout</a
-          >
-        </li>
+        <li><a href="admin.html"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+        <li><a href="admin-payments.html" class="active"><i class="fa-solid fa-money-bill-wave"></i> Payments</a></li>
+        <li><a href="admin-tables.html"><i class="fa-solid fa-chair"></i> Tables</a></li>
+        <li><a href="admin-reservations.html"><i class="fa-solid fa-calendar-check"></i> Reservations</a></li>
+        <li><a href="kitchen.html"><i class="fa-solid fa-fire-burner"></i> Kitchen</a></li>
+        <li><a href="admin-users.html"><i class="fa-solid fa-user-shield"></i> Admins</a></li>
+        <li class="mt-5"><a href="#" id="adminLogoutBtn" class="text-danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
       </ul>
     </nav>
 
     <div class="main-content">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">Payment Management</h2>
-        <button
-          onclick="addFakePayment()"
-          class="btn btn-outline-secondary btn-sm"
-        >
-          <i class="fa fa-plus"></i> Add Test Data
-        </button>
       </div>
 
       <ul class="nav nav-pills mb-3" id="paymentTabs">
         <li class="nav-item">
-          <a
-            class="nav-link active"
-            href="#"
-            onclick="filterPayments('pending', event)"
-            >Pending Verification</a
-          >
+          <a class="nav-link active" href="#" onclick="filterPayments('pending', event)">Pending Verification</a>
         </li>
         <li class="nav-item">
-          <a
-            class="nav-link"
-            href="#"
-            onclick="filterPayments('history', event)"
-            >Payment History</a
-          >
+          <a class="nav-link" href="#" onclick="filterPayments('history', event)">Payment History</a>
         </li>
       </ul>
 
@@ -171,13 +129,8 @@
                 </tr>
               </thead>
               <tbody id="paymentsTableBody">
-                <tr>
-                  <td colspan="7" class="text-center text-muted">
-                    Loading payments...
-                  </td>
-                </tr>
+                <tr><td colspan="7" class="text-center text-muted">Loading payments...</td></tr>
               </tbody>
-            </table>
           </div>
         </div>
       </div>
@@ -188,37 +141,16 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title fw-bold">Payment Proof</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-            ></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body text-center bg-light">
-            <img
-              id="modalReceiptImg"
-              src=""
-              alt="Receipt"
-              class="receipt-img shadow-sm mb-3 bg-white p-2 border"
-            />
+            <img id="modalReceiptImg" src="" alt="Receipt" class="receipt-img shadow-sm mb-3 bg-white p-2 border" />
             <h4 id="modalCustomerName" class="fw-bold"></h4>
             <h4 id="modalAmount" class="fw-bold"></h4>
           </div>
           <div class="modal-footer justify-content-center" id="modalActions">
-            <button
-              type="button"
-              id="rejectBtn"
-              class="btn btn-danger px-4 fw-bold"
-            >
-              Reject
-            </button>
-            <button
-              type="button"
-              id="approveBtn"
-              class="btn btn-success px-4 fw-bold"
-            >
-              Approve
-            </button>
+            <button type="button" id="rejectBtn" class="btn btn-danger px-4 fw-bold">Reject</button>
+            <button type="button" id="approveBtn" class="btn btn-success px-4 fw-bold">Approve</button>
           </div>
         </div>
       </div>
@@ -227,76 +159,53 @@
     <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
 
     <script type="module">
-      import {
-        auth,
-        db,
-        ref,
-        get,
-        onAuthStateChanged,
-        onValue,
-        update,
-        push,
-        signOut,
-      } from "./js/firebase-config.js";
+      import { auth, db, ref, get, onAuthStateChanged, onValue, update, signOut } from "./js/firebase-config.js";
 
-      const receiptModal = new bootstrap.Modal(
-        document.getElementById("receiptModal"),
-      );
+      const receiptModal = new bootstrap.Modal(document.getElementById("receiptModal"));
       let currentPaymentId = null;
       let currentResId = null;
+      let currentOrderId = null;
       let allPayments = [];
-      let currentView = "pending"; // tracks which tab we are on
+      let currentView = "pending";
 
-      // check if user is admin
       onAuthStateChanged(auth, async (user) => {
         if (!user) {
           window.location.href = "login.html";
           return;
         }
-        currentUserUid = user.uid;
         const snap = await get(ref(db, "users/" + user.uid));
         if (!snap.exists() || snap.val().role !== "admin") {
           window.location.href = "login.html";
         }
-      }); //----------- End of admin Check
+      });
 
-      // get all payments data and update in real-time
       const paymentsRef = ref(db, "payments");
       onValue(paymentsRef, (snapshot) => {
         allPayments = [];
         if (snapshot.exists()) {
           snapshot.forEach((child) => {
             const data = child.val();
-            // Convert timestamp to readable date/time
             const dateObj = new Date(data.timestamp || Date.now());
-
             allPayments.push({
               id: child.key,
               ...data,
               rawTime: data.timestamp || 0,
               formattedDate: dateObj.toLocaleDateString(),
-              formattedTime: dateObj.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              }),
+              formattedTime: dateObj.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
             });
           });
         }
         renderTable();
-      }); //----------- End of Payment Data
+      });
 
-      // create the table
       function renderTable() {
         const tbody = document.getElementById("paymentsTableBody");
         tbody.innerHTML = "";
 
-        // filter data based on selection
         let filtered = allPayments.filter((p) => {
           if (currentView === "pending") return p.status === "pending";
           if (currentView === "history") return p.status !== "pending";
         });
-
-        // Sort newest first
         filtered.sort((a, b) => b.rawTime - a.rawTime);
 
         if (filtered.length === 0) {
@@ -305,69 +214,49 @@
         }
 
         filtered.forEach((p) => {
-          // Create status badge with colors
           let statusBadge = "";
-          if (p.status === "pending") {
-            statusBadge =
-              '<span class="badge bg-warning text-dark">Pending</span>';
-          } else if (p.status === "approved") {
-            statusBadge = '<span class="badge bg-success">Approved</span>';
-          } else {
-            statusBadge = '<span class="badge bg-danger">Rejected</span>';
-          }
+          if (p.status === "pending") statusBadge = '<span class="badge bg-warning text-dark">Pending</span>';
+          else if (p.status === "approved") statusBadge = '<span class="badge bg-success">Approved</span>';
+          else statusBadge = '<span class="badge bg-danger">Rejected</span>';
 
           let catBadge = "";
-          if (p.category === "Online Reservation") {
-            catBadge = '<span class="badge bg-primary">Reservation</span>';
-          } else {
-            catBadge =
-              '<span class="badge bg-info text-dark">Online Order</span>';
-          }
+          if (p.category === "Online Reservation") catBadge = '<span class="badge bg-primary">Reservation</span>';
+          else catBadge = '<span class="badge bg-info text-dark">Online Order</span>';
 
           let actionBtn = "";
           if (p.status === "pending") {
-            actionBtn = `<button onclick="viewReceipt('${p.id}', '${p.receiptUrl}', '${p.amount}', '${p.customerName}', false, '${p.reservationId || ""}')" class="btn btn-sm btn-orange"><i class="fa-solid fa-eye"></i> Verify</button>`;
+            actionBtn = `<button onclick="viewReceipt('${p.id}', '${p.receiptUrl || ''}', '${p.amount}', '${p.customerName}', false, '${p.reservationId || ""}', '${p.orderId || ""}')" class="btn btn-sm btn-orange"><i class="fa-solid fa-eye"></i> Verify</button>`;
           } else {
-            actionBtn = `<button onclick="viewReceipt('${p.id}', '${p.receiptUrl}', '${p.amount}', '${p.customerName}', true)" class="btn btn-sm btn-secondary"><i class="fa-solid fa-file-invoice"></i> View</button>`;
+            actionBtn = `<button onclick="viewReceipt('${p.id}', '${p.receiptUrl || ''}', '${p.amount}', '${p.customerName}', true)" class="btn btn-sm btn-secondary"><i class="fa-solid fa-file-invoice"></i> View</button>`;
           }
+          
           tbody.innerHTML += `
-                    <tr>
-                        <td class="text-muted fw-bold">#${p.id.substring(1, 6).toUpperCase()}</td>
-                        <td class="fw-bold">${p.customerName}</td>
-                        <td>${catBadge}</td>
-                        <td><small class="fw-bold">${p.formattedDate}</small><br><small class="text-muted">${p.formattedTime}</small></td>
-                        <td class="fw-bold text-success">₱${p.amount}</td>
-                        <td>${statusBadge}</td>
-                        <td>${actionBtn}</td>
-                    </tr>
-                `;
+            <tr>
+              <td class="text-muted fw-bold">#${p.id.substring(1, 6).toUpperCase()}</td>
+              <td class="fw-bold">${p.customerName}</td>
+              <td>${catBadge}</td>
+              <td><small class="fw-bold">${p.formattedDate}</small><br><small class="text-muted">${p.formattedTime}</small></td>
+              <td class="fw-bold text-success">₱${p.amount}</td>
+              <td>${statusBadge}</td>
+              <td>${actionBtn}</td>
+            </tr>
+          `;
         });
-      } //----------- End of table
+      }
 
-      // TAB FILTERING
       window.filterPayments = function (view, event) {
         currentView = view;
-        document
-          .querySelectorAll("#paymentTabs .nav-link")
-          .forEach((link) => link.classList.remove("active"));
+        document.querySelectorAll("#paymentTabs .nav-link").forEach((link) => link.classList.remove("active"));
         event.target.classList.add("active");
         renderTable();
       };
 
-      // verify/view receipt modal
-      window.viewReceipt = function (
-        id,
-        imgUrl,
-        amount,
-        customerName,
-        isHistory,
-        resId,
-      ) {
+      window.viewReceipt = function (id, imgUrl, amount, customerName, isHistory, resId, orderId) {
         currentPaymentId = id;
         currentResId = resId;
-        document.getElementById("modalCustomerName").innerText =
-          "Name: " + customerName;
-        document.getElementById("modalReceiptImg").src = imgUrl;
+        currentOrderId = orderId;
+        document.getElementById("modalCustomerName").innerText = "Name: " + customerName;
+        document.getElementById("modalReceiptImg").src = imgUrl || "https://via.placeholder.com/300?text=No+Image";
         document.getElementById("modalAmount").innerText = "Amount: ₱" + amount;
 
         if (isHistory) {
@@ -378,65 +267,40 @@
         receiptModal.show();
       };
 
-      // approve/reject receipt
-      document
-        .getElementById("approveBtn")
-        .addEventListener("click", async () => {
-          // 1. Approve the Payment
-          await update(ref(db, "payments/" + currentPaymentId), {
-            status: "approved",
+      // APPROVE BUTTON - Updates order status to 'preparing' so kitchen can see it
+      document.getElementById("approveBtn").addEventListener("click", async () => {
+        await update(ref(db, "payments/" + currentPaymentId), { status: "approved" });
+
+        if (currentResId && currentResId !== "") {
+          await update(ref(db, "reservations/" + currentResId), { status: "approved" });
+        } else if (currentOrderId && currentOrderId !== "") {
+          // CRITICAL: This makes the order appear in kitchen.html!
+          await update(ref(db, "orders/" + currentOrderId), { 
+            status: "preparing",
+            paymentStatus: "approved"
           });
+        }
+        receiptModal.hide();
+      });
 
-          // 2. Auto-Approve the linked Reservation!
-          if (currentResId && currentResId !== "") {
-            await update(ref(db, "reservations/" + currentResId), {
-              status: "approved",
-            });
-          }
-          receiptModal.hide();
-        });
+      // REJECT BUTTON
+      document.getElementById("rejectBtn").addEventListener("click", async () => {
+        await update(ref(db, "payments/" + currentPaymentId), { status: "rejected" });
 
-      document
-        .getElementById("rejectBtn")
-        .addEventListener("click", async () => {
-          // 1. Reject the Payment
-          await update(ref(db, "payments/" + currentPaymentId), {
-            status: "rejected",
+        if (currentResId && currentResId !== "") {
+          await update(ref(db, "reservations/" + currentResId), { status: "cancelled" });
+        } else if (currentOrderId && currentOrderId !== "") {
+          await update(ref(db, "orders/" + currentOrderId), { 
+            status: "cancelled",
+            paymentStatus: "rejected"
           });
+        }
+        receiptModal.hide();
+      });
 
-          // 2. Auto-Cancel the linked Reservation!
-          if (currentResId && currentResId !== "") {
-            await update(ref(db, "reservations/" + currentResId), {
-              status: "cancelled",
-            });
-          }
-          receiptModal.hide();
-        }); //----------- End of Modal
-
-      // Fake Data Generator for Testing
-      window.addFakePayment = function () {
-        const categories = ["Online Reservation", "Online Order"];
-        const randomCat =
-          categories[Math.floor(Math.random() * categories.length)];
-
-        push(ref(db, "payments"), {
-          customerName: "Customer",
-          amount: "999",
-          category: randomCat,
-          timestamp: Date.now(),
-          status: "pending",
-          receiptUrl: "https://c.tenor.com/nsQ57a43PG0AAAAC/tenor.gif",
-        });
-      }; //----------- End of Fake Data Generator
-
-      // logout
-      document
-        .getElementById("adminLogoutBtn")
-        .addEventListener("click", () => {
-          signOut(auth).then(() => {
-            window.location.href = "login.html";
-          });
-        });
+      document.getElementById("adminLogoutBtn").addEventListener("click", () => {
+        signOut(auth).then(() => { window.location.href = "login.html"; });
+      });
     </script>
   </body>
 </html>

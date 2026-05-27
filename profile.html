@@ -42,6 +42,8 @@
         
         .btn-orange-outline { border: 2px solid var(--toms-orange); color: var(--toms-orange); border-radius: 50px; font-weight: bold; transition: 0.2s; }
         .btn-orange-outline:hover { background-color: var(--toms-orange); color: white; }
+        .cursor-pointer { cursor: pointer; transition: 0.2s; }
+        .cursor-pointer:hover { color: var(--toms-orange) !important; }
     </style>
 </head>
 <body>
@@ -60,8 +62,38 @@
         
         <div class="profile-card">
             <div class="profile-avatar" id="userInitial">?</div>
-            <h4 class="fw-bold mb-0" id="userName">Loading...</h4>
-            <p class="text-muted small mb-3" id="userEmail">Loading email...</p>
+            
+            <div id="profileViewMode">
+                <h4 class="fw-bold mb-0" id="userName">Loading...</h4>
+                <button class="btn btn-link text-muted p-0 mb-3 small text-decoration-none" onclick="toggleEditMode(true)">
+                    <i class="fa-solid fa-pen-to-square"></i> Edit Name
+                </button>
+            </div>
+
+            <div id="profileEditMode" class="d-none mb-3 px-3">
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <input type="text" id="editFirstName" class="form-control text-center form-control-sm" placeholder="First Name">
+                    </div>
+                    <div class="col-6">
+                        <input type="text" id="editLastName" class="form-control text-center form-control-sm" placeholder="Last Name">
+                    </div>
+                </div>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button class="btn btn-sm btn-success px-3 fw-bold" id="saveNameBtn">Save</button>
+                    <button class="btn btn-sm btn-secondary px-3" onclick="toggleEditMode(false)">Cancel</button>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center align-items-center mb-1">
+                <span class="text-muted small me-2"><i class="fa-solid fa-envelope w-15px"></i> <span id="userEmail" class="fw-bold">Loading...</span></span>
+                <i class="fa-solid fa-eye-slash text-muted cursor-pointer" id="toggleEmailIcon"></i>
+            </div>
+            
+            <div class="d-flex justify-content-center align-items-center mb-4">
+                <span class="text-muted small me-2"><i class="fa-solid fa-phone w-15px"></i> <span id="userPhone" class="fw-bold">Loading...</span></span>
+                <i class="fa-solid fa-eye-slash text-muted cursor-pointer" id="togglePhoneIcon"></i>
+            </div>
             
             <a href="Resetpass.html" class="btn btn-orange-outline btn-sm px-4">
                 <i class="fa-solid fa-lock"></i> Change Password
@@ -93,29 +125,116 @@
 
     <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
     <script type="module">
-        import { auth, db, ref, get, onValue, onAuthStateChanged, signOut } from "./js/firebase-config.js";
+        // Added 'update' to the imports for the edit name feature
+        import { auth, db, ref, get, update, onValue, onAuthStateChanged, signOut } from "./js/firebase-config.js";
 
+        let currentUserUid = "";
         let currentUserName = "";
+        
+        // Data states for masking/unmasking
+        let rawData = { email: "", phone: "", firstName: "", lastName: "" };
+        let showEmail = false;
+        let showPhone = false;
+
+        // Masking Helpers
+        function maskEmail(email) {
+            if (!email) return "No email linked";
+            const [name, domain] = email.split('@');
+            if (name.length <= 2) return email; 
+            return name.substring(0, 2) + '*'.repeat(name.length - 2) + '@' + domain;
+        }
+
+        function maskPhone(phone) {
+            if (!phone || phone === "N/A") return "No phone linked";
+            if (phone.length < 6) return phone;
+            return phone.substring(0, 3) + '*'.repeat(phone.length - 6) + phone.substring(phone.length - 3);
+        }
 
         // 1. SECURITY & PROFILE LOAD
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = "login.html";
             } else {
-                // Load User Data
+                currentUserUid = user.uid;
+                
                 const snap = await get(ref(db, 'users/' + user.uid));
                 if (snap.exists()) {
                     const data = snap.val();
-                    currentUserName = `${data.firstName} ${data.lastName}`;
+                    rawData.firstName = data.firstName || "";
+                    rawData.lastName = data.lastName || "";
+                    rawData.email = data.email || "";
+                    rawData.phone = data.phone || "N/A"; // fallback if phone isn't in DB yet
                     
-                    document.getElementById('userName').innerText = currentUserName;
-                    document.getElementById('userEmail').innerText = data.email;
-                    document.getElementById('userInitial').innerText = data.firstName.charAt(0).toUpperCase();
+                    updateProfileUI();
 
-                    // Start fetching their records now that we know their name
+                    // Start fetching their records
                     loadMyReservations();
                     loadMyOrders();
                 }
+            }
+        });
+
+        function updateProfileUI() {
+            currentUserName = `${rawData.firstName} ${rawData.lastName}`;
+            document.getElementById('userName').innerText = currentUserName;
+            document.getElementById('userInitial').innerText = rawData.firstName.charAt(0).toUpperCase() || "?";
+            
+            // Set Masked Displays initially
+            document.getElementById('userEmail').innerText = showEmail ? rawData.email : maskEmail(rawData.email);
+            document.getElementById('userPhone').innerText = showPhone ? rawData.phone : maskPhone(rawData.phone);
+        }
+
+        // EYE TOGGLE LISTENERS
+        document.getElementById('toggleEmailIcon').addEventListener('click', function() {
+            showEmail = !showEmail;
+            document.getElementById('userEmail').innerText = showEmail ? rawData.email : maskEmail(rawData.email);
+            this.className = showEmail ? "fa-solid fa-eye text-primary cursor-pointer" : "fa-solid fa-eye-slash text-muted cursor-pointer";
+        });
+
+        document.getElementById('togglePhoneIcon').addEventListener('click', function() {
+            showPhone = !showPhone;
+            document.getElementById('userPhone').innerText = showPhone ? rawData.phone : maskPhone(rawData.phone);
+            this.className = showPhone ? "fa-solid fa-eye text-primary cursor-pointer" : "fa-solid fa-eye-slash text-muted cursor-pointer";
+        });
+
+        // EDIT PROFILE LOGIC
+        window.toggleEditMode = function(show) {
+            if (show) {
+                document.getElementById('profileViewMode').classList.add('d-none');
+                document.getElementById('profileEditMode').classList.remove('d-none');
+                document.getElementById('editFirstName').value = rawData.firstName;
+                document.getElementById('editLastName').value = rawData.lastName;
+            } else {
+                document.getElementById('profileViewMode').classList.remove('d-none');
+                document.getElementById('profileEditMode').classList.add('d-none');
+            }
+        }
+
+        document.getElementById('saveNameBtn').addEventListener('click', async () => {
+            const newFirst = document.getElementById('editFirstName').value.trim();
+            const newLast = document.getElementById('editLastName').value.trim();
+            const btn = document.getElementById('saveNameBtn');
+
+            if (!newFirst || !newLast) return alert("First and Last name cannot be empty.");
+
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            try {
+                await update(ref(db, 'users/' + currentUserUid), {
+                    firstName: newFirst,
+                    lastName: newLast
+                });
+
+                rawData.firstName = newFirst;
+                rawData.lastName = newLast;
+                updateProfileUI();
+                toggleEditMode(false);
+            } catch (error) {
+                alert("Error updating profile.");
+            } finally {
+                btn.innerHTML = 'Save';
+                btn.disabled = false;
             }
         });
 
@@ -145,19 +264,16 @@
                     let myRes = [];
                     snapshot.forEach(child => {
                         let data = child.val();
-                        // Filter to only show THIS customer's reservations
                         if (data.name === currentUserName) {
                             myRes.push({ id: child.key, ...data });
                         }
                     });
 
-                    // Sort newest first
                     myRes.sort((a,b) => new Date(b.date + " " + b.time) - new Date(a.date + " " + a.time));
 
                     myRes.forEach(r => {
                         hasData = true;
                         
-                        // Status Badge Logic
                         let badge = "";
                         if (r.status === "pending") badge = `<span class="status-badge bg-warning text-dark"><i class="fa-solid fa-clock"></i> Pending Review</span>`;
                         else if (r.status === "approved") badge = `<span class="status-badge bg-success text-white"><i class="fa-solid fa-check"></i> Approved</span>`;
@@ -196,19 +312,16 @@
                     let myOrders = [];
                     snapshot.forEach(child => {
                         let data = child.val();
-                        // Filter to only show THIS customer's orders
                         if (data.customerName === currentUserName) {
                             myOrders.push({ id: child.key, ...data });
                         }
                     });
 
-                    // Sort newest first
                     myOrders.sort((a,b) => b.timestamp - a.timestamp);
 
                     myOrders.forEach(o => {
                         hasData = true;
                         
-                        // Status Badge Logic
                         let badge = "";
                         if (o.status === "pending") badge = `<span class="status-badge bg-warning text-dark"><i class="fa-solid fa-clock"></i> Pending Payment</span>`;
                         else if (o.status === "approved") badge = `<span class="status-badge bg-primary text-white"><i class="fa-solid fa-thumbs-up"></i> Confirmed</span>`;
