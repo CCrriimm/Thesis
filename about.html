@@ -1,426 +1,489 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>About - Story Bootstrap Template</title>
-  <meta name="description" content="">
-  <meta name="keywords" content="">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tom's Chicken - About Us</title>
+    
+    <link href="Bootstrap/Content/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
 
-  <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <style>
+        :root {
+            --toms-orange: #f57d10ff;
+            --toms-dark: #212529;
+            --toms-light: #fff8f0;
+        }
 
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com" rel="preconnect">
-  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--toms-dark);
+            background-color: #fcfcfc;
+        }
 
-  <!-- Vendor CSS Files -->
-  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
-  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+        .profile-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--toms-orange);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.3rem;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .profile-circle:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
 
-  <!-- Main CSS File -->
-  <link href="assets/css/main.css" rel="stylesheet">
+        .navbar {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.06);
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+        .nav-link {
+            font-weight: 600;
+            color: var(--toms-dark) !important;
+            margin: 0 10px;
+            transition: color 0.3s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: var(--toms-orange) !important;
+        }
+        .btn-orange {
+            background-color: var(--toms-orange);
+            color: white;
+            border-radius: 50px;
+            padding: 10px 28px;
+            font-weight: bold;
+            border: none;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .btn-orange:hover {
+            background-color: #d1660a;
+            color: white;
+            transform: translateY(-2px);
+        }
 
-  <!-- =======================================================
-  * Template Name: Story
-  * Template URL: https://bootstrapmade.com/story-bootstrap-blog-template/
-  * Updated: Aug 11 2025 with Bootstrap v5.3.7
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+        /* ABOUT HERO */
+        .about-hero {
+            background: linear-gradient(135deg, #212529 0%, #343a40 100%);
+            color: white;
+            padding: 80px 0 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        .about-hero::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(245, 125, 16, 0.18) 0%, rgba(245, 125, 16, 0) 70%);
+            border-radius: 50%;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #f0f0f0;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+            padding: 35px 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 32px rgba(245, 125, 16, 0.12);
+            border-color: rgba(245, 125, 16, 0.3);
+        }
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            background-color: #fff3e6;
+            color: var(--toms-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .flavor-badge {
+            background-color: white;
+            border: 1px solid #e9ecef;
+            border-radius: 30px;
+            padding: 8px 18px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            transition: all 0.2s;
+        }
+        .flavor-badge:hover {
+            border-color: var(--toms-orange);
+            background-color: var(--toms-light);
+            color: var(--toms-orange);
+            transform: scale(1.04);
+        }
+
+        .promo-card {
+            background: white;
+            border-radius: 16px;
+            border: 2px solid #eef0f2;
+            padding: 24px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .promo-card.highlight {
+            border-color: var(--toms-orange);
+            background: linear-gradient(to bottom, #ffffff, #fffaf5);
+        }
+        .promo-badge {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background-color: var(--toms-orange);
+            color: white;
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .cta-banner {
+            background: linear-gradient(135deg, var(--toms-orange) 0%, #e06800 100%);
+            border-radius: 20px;
+            color: white;
+            padding: 50px 30px;
+        }
+    </style>
 </head>
+<body>
 
-<body class="about-page">
-
-  <header id="header" class="header d-flex align-items-center position-relative">
-    <div class="container position-relative d-flex align-items-center justify-content-between">
-
-      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
-        <!-- Uncomment the line below if you also wish to use an image logo -->
-        <!-- <img src="assets/img/logo.webp" alt=""> -->
-        <h1 class="sitename">Story</h1>
-      </a>
-
-      <nav id="navmenu" class="navmenu">
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html" class="active">About</a></li>
-          <li><a href="category.html">Category</a></li>
-          <li><a href="blog-details.html">Blog Details</a></li>
-          <li><a href="author-profile.html">Author Profile</a></li>
-          <li class="dropdown"><a href="#"><span>Pages</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="about.html" class="active">About</a></li>
-              <li><a href="category.html">Category</a></li>
-              <li><a href="blog-details.html">Blog Details</a></li>
-              <li><a href="author-profile.html">Author Profile</a></li>
-              <li><a href="search-results.html">Search Results</a></li>
-              <li><a href="404.html">404 Not Found Page</a></li>
-
-              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                <ul>
-                  <li><a href="#">Deep Dropdown 1</a></li>
-                  <li><a href="#">Deep Dropdown 2</a></li>
-                  <li><a href="#">Deep Dropdown 3</a></li>
-                  <li><a href="#">Deep Dropdown 4</a></li>
-                  <li><a href="#">Deep Dropdown 5</a></li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-          <li><a href="contact.html">Contact</a></li>
-        </ul>
-        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-      </nav>
-
-      <div class="header-social-links">
-        <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
-        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+  <!-- Auth Required Modal -->
+  <div class="modal fade" id="authModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header text-white" style="background-color: var(--toms-orange)">
+          <h5 class="modal-title fw-bold"><i class="fa-solid fa-lock me-2"></i>Authentication Required</h5>
+        </div>
+        <div class="modal-body text-center py-4">
+          <i class="fa-solid fa-user-lock fs-1 mb-3" style="color: var(--toms-orange)"></i>
+          <p class="mb-1 fw-bold">You must be logged in to continue.</p>
+          <small class="text-muted">Please sign in or create an account to access reservations and orders.</small>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <a href="login.html" class="btn text-white fw-bold" style="background-color: var(--toms-orange)">Login / Sign Up</a>
+        </div>
       </div>
-
     </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+      <div class="container">
+          <a class="navbar-brand fw-bold fs-3" href="index.html" style="color: var(--toms-orange);">
+              Tom's<span class="text-dark">Chicken</span>
+          </a>
+
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+              <ul class="navbar-nav">
+                  <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#" onclick="checkMenuAuth()">Menu</a></li>
+                  <li class="nav-item"><a class="nav-link" href="#" onclick="checkReservationAuth()">Reservation</a></li>
+                  <li class="nav-item"><a class="nav-link active" href="about.html">About</a></li>
+                  <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+              </ul>
+              <div id="authSectionMobile" class="d-lg-none mt-3 text-center">
+                  <a href="login.html" class="btn-orange text-decoration-none">Login / Sign Up</a>
+              </div>
+          </div>
+
+          <div id="authSection" class="d-none d-lg-block">
+              <a href="login.html" class="btn-orange">Login</a>
+          </div>
+      </div>
+  </nav>
+
+  <!-- Hero Header -->
+  <header class="about-hero text-center">
+      <div class="container">
+          <span class="badge px-3 py-2 rounded-pill mb-3" style="background-color: rgba(245, 125, 16, 0.2); color: #ffa94d; font-weight: bold; letter-spacing: 1px;">
+              <i class="fa-solid fa-drumstick-bite me-1"></i> OUR CRAFT & STORY
+          </span>
+          <h1 class="display-3 fw-bold mb-3">Serving Unlimited Happiness</h1>
+          <p class="lead text-light mb-0 mx-auto" style="max-width: 680px; opacity: 0.9;">
+              Tom's Chicken was founded on one simple craving: freshly cooked, ultra-crispy flavored chicken wings that you can enjoy without limits.
+          </p>
+      </div>
   </header>
 
-  <main class="main">
-
-    <!-- Page Title -->
-    <div class="page-title">
-      <div class="heading">
-        <div class="container">
-          <div class="row d-flex justify-content-center text-center">
-            <div class="col-lg-8">
-              <h1 class="heading-title">About</h1>
-              <p class="mb-0">
-                Odio et unde deleniti. Deserunt numquam exercitationem. Officiis quo
-                odio sint voluptas consequatur ut a odio voluptatem. Sit dolorum
-                debitis veritatis natus dolores. Quasi ratione sint. Sit quaerat
-                ipsum dolorem.
-              </p>
-            </div>
+  <!-- Story & Vision Section -->
+  <section class="py-5">
+      <div class="container py-4">
+          <div class="row align-items-center g-5">
+              <div class="col-lg-6">
+                  <span class="fw-bold text-uppercase" style="color: var(--toms-orange); letter-spacing: 1px;">Fresh, Crispy & Flavorful</span>
+                  <h2 class="display-5 fw-bold mt-2 mb-4">Born from a Passion for Great Wings</h2>
+                  <p class="text-muted fs-5 leading-relaxed">
+                      At Tom's Chicken, we believe that great meals bring people together. Whether it's an intimate date, a joyful family dinner, or a lively barkada gathering, we craft every single wing with passion and premium ingredients.
+                  </p>
+                  <p class="text-muted leading-relaxed">
+                      Our signature recipes combine golden crispness with rich, handcrafted glazes and dry rubs. Powered by modern smart-table ordering and live refills, we guarantee your food arrives piping hot, fast, and ready to satisfy your deepest cravings.
+                  </p>
+                  <div class="row g-3 mt-3">
+                      <div class="col-sm-6">
+                          <div class="d-flex align-items-center gap-3 p-3 rounded bg-light border">
+                              <i class="fa-solid fa-check-circle fs-3 text-success"></i>
+                              <div>
+                                  <h6 class="fw-bold mb-0">100% Fresh Daily</h6>
+                                  <small class="text-muted">No shortcuts, always crisp</small>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-sm-6">
+                          <div class="d-flex align-items-center gap-3 p-3 rounded bg-light border">
+                              <i class="fa-solid fa-shield-heart fs-3" style="color: var(--toms-orange);"></i>
+                              <div>
+                                  <h6 class="fw-bold mb-0">Smart Refill Tech</h6>
+                                  <small class="text-muted">Fast dine-in service</small>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="col-lg-6">
+                  <div class="row g-3">
+                      <div class="col-6">
+                          <div class="feature-card text-center">
+                              <div class="feature-icon mx-auto"><i class="fa-solid fa-fire"></i></div>
+                              <h3 class="fw-bold">14+</h3>
+                              <p class="text-muted mb-0 fw-bold">Signature Flavors</p>
+                          </div>
+                      </div>
+                      <div class="col-6">
+                          <div class="feature-card text-center">
+                              <div class="feature-icon mx-auto"><i class="fa-solid fa-users"></i></div>
+                              <h3 class="fw-bold">2 Floors</h3>
+                              <p class="text-muted mb-0 fw-bold">13 Dining Tables</p>
+                          </div>
+                      </div>
+                      <div class="col-6">
+                          <div class="feature-card text-center">
+                              <div class="feature-icon mx-auto"><i class="fa-solid fa-bowl-food"></i></div>
+                              <h3 class="fw-bold">5 Unli</h3>
+                              <p class="text-muted mb-0 fw-bold">Promo Packages</p>
+                          </div>
+                      </div>
+                      <div class="col-6">
+                          <div class="feature-card text-center">
+                              <div class="feature-icon mx-auto"><i class="fa-solid fa-clock"></i></div>
+                              <h3 class="fw-bold">8 AM–8 PM</h3>
+                              <p class="text-muted mb-0 fw-bold">Open Daily</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
           </div>
-        </div>
       </div>
-      <nav class="breadcrumbs">
-        <div class="container">
-          <ol>
-            <li><a href="index.html">Home</a></li>
-            <li class="current">About</li>
-          </ol>
-        </div>
-      </nav>
-    </div><!-- End Page Title -->
+  </section>
 
-    <!-- About Section -->
-    <section id="about" class="about section">
-
-      <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-        <div class="row g-5 align-items-center">
-          <div class="col-lg-6 position-relative">
-            <div class="about-img" data-aos="fade-right">
-              <img src="assets/img/about/about-portrait-2.webp" class="img-fluid" alt="">
-            </div>
-            <div class="experience-badge" data-aos="fade-up">
-              <h2>12</h2>
-              <p>Years of<br>Experiense</p>
-            </div>
-            <div class="projects-badge" data-aos="fade-left">
-              <h2>345+</h2>
-              <p>Projects</p>
-            </div>
+  <!-- Flavors Showcase -->
+  <section class="py-5 bg-light">
+      <div class="container py-3">
+          <div class="text-center mb-5">
+              <span class="fw-bold text-uppercase" style="color: var(--toms-orange); letter-spacing: 1px;">Our Masterpieces</span>
+              <h2 class="display-6 fw-bold mt-1">Explore Our 14 Signature Flavors</h2>
+              <p class="text-muted">From savory sweet to extreme heat, there's a flavor for every palate.</p>
           </div>
 
-          <div class="col-lg-6" data-aos="fade-left">
-            <h2 class="display-4 fw-bold mb-4">Vestibulum Sagittis Lacinia Augue</h2>
-            <p class="lead mb-4">Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales.</p>
-
-            <div class="features">
-              <div class="feature-item mb-4" data-aos="fade-up">
-                <div class="feature-icon">
-                  <i class="bi bi-rocket-takeoff"></i>
-                </div>
-                <div class="feature-content">
-                  <h4>Pellentesque Dapibus</h4>
-                  <p>Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim.</p>
-                </div>
-              </div>
-
-              <div class="feature-item mb-4" data-aos="fade-up" data-aos-delay="100">
-                <div class="feature-icon">
-                  <i class="bi bi-globe2"></i>
-                </div>
-                <div class="feature-content">
-                  <h4>Suspendisse Pulvinar</h4>
-                  <p>Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem.</p>
-                </div>
-              </div>
-
-              <ul class="check-list" data-aos="fade-up" data-aos-delay="200">
-                <li><i class="bi bi-check-circle"></i> Phasellus viverra nulla ut metus varius laoreet quisque rutrum aenean.</li>
-                <li><i class="bi bi-check-circle"></i> Etiam ultricies nisi vel augue curabitur ullamcorper ultricies nisi nam.</li>
-              </ul>
-
-              <a href="#" class="btn btn-primary btn-lg mt-4" data-aos="fade-up" data-aos-delay="300">Learn More</a>
-            </div>
+          <div class="d-flex flex-wrap justify-content-center gap-3">
+              <span class="flavor-badge"><i class="fa-solid fa-pepper-hot text-danger"></i> Buffalo</span>
+              <span class="flavor-badge"><i class="fa-solid fa-cheese text-warning"></i> Garlic Parmesan</span>
+              <span class="flavor-badge"><i class="fa-solid fa-fire text-danger"></i> Mango Habanero</span>
+              <span class="flavor-badge"><i class="fa-solid fa-bowl-rice text-dark"></i> Teriyaki</span>
+              <span class="flavor-badge"><i class="fa-solid fa-smoking text-secondary"></i> Smoked BBQ</span>
+              <span class="flavor-badge"><i class="fa-solid fa-droplet text-warning"></i> Garlic Butter</span>
+              <span class="flavor-badge"><i class="fa-solid fa-bottle-droplet text-danger"></i> Spicy Korean</span>
+              <span class="flavor-badge"><i class="fa-solid fa-egg text-warning"></i> Salted Egg</span>
+              <span class="flavor-badge"><i class="fa-solid fa-lemon text-warning"></i> Lemon Glazed</span>
+              <span class="flavor-badge"><i class="fa-solid fa-jar text-warning"></i> Honey Mustard</span>
+              <span class="flavor-badge"><i class="fa-solid fa-fire-flame-curved text-warning"></i> Hot Orange Soda</span>
+              <span class="flavor-badge"><i class="fa-solid fa-cubes-stacked text-warning"></i> Cheesy</span>
+              <span class="flavor-badge"><i class="fa-solid fa-drumstick-bite text-dark"></i> Lechon Paksiw</span>
+              <span class="flavor-badge text-danger fw-bold border-danger"><i class="fa-solid fa-skull-crossbones text-danger"></i> Nuclear Bomb</span>
           </div>
-        </div>
-
       </div>
+  </section>
 
-    </section><!-- /About Section -->
-
-    <!-- Team Section -->
-    <section id="team" class="team section">
-
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <span class="description-title">Team</span>
-        <h2>Team</h2>
-        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
-      </div><!-- End Section Title -->
-
-      <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-        <div class="row g-4">
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-            <div class="team-member">
-              <div class="member-image">
-                <img src="assets/img/person/person-f-2.webp" class="img-fluid" alt="" loading="lazy">
-                <div class="social-overlay">
-                  <div class="social-icons">
-                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                    <a href="#"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#"><i class="bi bi-instagram"></i></a>
-                  </div>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Emma Rodriguez</h4>
-                <span>Senior Developer</span>
-                <p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</p>
-              </div>
-            </div><!-- End Team Member -->
+  <!-- Promo Highlights -->
+  <section class="py-5">
+      <div class="container py-4">
+          <div class="text-center mb-5">
+              <span class="fw-bold text-uppercase" style="color: var(--toms-orange); letter-spacing: 1px;">Affordable Feasts</span>
+              <h2 class="display-6 fw-bold mt-1">Unlimited Wings Packages</h2>
+              <p class="text-muted">Choose your promo, grab your table code, and enjoy unli refills!</p>
           </div>
 
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-            <div class="team-member">
-              <div class="member-image">
-                <img src="assets/img/person/person-m-7.webp" class="img-fluid" alt="" loading="lazy">
-                <div class="social-overlay">
-                  <div class="social-icons">
-                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                    <a href="#"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#"><i class="bi bi-instagram"></i></a>
+          <div class="row g-4">
+              <div class="col-md-4">
+                  <div class="promo-card h-100">
+                      <h4 class="fw-bold">TM1 Classic</h4>
+                      <h2 class="fw-bold text-success my-3">₱239 <small class="text-muted fs-6">/ pax</small></h2>
+                      <ul class="list-unstyled text-muted small">
+                          <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Unlimited Original Wings</li>
+                          <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Unlimited Rice</li>
+                          <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Unlimited Gravy</li>
+                      </ul>
                   </div>
-                </div>
               </div>
-              <div class="member-info">
-                <h4>Michael Torres</h4>
-                <span>Creative Director</span>
-                <p>Lorem ipsum dolor sit amet consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus.</p>
-              </div>
-            </div><!-- End Team Member -->
-          </div>
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
-            <div class="team-member">
-              <div class="member-image">
-                <img src="assets/img/person/person-f-11.webp" class="img-fluid" alt="" loading="lazy">
-                <div class="social-overlay">
-                  <div class="social-icons">
-                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                    <a href="#"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#"><i class="bi bi-instagram"></i></a>
+              <div class="col-md-4">
+                  <div class="promo-card highlight h-100 shadow-sm">
+                      <div class="promo-badge">Most Popular</div>
+                      <h4 class="fw-bold">TM3 Supreme</h4>
+                      <h2 class="fw-bold text-success my-3">₱369 <small class="text-muted fs-6">/ pax</small></h2>
+                      <ul class="list-unstyled text-muted small">
+                          <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Unlimited Flavored Wings</li>
+                          <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Unlimited Rice & Dips</li>
+                          <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Unlimited Crispy Isaw & Sisig</li>
+                          <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Unlimited Seasoned Fries</li>
+                      </ul>
                   </div>
-                </div>
               </div>
-              <div class="member-info">
-                <h4>Sarah Mitchell</h4>
-                <span>Project Manager</span>
-                <p>Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-              </div>
-            </div><!-- End Team Member -->
-          </div>
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-            <div class="team-member">
-              <div class="member-image">
-                <img src="assets/img/person/person-m-14.webp" class="img-fluid" alt="" loading="lazy">
-                <div class="social-overlay">
-                  <div class="social-icons">
-                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                    <a href="#"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#"><i class="bi bi-instagram"></i></a>
+              <div class="col-md-4">
+                  <div class="promo-card h-100">
+                      <h4 class="fw-bold">TM5 Ultimate</h4>
+                      <h2 class="fw-bold text-success my-3">₱399 <small class="text-muted fs-6">/ pax</small></h2>
+                      <ul class="list-unstyled text-muted small">
+                          <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> All TM3 Inclusions</li>
+                          <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Unlimited Lumpia & Pasta</li>
+                          <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Unlimited Nachos Supreme</li>
+                          <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i> Complete Dining Feast</li>
+                      </ul>
                   </div>
-                </div>
               </div>
-              <div class="member-info">
-                <h4>David Kim</h4>
-                <span>Business Analyst</span>
-                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur.</p>
-              </div>
-            </div><!-- End Team Member -->
           </div>
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-            <div class="team-member">
-              <div class="member-image">
-                <img src="assets/img/person/person-f-13.webp" class="img-fluid" alt="" loading="lazy">
-                <div class="social-overlay">
-                  <div class="social-icons">
-                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                    <a href="#"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#"><i class="bi bi-instagram"></i></a>
-                  </div>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Lisa Chang</h4>
-                <span>Marketing Lead</span>
-                <p>Excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-              </div>
-            </div><!-- End Team Member -->
-          </div>
-
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
-            <div class="team-member">
-              <div class="member-image">
-                <img src="assets/img/person/person-m-15.webp" class="img-fluid" alt="" loading="lazy">
-                <div class="social-overlay">
-                  <div class="social-icons">
-                    <a href="#"><i class="bi bi-linkedin"></i></a>
-                    <a href="#"><i class="bi bi-twitter-x"></i></a>
-                    <a href="#"><i class="bi bi-instagram"></i></a>
-                  </div>
-                </div>
-              </div>
-              <div class="member-info">
-                <h4>Ryan Cooper</h4>
-                <span>Software Engineer</span>
-                <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque.</p>
-              </div>
-            </div><!-- End Team Member -->
-          </div>
-
-        </div>
-
       </div>
+  </section>
 
-    </section><!-- /Team Section -->
-
-  </main>
-
-  <footer id="footer" class="footer position-relative light-background">
-
-    <div class="container">
-      <div class="row gy-5">
-
-        <div class="col-lg-4">
-          <div class="footer-brand">
-            <a href="index.html" class="logo d-flex align-items-center mb-3">
-              <span class="sitename">Story</span>
-            </a>
-            <p class="tagline">Innovating the digital landscape with elegant solutions and timeless design.</p>
-
-            <div class="social-links mt-4">
-              <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-              <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-              <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
-              <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
-              <a href="#" aria-label="Dribbble"><i class="bi bi-dribbble"></i></a>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-6">
-          <div class="footer-links-grid">
-            <div class="row">
-              <div class="col-6 col-md-4">
-                <h5>Company</h5>
-                <ul class="list-unstyled">
-                  <li><a href="#">About Us</a></li>
-                  <li><a href="#">Our Team</a></li>
-                  <li><a href="#">Careers</a></li>
-                  <li><a href="#">Newsroom</a></li>
-                </ul>
-              </div>
-              <div class="col-6 col-md-4">
-                <h5>Services</h5>
-                <ul class="list-unstyled">
-                  <li><a href="#">Web Development</a></li>
-                  <li><a href="#">UI/UX Design</a></li>
-                  <li><a href="#">Digital Strategy</a></li>
-                  <li><a href="#">Branding</a></li>
-                </ul>
-              </div>
-              <div class="col-6 col-md-4">
-                <h5>Support</h5>
-                <ul class="list-unstyled">
-                  <li><a href="#">Help Center</a></li>
-                  <li><a href="#">Contact Us</a></li>
-                  <li><a href="#">Privacy Policy</a></li>
-                  <li><a href="#">Terms of Service</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-2">
-          <div class="footer-cta">
-            <h5>Let's Connect</h5>
-            <a href="contact.html" class="btn btn-outline">Get in Touch</a>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="footer-bottom">
+  <!-- Call to Action -->
+  <section class="py-5">
       <div class="container">
-        <div class="row">
-          <div class="col-12">
-            <div class="footer-bottom-content">
-              <p class="mb-0">© <strong>Story</strong>. All rights reserved.</p>
-              <div class="credits">
-                <!-- All the links in the footer should remain intact. -->
-                <!-- You can delete the links only if you've purchased the pro version. -->
-                <!-- Licensing information: https://bootstrapmade.com/license/ -->
-                <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
-                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a> | <a href="https://bootstrapmade.com/tools/">DevTools</a>
+          <div class="cta-banner text-center">
+              <h2 class="display-5 fw-bold mb-3">Craving Crispy Wings Today?</h2>
+              <p class="fs-5 mb-4 mx-auto" style="max-width: 600px; opacity: 0.95;">
+                  Book your table in advance to skip the line, or place an order online for fast pickup!
+              </p>
+              <div class="d-flex flex-wrap justify-content-center gap-3">
+                  <button onclick="checkReservationAuth()" class="btn btn-light btn-lg px-4 rounded-pill fw-bold text-dark shadow-sm">
+                      <i class="fa-solid fa-calendar-check me-2" style="color: var(--toms-orange);"></i> Book a Table
+                  </button>
+                  <button onclick="checkMenuAuth()" class="btn btn-outline-light btn-lg px-4 rounded-pill fw-bold">
+                      <i class="fa-solid fa-utensils me-2"></i> View Menu & Order
+                  </button>
               </div>
-            </div>
           </div>
-        </div>
       </div>
-    </div>
+  </section>
 
+  <!-- Footer -->
+  <footer class="bg-dark text-white text-center py-4">
+      <div class="container">
+          <h4 style="color: var(--toms-orange);">Tom's Chicken</h4>
+          <p class="small text-muted mb-3">Experience the best flavored wings in town. Crispy, spicy, and refillable.</p>
+          <div class="d-flex justify-content-center gap-3 mb-3">
+              <a href="index.html" class="text-white text-decoration-none small">Home</a>
+              <span class="text-muted">•</span>
+              <a href="about.html" class="text-white text-decoration-none small">About</a>
+              <span class="text-muted">•</span>
+              <a href="contact.html" class="text-white text-decoration-none small">Contact</a>
+          </div>
+          <p class="small text-muted mb-0">&copy; 2026 Tom's Chicken. All Rights Reserved.</p>
+      </div>
   </footer>
 
-  <!-- Scroll Top -->
-  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <script type="module">
+      import { auth, onAuthStateChanged, signOut } from "./js/firebase-config.js";
 
-  <!-- Preloader -->
-  <div id="preloader"></div>
+      const authSection = document.getElementById("authSection");
+      const authSectionMobile = document.getElementById("authSectionMobile");
+      const authModal = new bootstrap.Modal(document.getElementById('authModal'));
 
-  <!-- Vendor JS Files -->
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
-  <script src="assets/vendor/aos/aos.js"></script>
-  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+      let currentUser = null;
 
-  <!-- Main JS File -->
-  <script src="assets/js/main.js"></script>
+      onAuthStateChanged(auth, (user) => {
+          currentUser = user;
+          if (user) {
+              const firstLetter = user.email.charAt(0).toUpperCase();
 
+              authSection.innerHTML = `
+                  <div class="d-flex align-items-center gap-2">
+                      <a href="profile.html" class="profile-circle" title="${user.email}">
+                          ${firstLetter}
+                      </a>
+                      <button id="logoutBtn" class="btn btn-dark rounded-pill px-4">Logout</button>
+                  </div>
+              `;
+
+              authSectionMobile.innerHTML = `
+                  <div class="d-flex flex-column align-items-center gap-2 mb-2">
+                      <a href="profile.html" class="profile-circle" title="${user.email}">
+                          ${firstLetter}
+                      </a>
+                      <button id="logoutBtnMobile" class="btn btn-dark rounded-pill px-4">Logout</button>
+                  </div>
+              `;
+
+              document.getElementById("logoutBtn").addEventListener("click", () => {
+                  signOut(auth).then(() => window.location.reload());
+              });
+              document.getElementById("logoutBtnMobile").addEventListener("click", () => {
+                  signOut(auth).then(() => window.location.reload());
+              });
+          } else {
+              authSection.innerHTML = `
+                  <a href="login.html" class="btn-orange text-decoration-none">Login / Sign Up</a>
+              `;
+              authSectionMobile.innerHTML = `
+                  <a href="login.html" class="btn-orange text-decoration-none">Login / Sign Up</a>
+              `;
+          }
+      });
+
+      window.checkReservationAuth = function() {
+          if (currentUser || auth.currentUser) {
+              window.location.href = "reservation.html";
+          } else {
+              authModal.show();
+          }
+      }
+
+      window.checkMenuAuth = function() {
+          if (currentUser || auth.currentUser) {
+              window.location.href = "menu.html";
+          } else {
+              authModal.show();
+          }
+      }
+  </script>
 </body>
-
 </html>

@@ -151,7 +151,7 @@
               </div>
               <div>
                 <h6 class="text-muted mb-1">Active Tables</h6>
-                <h3 class="fw-bold mb-0" id="activeTablesCount">0 / 10</h3>
+                <h3 class="fw-bold mb-0" id="activeTablesCount">0 / 13</h3>
               </div>
             </div>
           </div>
@@ -185,6 +185,8 @@
         signOut,
       } from "./js/firebase-config.js";
 
+      let currentUserUid = null;
+
       //----------- Check if user is admin
       onAuthStateChanged(auth, async (user) => {
         if (!user) {
@@ -212,7 +214,7 @@
       });//----------- End of Pending Payments Check
 
       // Checks Active Tables
-      const TOTAL_TABLES = 10;
+      const TOTAL_TABLES = 13;
       onValue(ref(db, "tables"), (snapshot) => {
         let activeCount = 0;
         if (snapshot.exists()) {

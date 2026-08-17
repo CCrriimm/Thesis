@@ -151,6 +151,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="checkReservationAuth()">Reservation</a>
                     </li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
                     <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
                 </ul> <!--Mobile Navigation-->
                 <div id="authSectionMobile" class="d-lg-none mt-3 text-center">
@@ -228,8 +229,11 @@
         const authSectionMobile = document.getElementById("authSectionMobile");
         const authModal = new bootstrap.Modal(document.getElementById('authModal'));
 
+        let currentUser = null;
+
         // check if user is logged in or not and update navbar accordingly
         onAuthStateChanged(auth, (user) => {
+            currentUser = user;
             if (user) {
                 const firstLetter = user.email.charAt(0).toUpperCase();
 
@@ -272,8 +276,7 @@
 
         // check if user is logged in or not and redirect accordingly
         window.checkReservationAuth = function() {
-            const user = auth.currentUser;
-            if (user) {
+            if (currentUser || auth.currentUser) {
                 window.location.href = "reservation.html";
             } else {
                 authModal.show();
@@ -281,8 +284,7 @@
         }
 
         window.checkMenuAuth = function() {
-            const user = auth.currentUser;
-            if (user) {
+            if (currentUser || auth.currentUser) {
                 window.location.href = "menu.html";
             } else {
                 authModal.show();

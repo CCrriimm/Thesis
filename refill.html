@@ -179,6 +179,18 @@
             return cardHtml + `</div>`;
         }
 
+        // AUTO-VERIFY IF URL HAS ?code= PARAMETER (QR Code Scan Support)
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const codeParam = urlParams.get('code');
+            if (codeParam) {
+                document.getElementById('unliCode').value = codeParam.toUpperCase();
+                setTimeout(() => {
+                    document.getElementById('verifyBtn').click();
+                }, 300);
+            }
+        });
+
         // VERIFY UNLI CODE & GRAB TABLE CONTEXT
         document.getElementById('verifyBtn').addEventListener('click', async () => {
             const codeInput = document.getElementById('unliCode').value.trim().toUpperCase();

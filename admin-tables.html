@@ -44,7 +44,7 @@
     <div class="main-content">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">Table Management</h2>
-        <span class="badge bg-dark fs-6" id="activeCount">0 / 10 Active</span>
+        <span class="badge bg-dark fs-6" id="activeCount">0 / 13 Active</span>
       </div>
 
       <div class="modal fade" id="promoSelectModal" tabindex="-1" data-bs-backdrop="static">
@@ -118,6 +118,32 @@
         </div>
       </div>
 
+      <div class="modal fade" id="qrModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+              <h5 class="modal-title fw-bold"><i class="fa-solid fa-qrcode" style="color: var(--toms-orange);"></i> Table Refill QR Code</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+              <h4 class="fw-bold mb-1" id="qrModalTableTitle" style="color: var(--toms-orange);">Table ?</h4>
+              <p class="text-muted small mb-3" id="qrModalPromoSubtitle">Promo details</p>
+              
+              <div class="p-3 bg-white border rounded d-inline-block shadow-sm mb-3">
+                <img id="qrModalImg" src="" alt="Table QR Code" style="width: 200px; height: 200px;" class="img-fluid" />
+              </div>
+              
+              <h5 class="fw-bold mb-1">Code: <span id="qrModalCodeText" class="unli-code">UNLI-XXXX</span></h5>
+              <small class="text-muted d-block">Scan to open refill request page automatically</small>
+            </div>
+            <div class="modal-footer justify-content-center">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-orange fw-bold" onclick="window.print()"><i class="fa-solid fa-print me-1"></i> Print</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <p class="text-muted mb-4">Generate access codes for Unlimited Chicken Promo Customers</p>
       <div class="row g-4" id="tableGrid"></div>
     </div>
@@ -126,12 +152,12 @@
       import { auth, db, ref, get, onAuthStateChanged, onValue, update, signOut } from "./js/firebase-config.js";
 
       onAuthStateChanged(auth, async (user) => {
-        if (!user) { window.location.href = "index.html"; return; }
+        if (!user) { window.location.href = "login.html"; return; }
         const snap = await get(ref(db, "users/" + user.uid));
         if (!snap.exists() || snap.val().role !== "admin") { window.location.href = "login.html"; }
       });
 
-      const TOTAL_TABLES = 10;
+      const TOTAL_TABLES = 13;
       const tablesRef = ref(db, "tables");
 
       onValue(tablesRef, (snapshot) => {
@@ -155,7 +181,10 @@
             codeHTML = `
               <h4 class="unli-code fw-bold my-2">${tableInfo.code}</h4>
               <div class="badge bg-dark mb-3">${tableInfo.promo} | ${tableInfo.pax} Pax</div>
-              <button onclick="clearTable(${i})" class="btn btn-outline-danger btn-sm w-100 fw-bold">End Session</button>
+              <div class="d-flex gap-2">
+                <button onclick="viewTableQR(${i}, '${tableInfo.code}', '${tableInfo.promo}', ${tableInfo.pax})" class="btn btn-dark btn-sm w-50 fw-bold"><i class="fa-solid fa-qrcode"></i> QR</button>
+                <button onclick="clearTable(${i})" class="btn btn-outline-danger btn-sm w-50 fw-bold">End</button>
+              </div>
             `;
           } else {
             codeHTML = `
@@ -218,6 +247,20 @@
         document.getElementById("successMessage").textContent = `Table ${pendingTableNum} is active!\nCode: ${randomCode}\nPromo: ${selectedPromo} (${pax} Pax)`;
         new bootstrap.Modal(document.getElementById("successModal")).show();
       });
+
+      const qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
+      window.viewTableQR = function (tableNum, code, promo, pax) {
+        document.getElementById('qrModalTableTitle').innerText = "Table " + tableNum;
+        document.getElementById('qrModalPromoSubtitle').innerText = `${promo} | ${pax} Pax`;
+        document.getElementById('qrModalCodeText').innerText = code;
+        
+        // Base URL for refill page
+        const refillUrl = `${window.location.origin}${window.location.pathname.replace('admin-tables.html', 'refill.html')}?code=${code}`;
+        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(refillUrl)}`;
+        document.getElementById('qrModalImg').src = qrApiUrl;
+        
+        qrModal.show();
+      };
 
       let tableToEnd = null;
       window.clearTable = function (tableNum) {
