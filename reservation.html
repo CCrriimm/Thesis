@@ -32,8 +32,35 @@
         margin: 0 auto;
         padding: 15px;
       }
+      @media (min-width: 768px) {
+        .mobile-container {
+          max-width: 95%;
+          padding: 20px 25px;
+        }
+      }
+      @media (min-width: 992px) {
+        .mobile-container {
+          max-width: 1160px;
+          padding: 25px 25px;
+        }
+        body {
+          padding-bottom: 40px;
+        }
+        .floating-bottom {
+          display: none !important;
+        }
+      }
+      @media (min-width: 1300px) {
+        .mobile-container {
+          max-width: 1260px;
+        }
+      }
 
       /* CALENDAR STYLES */
+      #step1-calendar {
+        max-width: 820px;
+        margin: 0 auto;
+      }
       .calendar-header {
         display: flex;
         justify-content: space-between;
@@ -41,21 +68,35 @@
         margin-bottom: 15px;
         font-weight: bold;
       }
+      @media (min-width: 768px) {
+        .calendar-header {
+          padding: 5px 10px 15px;
+        }
+        .calendar-header h5 {
+          font-size: 1.35rem;
+          font-weight: 800;
+        }
+      }
       .calendar-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        gap: 5px;
+        gap: 6px;
         text-align: center;
+      }
+      @media (min-width: 768px) {
+        .calendar-grid {
+          gap: 10px;
+        }
       }
       .day-name {
         font-weight: bold;
         color: #6c757d;
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         padding-bottom: 10px;
       }
       .cal-day {
         padding: 10px 2px;
-        border-radius: 6px;
+        border-radius: 8px;
         border: 1px solid #dee2e6;
         cursor: pointer;
         transition: 0.2s;
@@ -66,6 +107,13 @@
         justify-content: center;
         font-weight: bold;
         overflow: hidden;
+      }
+      @media (min-width: 768px) {
+        .cal-day {
+          min-height: 65px;
+          padding: 12px 4px;
+          font-size: 1.05rem;
+        }
       }
       .cal-day.empty {
         background: transparent;
@@ -113,6 +161,45 @@
         text-align: center;
       }
 
+      .sticky-desktop-sidebar {
+        position: static;
+      }
+      @media (min-width: 992px) {
+        .sticky-desktop-sidebar {
+          position: sticky;
+          top: 85px;
+          z-index: 10;
+        }
+      }
+
+      /* Advance Order Grid */
+      .advance-menu-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 12px;
+      }
+      @media (min-width: 768px) {
+        .advance-menu-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      .advance-item-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin-bottom: 0;
+        transition: box-shadow 0.2s ease;
+      }
+      .advance-item-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
       /* MENU & CART (Advance Order) */
       .menu-card {
         display: flex;
@@ -123,6 +210,37 @@
       }
       .menu-card:last-child {
         border-bottom: none;
+      }
+      .menu-card-img-wrap {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        overflow: visible;
+        flex-shrink: 0;
+        background: #f8f9fa;
+        cursor: pointer;
+      }
+      .menu-card-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 12px;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+      /* Desktop Hover Magnifier / Large Preview */
+      @media (min-width: 769px) {
+        .menu-card-img-wrap:hover img {
+          position: absolute;
+          top: -30px;
+          left: -30px;
+          width: 160px;
+          height: 160px;
+          border-radius: 16px;
+          box-shadow: 0 14px 28px rgba(0,0,0,0.35);
+          z-index: 1050;
+          transform: scale(1.05);
+        }
       }
       .qty-btn {
         width: 30px;
@@ -148,8 +266,8 @@
         text-align: center;
       }
       .qr-placeholder {
-        width: 150px;
-        height: 150px;
+        width: 170px;
+        height: 170px;
         background: white;
         border: 2px dashed #ffc107;
         margin: 10px auto;
@@ -157,6 +275,17 @@
         align-items: center;
         justify-content: center;
         border-radius: 10px;
+        overflow: hidden;
+      }
+      .qr-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .qr-img:hover {
+        transform: scale(1.03);
       }
 
       .floating-bottom {
@@ -240,135 +369,325 @@
       </div>
 
       <form id="reservationForm" class="d-none">
-        <div class="booking-card">
-          <div
-            class="card-header-orange d-flex justify-content-between align-items-center"
-          >
-            <h5 class="mb-0 fw-bold">
-              <i class="fa-solid fa-calendar-check"></i> Details
-            </h5>
-            <button
-              type="button"
-              class="btn btn-sm btn-light text-dark fw-bold py-0"
-              onclick="changeDate()"
-            >
-              Change Date
-            </button>
-          </div>
-          <div class="card-body p-3">
-            <h4
-              class="fw-bold text-center mb-3"
-              id="displaySelectedDate"
-              style="color: var(--toms-orange)"
-            >
-              YYYY-MM-DD
-            </h4>
-            <input type="hidden" id="resDate" />
-
-            <div class="row g-3">
-              <div class="col-12">
-                <label class="form-label fw-bold small text-muted"
-                  >Arrival Time Slot</label
+        <div id="reservationErrorAlert" class="alert alert-danger d-none py-2 px-3 small mb-3"></div>
+        <div class="row g-4">
+          <!-- Main Left Column -->
+          <div class="col-lg-7 col-xl-8">
+            <!-- Reservation Details Card -->
+            <div class="booking-card mb-4">
+              <div
+                class="card-header-orange d-flex justify-content-between align-items-center"
+              >
+                <h5 class="mb-0 fw-bold">
+                  <i class="fa-solid fa-calendar-check me-2"></i> Details
+                </h5>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-light text-dark fw-bold py-1 px-3 rounded-pill"
+                  onclick="changeDate()"
                 >
-                <select id="resTime" class="form-select fw-bold" required>
-                  <option value="" disabled selected>
-                    Select an available slot...
-                  </option>
-                  <option value="8:00 AM - 11:00 AM">8:00 AM - 11:00 AM</option>
-                  <option value="11:00 AM - 2:00 PM">11:00 AM - 2:00 PM</option>
-                  <option value="2:00 PM - 5:00 PM">2:00 PM - 5:00 PM</option>
-                  <option value="5:00 PM - 8:00 PM">5:00 PM - 8:00 PM</option>
-                </select>
-                <small class="text-muted" style="font-size: 0.7rem"
-                  >Limited to 2 reservations per time slot.</small
-                >
+                  <i class="fa-solid fa-calendar-day me-1"></i> Change Date
+                </button>
               </div>
-
-              <div class="col-12 mt-3">
-                <label class="form-label fw-bold small text-muted"
-                  >No. of People</label
+              <div class="card-body p-3 p-md-4">
+                <h4
+                  class="fw-bold text-center mb-3"
+                  id="displaySelectedDate"
+                  style="color: var(--toms-orange)"
                 >
-                <input
-                  type="number"
-                  id="resPax"
-                  class="form-control"
-                  min="1"
-                  value="2"
-                  required
-                />
+                  YYYY-MM-DD
+                </h4>
+                <input type="hidden" id="resDate" />
+
+                <div class="row g-3">
+                  <div class="col-md-6 col-12">
+                    <label class="form-label fw-bold small text-muted"
+                      >Arrival Time Slot</label
+                    >
+                    <select id="resTime" class="form-select fw-bold" required>
+                      <option value="" disabled selected>
+                        Select an available slot...
+                      </option>
+                      <option value="8:00 AM - 11:00 AM">8:00 AM - 11:00 AM</option>
+                      <option value="11:00 AM - 2:00 PM">11:00 AM - 2:00 PM</option>
+                      <option value="2:00 PM - 5:00 PM">2:00 PM - 5:00 PM</option>
+                      <option value="5:00 PM - 8:00 PM">5:00 PM - 8:00 PM</option>
+                    </select>
+                    <small class="text-muted" style="font-size: 0.72rem"
+                      >Limited to 2 reservations per time slot.</small
+                    >
+                  </div>
+
+                  <div class="col-md-6 col-12">
+                    <label class="form-label fw-bold small text-muted"
+                      >No. of People</label
+                    >
+                    <input
+                      type="number"
+                      id="resPax"
+                      class="form-control fw-bold"
+                      min="1"
+                      value="2"
+                      required
+                    />
+                  </div>
+
+                  <div class="col-12">
+                    <label class="form-label fw-bold small text-muted"
+                      >Table Selection</label
+                    >
+                    <div class="input-group">
+                      <input
+                        type="text"
+                        id="resTableSize"
+                        class="form-control fw-bold"
+                        placeholder="Select a table from floor map..."
+                        readonly
+                        required
+                      />
+                      <button
+                        type="button"
+                        class="btn text-white fw-bold px-3 px-md-4"
+                        style="background-color: var(--toms-orange)"
+                        id="openTableSelectionBtn"
+                      >
+                        <i class="fa-solid fa-map me-1"></i> Choose Table
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
+            </div>
 
-              <div class="col-12 mt-3">
-                <label class="form-label fw-bold small text-muted"
-                  >Table Selection</label
+            <!-- Advance Order Food Card -->
+            <div class="booking-card mb-4">
+              <div class="card-body p-3 p-md-4">
+                <div
+                  class="form-check form-switch d-flex justify-content-between align-items-center mb-2 px-0"
                 >
-                <div class="input-group">
-                  <input
-                    type="text"
-                    id="resTableSize"
-                    class="form-control"
-                    placeholder="Select a table..."
-                    readonly
-                    required
-                  />
-                  <button
-                    type="button"
-                    class="btn text-white fw-bold"
-                    style="background-color: var(--toms-orange)"
-                    id="openTableSelectionBtn"
+                  <label
+                    class="form-check-label fw-bold fs-5"
+                    for="advanceOrderToggle"
+                    >Advance Order Food?</label
                   >
-                    <i class="fa-solid fa-map"></i> Map
+                  <input
+                    class="form-check-input fs-4"
+                    type="checkbox"
+                    id="advanceOrderToggle"
+                    style="margin-right: 0; cursor: pointer;"
+                  />
+                </div>
+                <p class="text-muted small mb-0">
+                  Skip the wait! Order Unli-Promos, Barkada sets, wings, or favorite meals now. 50% food downpayment is paid today.
+                </p>
+              </div>
+
+              <div id="advanceMenuSection" class="d-none bg-light border-top">
+                <div id="menuContainer">
+                  <p class="text-center text-muted py-4">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Loading Menu...
+                  </p>
+                </div>
+                <div
+                  class="p-3 bg-dark text-white d-flex justify-content-between align-items-center"
+                >
+                  <h6 class="mb-0 fw-bold">Food Total:</h6>
+                  <h5 class="mb-0 fw-bold text-warning">₱<span id="cartTotal">0.00</span></h5>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar Column (Right on Desktop, Stacked on Mobile) -->
+          <div class="col-lg-5 col-xl-4">
+            <div class="sticky-desktop-sidebar">
+              <!-- Live Reservation Summary Card -->
+              <div class="booking-card mb-4 border-top border-4" style="border-top-color: var(--toms-orange) !important;">
+                <div class="card-body p-3 p-md-4">
+                  <h6 class="fw-bold mb-3 text-dark d-flex align-items-center">
+                    <i class="fa-solid fa-receipt me-2" style="color: var(--toms-orange);"></i> Reservation Summary
+                  </h6>
+                  
+                  <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <span class="text-muted small">Date:</span>
+                    <span class="fw-bold small text-end" id="sidebarSummaryDate">--</span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <span class="text-muted small">Arrival Slot:</span>
+                    <span class="fw-bold small text-end text-primary" id="sidebarSummaryTime">Select slot</span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <span class="text-muted small">Guests & Table:</span>
+                    <span class="fw-bold small text-end" id="sidebarSummaryTable">2 Pax (No table selected)</span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <span class="text-muted small">Table Reservation Fee:</span>
+                    <span class="fw-bold small">₱70.00</span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center py-2 border-bottom d-none" id="sidebarAdvanceRow">
+                    <span class="text-muted small">Advance Food Total:</span>
+                    <span class="fw-bold small" id="sidebarFoodTotal">₱0.00</span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center py-2 border-bottom d-none" id="sidebarAdvanceDownpaymentRow">
+                    <span class="text-muted small">50% Food Downpayment:</span>
+                    <span class="fw-bold small text-success" id="sidebarFoodDownpayment">₱0.00</span>
+                  </div>
+
+                  <div class="p-3 rounded bg-light border d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                      <span class="fw-bold d-block text-dark">Amount to Pay</span>
+                      <small class="text-muted" style="font-size: 0.7rem;">Paid via GCash/PayMaya</small>
+                    </div>
+                    <div class="text-end">
+                      <span class="fw-bold fs-4" style="color: var(--toms-orange);">₱<span id="sidebarTotalAmount">70.00</span></span>
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-orange shadow-sm fs-5 mt-3 d-none d-lg-block">
+                    <i class="fa-solid fa-arrow-right me-2"></i> Proceed to Checkout
                   </button>
+                </div>
+              </div>
+
+              <!-- House Rules & Dining Policy Card -->
+              <div class="booking-card mb-4 border-start border-4" style="border-left-color: var(--toms-orange) !important;">
+                <div class="card-body p-3">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0 text-dark">
+                      <i class="fa-solid fa-scroll me-2" style="color: var(--toms-orange);"></i> House Rules & Policies
+                    </h6>
+                    <button type="button" class="btn btn-sm btn-outline-dark rounded-pill fw-bold py-0 px-2" data-bs-toggle="modal" data-bs-target="#houseRulesModal">
+                      <i class="fa-solid fa-eye me-1"></i> Full Rules
+                    </button>
+                  </div>
+                  <p class="text-muted small mb-2">Please take note of our dining policies before completing your reservation:</p>
+                  <div class="row g-2 small">
+                    <div class="col-6">
+                      <div class="p-2 bg-light rounded border text-muted">
+                        <i class="fa-solid fa-clock text-warning me-1"></i> <b>2-Hour Limit</b> for Unli Dining
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="p-2 bg-light rounded border text-muted">
+                        <i class="fa-solid fa-ban text-danger me-1"></i> <b>No Sharing</b> / Leftovers Charged
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="p-2 bg-light rounded border text-muted">
+                        <i class="fa-solid fa-users text-primary me-1"></i> <b>All UNLI or None</b> per table
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="p-2 bg-light rounded border text-muted">
+                        <i class="fa-solid fa-drumstick-bite text-warning me-1"></i> <b>4 pcs</b> initial wing serving
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="booking-card mb-5">
-          <div class="card-body p-3">
-            <div
-              class="form-check form-switch d-flex justify-content-between align-items-center mb-2 px-0"
-            >
-              <label
-                class="form-check-label fw-bold fs-5"
-                for="advanceOrderToggle"
-                >Advance Order Food?</label
-              >
-              <input
-                class="form-check-input fs-4"
-                type="checkbox"
-                id="advanceOrderToggle"
-                style="margin-right: 0"
-              />
-            </div>
-            <p class="text-muted small mb-0">
-              Skip the wait! Order Unli-Promos or Barkada sets now. You will be
-              asked to pay 50% of your food downpayment today.
-            </p>
-          </div>
-
-          <div id="advanceMenuSection" class="d-none bg-light border-top">
-            <div id="menuContainer">
-              <p class="text-center text-muted py-4">
-                <i class="fa-solid fa-spinner fa-spin"></i> Loading Menu...
-              </p>
-            </div>
-            <div
-              class="p-3 bg-dark text-white d-flex justify-content-between align-items-center"
-            >
-              <h6 class="mb-0 fw-bold">Food Total:</h6>
-              <h5 class="mb-0 fw-bold">₱<span id="cartTotal">0.00</span></h5>
-            </div>
-          </div>
-        </div>
-
-        <div class="floating-bottom">
+        <div class="floating-bottom d-lg-none">
           <button type="submit" class="btn btn-orange shadow fs-5">
             <i class="fa-solid fa-arrow-right"></i> Proceed to Checkout
           </button>
         </div>
       </form>
+    </div>
+
+    <!-- House Rules Modal -->
+    <div class="modal fade" id="houseRulesModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title fw-bold">
+              <i class="fa-solid fa-scroll me-2" style="color: var(--toms-orange);"></i> Tom's Chicken - House Rules
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-4 bg-light">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-danger fs-6"><i class="fa-solid fa-ban"></i> NO!</span>
+                    <h6 class="fw-bold mb-0 text-danger">Sharing & Leftovers</h6>
+                  </div>
+                  <p class="small text-muted mb-0">Strictly no sharing for unlimited promos. Leftover chicken will be charged corresponding to regular to-go rates.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-warning text-dark fs-6"><i class="fa-solid fa-hourglass-half"></i> Serving Time</span>
+                    <h6 class="fw-bold mb-0">Freshly Cooked</h6>
+                  </div>
+                  <p class="small text-muted mb-0">We don't serve fast food. We serve GOOD FOOD as fast as we can! Please give us ~20 mins to prepare your orders fresh.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-dark fs-6"><i class="fa-solid fa-users"></i> Table Policy</span>
+                    <h6 class="fw-bold mb-0">All UNLI or NO UNLI</h6>
+                  </div>
+                  <p class="small text-muted mb-0">To avoid confusion and sharing, all persons seated at the same table must go UNLI or NO UNLI AT ALL.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-warning text-dark fs-6"><i class="fa-solid fa-rotate"></i> Refills</span>
+                    <h6 class="fw-bold mb-0">Refill Protocol</h6>
+                  </div>
+                  <p class="small text-muted mb-0">First serving of wings consists of 4 pcs. No refills can be submitted until the first serving is finished.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-primary fs-6"><i class="fa-solid fa-clock"></i> 2 Hours</span>
+                    <h6 class="fw-bold mb-0">Dining Time Limit</h6>
+                  </div>
+                  <p class="small text-muted mb-0">You can enjoy your unlimited chicken wings and sides for a full TWO (2) HOURS starting from your table activation.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-danger fs-6"><i class="fa-solid fa-box-tissue"></i> Outside Food</span>
+                    <h6 class="fw-bold mb-0">No Outside Food</h6>
+                  </div>
+                  <p class="small text-muted mb-0">Food & drinks from outside establishments are strictly NOT ALLOWED inside the dining area.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-success fs-6"><i class="fa-solid fa-child"></i> Kids Promo</span>
+                    <h6 class="fw-bold mb-0">Kids Under 3ft</h6>
+                  </div>
+                  <p class="small text-muted mb-0">Kids under 3 feet in height dine for <b>FREE</b> when accompanying dining adults.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-secondary fs-6"><i class="fa-solid fa-bowl-rice"></i> Inclusions</span>
+                    <h6 class="fw-bold mb-0">Rice Notice</h6>
+                  </div>
+                  <p class="small text-muted mb-0">All unlimited promo packages are AUTOMATICALLY served with steamed white rice.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button type="button" class="btn text-white fw-bold px-4" style="background-color: var(--toms-orange);" data-bs-dismiss="modal">I Understand</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div
@@ -412,13 +731,24 @@
               </div>
             </div>
 
+            <!-- House Rules Reminder -->
+            <div class="alert alert-warning py-2 px-3 small mb-3 border-warning d-flex align-items-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation fs-5 text-warning"></i>
+              <div>
+                <strong>House Rules Agreement:</strong> 2-hr dining limit, all guests per table must go unli/regular, no sharing or leftovers, and no outside food.
+              </div>
+            </div>
+
             <div class="payment-box mb-4 text-center">
               <h6 class="fw-bold text-dark mb-1">GCash / PayMaya</h6>
               <p class="mb-2 small">Send to: <b>0912 345 6789</b></p>
-              <div class="qr-placeholder mx-auto">
-                <i class="fa-solid fa-qrcode fa-3x text-muted opacity-50"></i>
+              <div class="qr-placeholder mx-auto shadow-sm">
+                <img src="Media/Payment_QR.png" alt="Payment QR Code" class="qr-img" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fa-solid fa-qrcode fa-3x text-muted opacity-50\'></i>';" />
               </div>
+              <small class="text-muted d-block mt-1">Scan or tap to save QR for payment</small>
             </div>
+
+            <div id="paymentErrorAlert" class="alert alert-danger d-none py-2 px-3 small mb-3"></div>
 
             <div class="mb-3">
               <label class="form-label fw-bold small text-muted"
@@ -434,21 +764,34 @@
               <input type="hidden" id="receiptBase64" />
             </div>
           </div>
-          <div class="modal-footer d-flex">
-            <button
-              type="button"
-              class="btn btn-secondary me-auto"
-              data-bs-dismiss="modal"
-            >
-              Cancel
-            </button>
+          <div class="modal-footer">
             <button
               type="button"
               id="confirmPayBtn"
-              class="btn btn-orange px-4 fw-bold shadow-sm"
+              class="btn btn-orange w-100 py-2 fw-bold shadow-sm"
             >
               Confirm & Pay
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Food Item Image Preview Modal (for Mobile & Click View) -->
+    <div class="modal fade" id="foodImagePreviewModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 overflow-hidden shadow-lg">
+          <div class="modal-header bg-dark text-white py-2">
+            <h6 class="modal-title fw-bold" id="previewFoodTitle">Item Preview</h6>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-0 text-center bg-light">
+            <img id="previewFoodImage" src="" alt="Food Preview" style="width: 100%; max-height: 400px; object-fit: contain;" />
+            <div class="p-3 bg-white text-start">
+              <h5 class="fw-bold mb-1" id="previewFoodName"></h5>
+              <p class="text-muted small mb-2" id="previewFoodDesc"></p>
+              <span class="badge bg-success fs-6" id="previewFoodPrice"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -602,7 +945,6 @@
       // 1. SECURITY
       onAuthStateChanged(auth, async (user) => {
         if (!user) {
-          alert("Please login to book a table.");
           window.location.href = "login.html";
         } else {
           const snap = await get(ref(db, "users/" + user.uid));
@@ -752,6 +1094,7 @@
           }
         });
         select.value = ""; // Force them to pick a new valid time
+        syncReservationSummary();
       };
 
       window.changeDate = function () {
@@ -877,12 +1220,15 @@
         document.getElementById("confirmTableBtn").disabled = false;
       };
 
+      document.getElementById("resTime").addEventListener("change", syncReservationSummary);
+
       document.getElementById("resPax").addEventListener("input", () => {
         selectedTable = null;
         document.getElementById("resTableSize").value = "";
         document.getElementById("confirmTableBtn").disabled = true;
         document.getElementById("selectedTableInfo").innerHTML =
           '<small class="text-muted">Click on a table to select</small>';
+        syncReservationSummary();
 
         if (
           document
@@ -918,6 +1264,7 @@
             let floorText = floor === "1" ? "1st Floor" : "2nd Floor";
             document.getElementById("resTableSize").value =
               `Table ${selectedTable.id}, ${floorText}, ${selectedTable.seats} Seater`;
+            syncReservationSummary();
             if (tableSelectionModal) tableSelectionModal.hide();
           }
         });
@@ -960,46 +1307,253 @@
           } else {
             menuSec.classList.add("d-none");
           }
+          syncReservationSummary();
         });
 
-      onValue(ref(db, "advanceMenu"), (snapshot) => {
+      function getItemImage(item) {
+        if (item.image) return item.image;
+        if (item.img) return item.img;
+        if (item.imageUrl) return item.imageUrl;
+
+        const name = (item.name || "").toLowerCase();
+        const cat = (item.category || "").toLowerCase();
+
+        if (name.includes("caesar")) return "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("kani")) return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("tlc burger")) return "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("chicken burger")) return "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("clubhouse")) return "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("quesadilla")) return "https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("mozzarella")) return "https://images.unsplash.com/photo-1531749668029-2db88e4276c7?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("lumpia")) return "https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("isaw")) return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Isaw_%28street_food_in_the_Philippines%29.jpg/800px-Isaw_%28street_food_in_the_Philippines%29.jpg";
+        if (name.includes("nachos")) return "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("bacon fries")) return "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("beef fries")) return "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("fries")) return "https://images.unsplash.com/photo-1630384060421-cb34d0dc8919?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("chicken sisig")) return "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Sizzling_chicken_sisig_%28Philippines%29.jpg/800px-Sizzling_chicken_sisig_%28Philippines%29.jpg";
+        if (name.includes("pork sisig") || name.includes("sisig")) return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Pork_Sisig_served_on_a_hot_plate.jpg/800px-Pork_Sisig_served_on_a_hot_plate.jpg";
+        if (name.includes("steak") || name.includes("burger steak")) return "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("chicken") && name.includes("rice")) return "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("pesto")) return "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("tuyo")) return "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Tuyo_Gourmet_Pasta_%28Philippines%29.jpg/800px-Tuyo_Gourmet_Pasta_%28Philippines%29.jpg";
+        if (name.includes("carbonara") || name.includes("longga")) return "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("meaty") || name.includes("spaghetti")) return "https://images.unsplash.com/photo-1621996346565-e3d5d6281270?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("mango") || name.includes("shake") || name.includes("drink")) return "https://images.unsplash.com/photo-1546173159-315724a31696?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("barkada") || name.includes("set a") || name.includes("set b")) return "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("wing") || name.includes("wings")) return "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=800&auto=format&fit=crop&q=80";
+
+        if (cat.includes("salad")) return "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("burger") || cat.includes("sandwich")) return "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("pasta")) return "https://images.unsplash.com/photo-1621996346565-e3d5d6281270?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("starter") || cat.includes("appetizer")) return "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("rice")) return "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("wing") || cat.includes("barkada")) return "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=800&auto=format&fit=crop&q=80";
+
+        return "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=800&auto=format&fit=crop&q=80";
+      }
+
+      // Food Image Preview Helper (for Mobile click & desktop hover modal)
+      window.openFoodPreview = function(name, imgSrc, price, desc) {
+        document.getElementById("previewFoodTitle").textContent = name;
+        document.getElementById("previewFoodName").textContent = name;
+        document.getElementById("previewFoodImage").src = imgSrc;
+        document.getElementById("previewFoodPrice").textContent = "₱" + price;
+        document.getElementById("previewFoodDesc").textContent = desc || "Freshly cooked and made to order.";
+        const previewModal = new bootstrap.Modal(document.getElementById("foodImagePreviewModal"));
+        previewModal.show();
+      };
+
+      // Load BOTH Unli/Barkada sets from advanceMenu AND the full restaurant menu from "menu"
+      let advanceMenuPromos = null;
+      let fullRestaurantMenu = null;
+
+      function renderCombinedAdvanceMenu() {
         const container = document.getElementById("menuContainer");
         container.innerHTML = "";
         currentMenuData = {};
 
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          for (let catKey in data) {
-            let cat = data[catKey];
-            let html = `<div class="p-3 bg-white border-bottom"><h6 class="fw-bold mb-0" style="color: var(--toms-orange);"><i class="fa-solid ${cat.icon} me-2"></i> ${cat.title}</h6></div>`;
+        // 1. Render Unli Promos & Barkada Sets (from advanceMenu if present)
+        if (advanceMenuPromos) {
+          for (let catKey in advanceMenuPromos) {
+            let cat = advanceMenuPromos[catKey];
+            let html = `<div class="p-3 bg-white border-bottom"><h6 class="fw-bold mb-0" style="color: var(--toms-orange);"><i class="fa-solid ${cat.icon || 'fa-fire'} me-2"></i> ${cat.title}</h6></div><div class="advance-menu-grid">`;
 
             for (let itemKey in cat.items) {
               let item = cat.items[itemKey];
-              let uniqueID = `${catKey}_${itemKey}`;
+              let uniqueID = `adv_${catKey}_${itemKey}`;
               currentMenuData[uniqueID] = item;
+              let imgSrc = getItemImage(item);
+              let desc = (item.desc || "").replace(/"/g, '&quot;');
+              let safeName = (item.name || "").replace(/"/g, '&quot;');
 
               html += `
-                            <div class="menu-card bg-white">
-                                <div>
-                                    <h6 class="fw-bold mb-1">${item.name}</h6>
-                                    <small class="text-muted d-block mb-1" style="font-size: 0.75rem;">${item.desc}</small>
-                                    <span class="fw-bold text-success">₱${item.price}</span>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    <button type="button" class="qty-btn" onclick="updateCart('${uniqueID}', -1)">-</button>
-                                    <span class="fw-bold mx-2" style="width: 20px; text-align:center;" id="qty_${uniqueID}">0</span>
-                                    <button type="button" class="qty-btn" onclick="updateCart('${uniqueID}', 1)">+</button>
-                                </div>
-                            </div>
-                        `;
+                <div class="advance-item-card">
+                  <div class="d-flex flex-row align-items-center gap-3">
+                    <div class="menu-card-img-wrap shadow-sm" onclick="openFoodPreview('${safeName}', '${imgSrc}', '${item.price}', '${desc}')" title="Click to view full image">
+                      <img src="${imgSrc}" alt="${safeName}" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\\'fa-solid fa-utensils text-warning p-3\\'></i>';" />
+                    </div>
+                    <div style="flex-grow: 1;">
+                      <h6 class="fw-bold mb-1">${item.name}</h6>
+                      <small class="text-muted d-block mb-1" style="font-size: 0.75rem;">${item.desc || ""}</small>
+                      <span class="fw-bold text-success">₱${item.price}</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                      <button type="button" class="qty-btn" onclick="updateCart('${uniqueID}', -1)">-</button>
+                      <span class="fw-bold mx-2" style="width: 20px; text-align:center;" id="qty_${uniqueID}">0</span>
+                      <button type="button" class="qty-btn" onclick="updateCart('${uniqueID}', 1)">+</button>
+                    </div>
+                  </div>
+                </div>
+              `;
             }
+            html += `</div>`;
             container.innerHTML += html;
           }
-        } else {
-          container.innerHTML =
-            '<p class="text-center text-muted py-3">Menu unavailable.</p>';
         }
+
+        // 2. Render Full Restaurant Menu (Salads, Burgers, Pasta, Rice Meals, Wings, etc.)
+        if (fullRestaurantMenu) {
+          const categorizedData = {};
+          const order = ["Salads", "Burgers & Sandwiches", "Appetizers", "Starters", "Rice Meals", "Pasta", "Wings To-Go", "Barkada Sets"];
+
+          for (let key in fullRestaurantMenu) {
+            let item = fullRestaurantMenu[key];
+            let cat = item.category || "Other";
+            if (!categorizedData[cat]) categorizedData[cat] = {};
+            categorizedData[cat][key] = item;
+          }
+
+          order.forEach(categoryName => {
+            if (categorizedData[categoryName]) {
+              let html = `<div class="p-3 bg-white border-bottom mt-2"><h6 class="fw-bold mb-0" style="color: var(--toms-orange);"><i class="fa-solid fa-utensils me-2"></i> ${categoryName}</h6></div><div class="advance-menu-grid">`;
+
+              for (let key in categorizedData[categoryName]) {
+                let item = categorizedData[categoryName][key];
+                let uniqueID = `full_${key}`;
+                currentMenuData[uniqueID] = item;
+                let imgSrc = getItemImage(item);
+                let desc = (item.desc || "").replace(/"/g, '&quot;');
+                let safeName = (item.name || "").replace(/"/g, '&quot;');
+
+                let dropdownsHTML = "";
+                if (item.options && item.options.length > 0) {
+                  let count = item.optionCount || 1;
+                  dropdownsHTML += `<div class="d-flex flex-wrap gap-2 mt-2 p-2 bg-light rounded w-100 border">`;
+                  dropdownsHTML += `<div class="w-100 small fw-bold text-muted mb-1">Select ${count} Flavor(s):</div>`;
+                  for(let i = 0; i < count; i++) {
+                    dropdownsHTML += `<select class="form-select form-select-sm" style="font-size: 0.8rem;" id="flavor_${uniqueID}_${i}">`;
+                    item.options.forEach(opt => {
+                      dropdownsHTML += `<option value="${opt}">${opt}</option>`;
+                    });
+                    dropdownsHTML += `</select>`;
+                  }
+                  dropdownsHTML += `</div>`;
+                }
+
+                html += `
+                  <div class="advance-item-card">
+                    <div class="d-flex flex-row align-items-center gap-3 w-100">
+                      <div class="menu-card-img-wrap shadow-sm" onclick="openFoodPreview('${safeName}', '${imgSrc}', '${item.price}', '${desc}')" title="Click to view full image">
+                        <img src="${imgSrc}" alt="${safeName}" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\\'fa-solid fa-utensils text-warning p-3\\'></i>';" />
+                      </div>
+                      <div style="flex-grow: 1;">
+                        <h6 class="fw-bold mb-1">${item.name}</h6>
+                        <small class="text-muted d-block mb-1" style="font-size: 0.75rem;">${item.desc || ""}</small>
+                        <span class="fw-bold text-success">₱${item.price}</span>
+                      </div>
+                      <div class="d-flex align-items-center">
+                        <button type="button" class="qty-btn" onclick="updateCart('${uniqueID}', -1)">-</button>
+                        <span class="fw-bold mx-2" style="width: 20px; text-align:center;" id="qty_${uniqueID}">0</span>
+                        <button type="button" class="qty-btn" onclick="updateCart('${uniqueID}', 1)">+</button>
+                      </div>
+                    </div>
+                    ${dropdownsHTML}
+                  </div>
+                `;
+              }
+              html += `</div>`;
+              container.innerHTML += html;
+            }
+          });
+        }
+
+        if (!advanceMenuPromos && !fullRestaurantMenu) {
+          container.innerHTML = '<p class="text-center text-muted py-3">Loading full menu...</p>';
+        }
+      }
+
+      onValue(ref(db, "advanceMenu"), (snapshot) => {
+        if (snapshot.exists()) {
+          advanceMenuPromos = snapshot.val();
+        }
+        renderCombinedAdvanceMenu();
       });
+
+      onValue(ref(db, "menu"), (snapshot) => {
+        if (snapshot.exists()) {
+          fullRestaurantMenu = snapshot.val();
+        }
+        renderCombinedAdvanceMenu();
+      });
+
+      function syncReservationSummary() {
+        const dateVal = document.getElementById("resDate").value;
+        if (dateVal) {
+          const d = new Date(dateVal);
+          const dateEl = document.getElementById("sidebarSummaryDate");
+          if (dateEl) {
+            dateEl.innerText = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+          }
+        }
+
+        const timeEl = document.getElementById("resTime");
+        const sidebarTime = document.getElementById("sidebarSummaryTime");
+        if (timeEl && sidebarTime) {
+          sidebarTime.innerText = timeEl.value || "Select slot";
+        }
+
+        const pax = document.getElementById("resPax").value || 2;
+        const tableText = document.getElementById("resTableSize").value;
+        const sidebarTable = document.getElementById("sidebarSummaryTable");
+        if (sidebarTable) {
+          if (tableText) {
+            const shortTable = tableText.split(",")[0];
+            sidebarTable.innerText = `${pax} Pax (${shortTable})`;
+          } else {
+            sidebarTable.innerText = `${pax} Pax (No table selected)`;
+          }
+        }
+
+        const isAdvance = document.getElementById("advanceOrderToggle").checked;
+        let total = 0;
+        if (isAdvance) {
+          for (let item in advanceCart) {
+            total += advanceCart[item].price * advanceCart[item].qty;
+          }
+        }
+        const downpayment = total / 2;
+        const totalDue = 70 + downpayment;
+
+        const advRow = document.getElementById("sidebarAdvanceRow");
+        const dpRow = document.getElementById("sidebarAdvanceDownpaymentRow");
+        const foodTotalEl = document.getElementById("sidebarFoodTotal");
+        const foodDpEl = document.getElementById("sidebarFoodDownpayment");
+        const totalAmountEl = document.getElementById("sidebarTotalAmount");
+
+        if (advRow && dpRow && foodTotalEl && foodDpEl && totalAmountEl) {
+          if (isAdvance && total > 0) {
+            advRow.classList.remove("d-none");
+            dpRow.classList.remove("d-none");
+            foodTotalEl.innerText = "₱" + total.toFixed(2);
+            foodDpEl.innerText = "₱" + downpayment.toFixed(2);
+          } else {
+            advRow.classList.add("d-none");
+            dpRow.classList.add("d-none");
+          }
+          totalAmountEl.innerText = totalDue.toFixed(2);
+        }
+      }
 
       window.updateCart = function (id, change) {
         if (!advanceCart[id]) {
@@ -1010,7 +1564,8 @@
         if (newQty < 0) newQty = 0;
 
         advanceCart[id].qty = newQty;
-        document.getElementById(`qty_${id}`).innerText = newQty;
+        const qtyEl = document.getElementById(`qty_${id}`);
+        if (qtyEl) qtyEl.innerText = newQty;
 
         if (newQty === 0) delete advanceCart[id];
 
@@ -1019,6 +1574,7 @@
           total += advanceCart[item].price * advanceCart[item].qty;
         }
         document.getElementById("cartTotal").innerText = total.toFixed(2);
+        syncReservationSummary();
       };
 
       // ==========================================
@@ -1027,13 +1583,41 @@
 
       let finalPaymentAmount = 70;
 
+      function showReservationError(msg) {
+        const el = document.getElementById("reservationErrorAlert");
+        if (el) {
+          el.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-1"></i> ${msg}`;
+          el.classList.remove("d-none");
+          el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      }
+
+      function clearReservationError() {
+        const el = document.getElementById("reservationErrorAlert");
+        if (el) el.classList.add("d-none");
+      }
+
+      function showPaymentError(msg) {
+        const el = document.getElementById("paymentErrorAlert");
+        if (el) {
+          el.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-1"></i> ${msg}`;
+          el.classList.remove("d-none");
+        }
+      }
+
+      function clearPaymentError() {
+        const el = document.getElementById("paymentErrorAlert");
+        if (el) el.classList.add("d-none");
+      }
+
       document
         .getElementById("reservationForm")
         .addEventListener("submit", (e) => {
           e.preventDefault();
+          clearReservationError();
 
           if (!document.getElementById("resTableSize").value) {
-            alert("Please select a table from the map before proceeding.");
+            showReservationError("Please select a table from the map before proceeding.");
             return;
           }
 
@@ -1064,6 +1648,7 @@
               .classList.remove("d-none");
           }
 
+          clearPaymentError();
           const paymentModal = new bootstrap.Modal(
             document.getElementById("paymentModal"),
           );
@@ -1071,70 +1656,84 @@
         });
 
       document.getElementById("confirmPayBtn").addEventListener("click", async () => {
-    const fileInput = document.getElementById("resReceipt").files[0];
-    if (!fileInput) {
-        alert("Please upload your payment receipt first.");
-        return;
-    }
+        clearPaymentError();
+        const fileInput = document.getElementById("resReceipt").files[0];
+        if (!fileInput) {
+          showPaymentError("Please upload your payment receipt before submitting.");
+          return;
+        }
 
-    const btn = document.getElementById("confirmPayBtn");
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-    btn.disabled = true;
+        const btn = document.getElementById("confirmPayBtn");
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+        btn.disabled = true;
 
-    let compiledNotes = "";
-    if (document.getElementById("advanceOrderToggle").checked) {
-        let itemsList = [];
-        for (let id in advanceCart) itemsList.push(`${advanceCart[id].qty}x ${advanceCart[id].name}`);
-        if (itemsList.length > 0) compiledNotes = "[ADVANCE ORDER] " + itemsList.join(", ");
-    }
+        let compiledNotes = "";
+        if (document.getElementById("advanceOrderToggle").checked) {
+            let itemsList = [];
+            for (let id in advanceCart) {
+              let item = advanceCart[id];
+              let optStr = "";
+              if (item.options && item.options.length > 0) {
+                let count = item.optionCount || 1;
+                let chosen = [];
+                for (let i = 0; i < count; i++) {
+                  let sel = document.getElementById(`flavor_${id}_${i}`);
+                  if (sel) chosen.push(sel.value);
+                }
+                if (chosen.length > 0) optStr = ` (${chosen.join(", ")})`;
+              }
+              itemsList.push(`${item.qty}x ${item.name}${optStr}`);
+            }
+            if (itemsList.length > 0) compiledNotes = "[ADVANCE ORDER] " + itemsList.join(", ");
+        }
 
-    try {
-        // Upload Image to Firebase Storage
-        const sRef = storageRef(storage, `receipts/reservations/${Date.now()}_${fileInput.name}`);
-        await uploadBytes(sRef, fileInput);
-        const receiptUrl = await getDownloadURL(sRef);
+        try {
+            // Upload Image to Firebase Storage
+            const sRef = storageRef(storage, `receipts/reservations/${Date.now()}_${fileInput.name}`);
+            await uploadBytes(sRef, fileInput);
+            const receiptUrl = await getDownloadURL(sRef);
 
-        const newResRef = push(ref(db, "reservations"));
-        const resId = newResRef.key;
-        const selectedDate = document.getElementById("resDate").value;
-        const selectedTime = document.getElementById("resTime").value;
+            const newResRef = push(ref(db, "reservations"));
+            const resId = newResRef.key;
+            const selectedDate = document.getElementById("resDate").value;
+            const selectedTime = document.getElementById("resTime").value;
 
-        const tableMatch = document.getElementById("resTableSize").value.match(/Table (\d+)/);
-        const tableId = tableMatch[1];
+            const tableMatch = document.getElementById("resTableSize").value.match(/Table (\d+)/);
+            const tableId = tableMatch[1];
 
-        await set(ref(db, `reservationSlots/${selectedDate}/${selectedTime}/tables/${tableId}`), true);
+            await set(ref(db, `reservationSlots/${selectedDate}/${selectedTime}/tables/${tableId}`), true);
 
-        await set(newResRef, {
-            name: currentUserName,
-            date: selectedDate,
-            time: selectedTime,
-            pax: document.getElementById("resPax").value,
-            tableSize: document.getElementById("resTableSize").value,
-            notes: compiledNotes,
-            type: "online",
-            status: "pending",
-        });
+            await set(newResRef, {
+                name: currentUserName,
+                date: selectedDate,
+                time: selectedTime,
+                pax: document.getElementById("resPax").value,
+                tableSize: document.getElementById("resTableSize").value,
+                notes: compiledNotes,
+                type: "online",
+                status: "pending",
+            });
 
-        await push(ref(db, "payments"), {
-            customerName: currentUserName,
-            amount: finalPaymentAmount.toFixed(2),
-            category: "Online Reservation",
-            timestamp: Date.now(),
-            status: "pending",
-            receiptUrl: receiptUrl, // Saving the real Storage URL
-            reservationId: resId,
-        });
+            await push(ref(db, "payments"), {
+                customerName: currentUserName,
+                amount: finalPaymentAmount.toFixed(2),
+                category: "Online Reservation",
+                timestamp: Date.now(),
+                status: "pending",
+                receiptUrl: receiptUrl, // Saving the real Storage URL
+                reservationId: resId,
+            });
 
-        bootstrap.Modal.getInstance(document.getElementById("paymentModal")).hide();
-        new bootstrap.Modal(document.getElementById("ReservSuccessModal")).show();
-        
-    } catch (error) {
-        console.error(error);
-        alert("Error: " + error.message);
-        btn.innerHTML = "Confirm & Pay";
-        btn.disabled = false;
-    }
-});
+            bootstrap.Modal.getInstance(document.getElementById("paymentModal")).hide();
+            new bootstrap.Modal(document.getElementById("ReservSuccessModal")).show();
+            
+        } catch (error) {
+            console.error(error);
+            showPaymentError("Error saving reservation: " + (error.message || "Please check your network and try again."));
+            btn.innerHTML = "Confirm & Pay";
+            btn.disabled = false;
+        }
+    });
     </script>
   </body>
 </html>

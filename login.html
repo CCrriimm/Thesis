@@ -112,10 +112,15 @@
             >
           </div>
           
+          <!-- reCAPTCHA v2 Checkbox -->
+          <div class="mb-3 d-flex justify-content-center">
+            <div id="recaptcha-container"></div>
+          </div>
+          
           <button
             type="submit"
             id="loginBtn"
-            class="btn w-100 py-2 text-white fw-bold"
+            class="btn w-100 py-2 text-white fw-bold shadow-sm"
             style="background-color: #f57d10ff"
           >
             LOGIN
@@ -139,11 +144,38 @@
         ref,
         get,
         signInWithEmailAndPassword,
+        RecaptchaVerifier
       } from "./js/firebase-config.js";
 
       const loginForm = document.getElementById("loginForm");
       const errorAlert = document.getElementById("error-alert");
       const loginBtn = document.getElementById("loginBtn");
+
+      let recaptchaWidgetId = null;
+      let recaptchaResponseToken = null;
+
+      // Initialize reCAPTCHA v2 checkbox for bot protection on Login
+      try {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+          size: "normal",
+          callback: (response) => {
+            recaptchaResponseToken = response;
+            errorAlert.classList.add("d-none");
+          },
+          "expired-callback": () => {
+            recaptchaResponseToken = null;
+            showError("reCAPTCHA expired. Please verify the checkbox again.");
+          }
+        });
+
+        window.recaptchaVerifier.render().then((widgetId) => {
+          recaptchaWidgetId = widgetId;
+        }).catch((err) => {
+          console.error("Login reCAPTCHA render error:", err);
+        });
+      } catch (err) {
+        console.error("RecaptchaVerifier initialization error:", err);
+      }
 
       document.getElementById("togglePassword").addEventListener("click", function () {
         const passwordInput = document.getElementById("password");
@@ -161,6 +193,30 @@
         const email = document.getElementById("email").value;
         const pass = document.getElementById("password").value;
         errorAlert.classList.add("d-none"); // Hides any previous error messages
+
+        // Verify reCAPTCHA checkbox before proceeding
+        let recaptchaResponse = recaptchaResponseToken;
+        try {
+          if (!recaptchaResponse && window.grecaptcha) {
+            if (recaptchaWidgetId !== null) {
+              recaptchaResponse = window.grecaptcha.getResponse(recaptchaWidgetId);
+            }
+            if (!recaptchaResponse) {
+              recaptchaResponse = window.grecaptcha.getResponse();
+            }
+          }
+          if (!recaptchaResponse && window.recaptchaVerifier && typeof window.recaptchaVerifier.getResponse === "function") {
+            recaptchaResponse = window.recaptchaVerifier.getResponse();
+          }
+        } catch (err) {
+          console.warn("Login reCAPTCHA getResponse:", err);
+        }
+
+        if (!recaptchaResponse) {
+          showError("Please check the 'I'm not a robot' reCAPTCHA box before logging in.");
+          return;
+        }
+
         loginBtn.innerHTML = "Checking..."; // Change button text
         loginBtn.disabled = true; // Disables button to prevent multiple clicks
 
@@ -194,6 +250,13 @@
           }
         } catch (error) {
           console.error(error); // Logs full error on terminal for debugging
+          // Reset reCAPTCHA on failed login attempt
+          try {
+            if (window.grecaptcha && recaptchaWidgetId !== null) {
+              window.grecaptcha.reset(recaptchaWidgetId);
+            }
+          } catch (e) {}
+
           if (error.code === "auth/invalid-credential") {
             showError("Incorrect email or password.");
           } else {

@@ -55,7 +55,22 @@
         </div>
 
         <div id="orderArea">
-            <p class="text-muted small px-2 mb-3">Select your refills below. <br> Max limit based on party size. Leftovers will be charged.</p>
+            <!-- House Rules Alert Card -->
+            <div class="card border-0 shadow-sm rounded-3 mb-3 bg-light border-start border-4" style="border-left: 4px solid var(--toms-orange) !important;">
+                <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="fw-bold text-dark mb-1">
+                            <i class="fa-solid fa-scroll me-1" style="color: var(--toms-orange);"></i> House Rules & Policy
+                        </h6>
+                        <small class="text-muted d-block">2-Hr Limit • No Sharing/Leftovers • 4pcs First Serving</small>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-dark rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#refillHouseRulesModal">
+                        <i class="fa-solid fa-eye me-1"></i> Rules
+                    </button>
+                </div>
+            </div>
+
+            <p class="text-muted small px-2 mb-3">Select your refills below. Max limit based on party size. Leftovers will be charged.</p>
 
             <div id="dynamicMenuArea" class="mb-5">
                 <div class="text-center text-muted py-4">
@@ -75,6 +90,99 @@
             <p class="text-muted small mb-3">Your refill is currently processing.</p>
             <div class="active-order-list" id="currentRefillItems"></div>
         </div>
+    </div>
+
+    <!-- House Rules Modal for Refill -->
+    <div class="modal fade" id="refillHouseRulesModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title fw-bold">
+              <i class="fa-solid fa-scroll me-2" style="color: var(--toms-orange);"></i> House Rules & Refill Policy
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-4 bg-light">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-danger fs-6"><i class="fa-solid fa-ban"></i> NO!</span>
+                    <h6 class="fw-bold mb-0 text-danger">Sharing & Leftovers</h6>
+                  </div>
+                  <p class="small text-muted mb-0">Strictly no sharing for unlimited promos. Leftover chicken will be charged corresponding to regular to-go rates.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-warning text-dark fs-6"><i class="fa-solid fa-hourglass-half"></i> Serving Time</span>
+                    <h6 class="fw-bold mb-0">Freshly Cooked</h6>
+                  </div>
+                  <p class="small text-muted mb-0">We don't serve fast food. We serve GOOD FOOD as fast as we can! Please give us ~20 mins to prepare your orders fresh.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-dark fs-6"><i class="fa-solid fa-users"></i> Table Policy</span>
+                    <h6 class="fw-bold mb-0">All UNLI or NO UNLI</h6>
+                  </div>
+                  <p class="small text-muted mb-0">To avoid confusion and sharing, all persons seated at the same table must go UNLI or NO UNLI AT ALL.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-warning text-dark fs-6"><i class="fa-solid fa-rotate"></i> Refills</span>
+                    <h6 class="fw-bold mb-0">Refill Protocol</h6>
+                  </div>
+                  <p class="small text-muted mb-0">First serving of wings consists of 4 pcs. No refills can be submitted until the first serving is finished.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-primary fs-6"><i class="fa-solid fa-clock"></i> 2 Hours</span>
+                    <h6 class="fw-bold mb-0">Dining Time Limit</h6>
+                  </div>
+                  <p class="small text-muted mb-0">You can enjoy your unlimited chicken wings and sides for a full TWO (2) HOURS starting from your table activation.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-danger fs-6"><i class="fa-solid fa-box-tissue"></i> Outside Food</span>
+                    <h6 class="fw-bold mb-0">No Outside Food</h6>
+                  </div>
+                  <p class="small text-muted mb-0">Food & drinks from outside establishments are strictly NOT ALLOWED inside the dining area.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-success fs-6"><i class="fa-solid fa-child"></i> Kids Promo</span>
+                    <h6 class="fw-bold mb-0">Kids Under 3ft</h6>
+                  </div>
+                  <p class="small text-muted mb-0">Kids under 3 feet in height dine for <b>FREE</b> when accompanying dining adults.</p>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 shadow-sm border h-100">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-secondary fs-6"><i class="fa-solid fa-bowl-rice"></i> Inclusions</span>
+                    <h6 class="fw-bold mb-0">Rice Notice</h6>
+                  </div>
+                  <p class="small text-muted mb-0">All unlimited promo packages are AUTOMATICALLY served with steamed white rice.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button type="button" class="btn text-white fw-bold px-4" style="background-color: var(--toms-orange);" data-bs-dismiss="modal">I Understand</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050; width: 100%; max-width: 400px;">

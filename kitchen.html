@@ -134,6 +134,27 @@
         margin-top: 5px;
         display: inline-block;
       }
+      .filter-badge {
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        opacity: 0.65;
+        user-select: none;
+        font-size: 0.95rem;
+        border: 2px solid transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .filter-badge:hover {
+        opacity: 0.95;
+        transform: translateY(-2px);
+      }
+      .filter-badge.active {
+        opacity: 1;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        border-color: rgba(255, 255, 255, 0.95);
+      }
     </style>
   </head>
   <body>
@@ -197,23 +218,35 @@
         >
       </div>
 
-      <div class="row mb-3">
-        <div class="col-12 d-flex gap-3">
+      <div class="row mb-4">
+        <div class="col-12 d-flex flex-wrap align-items-center gap-2">
+          <span class="fw-bold text-muted me-2"><i class="fa-solid fa-filter me-1"></i> Filter:</span>
           <span
-            class="badge px-3 py-2"
-            style="background-color: #ff9800; font-size: 0.9rem"
-            ><i class="fa-solid fa-rotate"></i> Table Refill</span
+            id="filterAll"
+            class="badge px-3 py-2 bg-dark filter-badge active"
+            onclick="setKitchenFilter('all')"
+            ><i class="fa-solid fa-layer-group"></i> All Orders (<span id="countAll">0</span>)</span
           >
           <span
-            class="badge px-3 py-2"
-            style="background-color: #2196f3; font-size: 0.9rem"
-            ><i class="fa-solid fa-bag-shopping"></i> Online Pickup</span
+            id="filterRefill"
+            class="badge px-3 py-2 filter-badge"
+            style="background-color: #ff9800; color: #000;"
+            onclick="setKitchenFilter('refill')"
+            ><i class="fa-solid fa-rotate"></i> Table Refill (<span id="countRefill">0</span>)</span
           >
           <span
-            class="badge px-3 py-2"
-            style="background-color: #4caf50; font-size: 0.9rem"
-            ><i class="fa-solid fa-calendar-check"></i> Reservation
-            (Advance)</span
+            id="filterOnline"
+            class="badge px-3 py-2 filter-badge text-white"
+            style="background-color: #2196f3;"
+            onclick="setKitchenFilter('online')"
+            ><i class="fa-solid fa-bag-shopping"></i> Online Pickup (<span id="countOnline">0</span>)</span
+          >
+          <span
+            id="filterReservation"
+            class="badge px-3 py-2 filter-badge text-white"
+            style="background-color: #4caf50;"
+            onclick="setKitchenFilter('reservation')"
+            ><i class="fa-solid fa-calendar-check"></i> Reservation (Advance) (<span id="countReservation">0</span>)</span
           >
         </div>
       </div>
@@ -399,23 +432,56 @@
         renderKitchen();
       });
 
+      let currentKitchenFilter = "all";
+
+      window.setKitchenFilter = function (filterType) {
+        currentKitchenFilter = filterType;
+        document.querySelectorAll(".filter-badge").forEach((el) => el.classList.remove("active"));
+        if (filterType === "all") document.getElementById("filterAll")?.classList.add("active");
+        if (filterType === "refill") document.getElementById("filterRefill")?.classList.add("active");
+        if (filterType === "online") document.getElementById("filterOnline")?.classList.add("active");
+        if (filterType === "reservation") document.getElementById("filterReservation")?.classList.add("active");
+        renderKitchen();
+      };
+
       function renderKitchen() {
         const container = document.getElementById("ticketsContainer");
         container.innerHTML = "";
-        let ticketsToDisplay = [];
+        let allTickets = [];
 
-        for (let i = 0; i < activeOrders.length; i++) { 
-            if (isOrderWithinOneHourBefore(activeOrders[i].pickupTime)) {
-                ticketsToDisplay.push(activeOrders[i]); 
-            }
+        let refillCount = 0;
+        let onlineCount = 0;
+        let reservationCount = 0;
+
+        for (let i = 0; i < activeRefills.length; i++) {
+          allTickets.push(activeRefills[i]);
+          refillCount++;
         }
-        for (let i = 0; i < activeRefills.length; i++) { 
-            ticketsToDisplay.push(activeRefills[i]); 
+
+        for (let i = 0; i < activeOrders.length; i++) {
+          if (isOrderWithinOneHourBefore(activeOrders[i].pickupTime)) {
+            allTickets.push(activeOrders[i]);
+            onlineCount++;
+          }
         }
-        for (let i = 0; i < activeReservations.length; i++) { 
-            if (isWithinOneHourBefore(activeReservations[i].date, activeReservations[i].time)) {
-                ticketsToDisplay.push(activeReservations[i]); 
-            }
+
+        for (let i = 0; i < activeReservations.length; i++) {
+          if (isWithinOneHourBefore(activeReservations[i].date, activeReservations[i].time)) {
+            allTickets.push(activeReservations[i]);
+            reservationCount++;
+          }
+        }
+
+        // Update badge counts in real-time
+        if (document.getElementById("countAll")) document.getElementById("countAll").innerText = allTickets.length;
+        if (document.getElementById("countRefill")) document.getElementById("countRefill").innerText = refillCount;
+        if (document.getElementById("countOnline")) document.getElementById("countOnline").innerText = onlineCount;
+        if (document.getElementById("countReservation")) document.getElementById("countReservation").innerText = reservationCount;
+
+        // Apply selected filter
+        let ticketsToDisplay = allTickets;
+        if (currentKitchenFilter !== "all") {
+          ticketsToDisplay = allTickets.filter((t) => t.type === currentKitchenFilter);
         }
 
         ticketsToDisplay.sort((a, b) => {
@@ -427,8 +493,9 @@
         });
 
         if (ticketsToDisplay.length === 0) {
+          const filterName = currentKitchenFilter === "all" ? "active orders" : currentKitchenFilter + " orders";
           container.innerHTML =
-            '<div class="col-12 text-center mt-5 text-muted"><i class="fa-solid fa-mug-hot fa-3x mb-3 opacity-50"></i><h4>No active orders. Kitchen is clear!</h4></div>';
+            `<div class="col-12 text-center mt-5 text-muted"><i class="fa-solid fa-mug-hot fa-3x mb-3 opacity-50"></i><h4>No ${filterName} in queue. Kitchen is clear!</h4></div>`;
           return;
         }
 

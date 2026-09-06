@@ -79,6 +79,40 @@
         border-radius: 10px;
         font-size: 24px;
       }
+      .pickup-card {
+        background: white;
+        border: 2px solid #28a745;
+        border-radius: 12px;
+        padding: 16px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .pickup-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(40, 167, 69, 0.2);
+        border-color: #218838;
+      }
+      .pulse-badge {
+        animation: pulse 1.8s infinite;
+      }
+      @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.06); opacity: 0.85; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      .btn-orange {
+        background-color: var(--toms-orange);
+        color: white;
+        border: none;
+      }
+      .btn-orange:hover {
+        background-color: #d1660a;
+        color: white;
+      }
     </style>
   </head>
   <body>
@@ -172,6 +206,95 @@
           </div>
         </div>
       </div>
+
+      <!-- Online Orders Ready For Pickup Section -->
+      <div class="card shadow-sm border-0 mb-4 rounded-4 overflow-hidden">
+        <div class="card-header bg-white py-3 px-4 d-flex justify-content-between align-items-center border-bottom">
+          <div class="d-flex align-items-center gap-2">
+            <div class="bg-success text-white rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+              <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold mb-0 text-dark">Ready for Pickup</h5>
+              <small class="text-muted">Online orders cooked by chef, waiting for customer pickup</small>
+            </div>
+          </div>
+          <span class="badge bg-success rounded-pill px-3 py-2 fs-6 pulse-badge" id="readyCountBadge">
+            <span id="readyPickupCount">0</span> Orders Waiting
+          </span>
+        </div>
+        <div class="card-body p-4 bg-light">
+          <div class="row g-3" id="readyPickupOrdersContainer">
+            <div class="col-12 text-center text-muted py-5">
+              <i class="fa-solid fa-spinner fa-spin fa-2x mb-2"></i>
+              <p class="mb-0">Checking for orders ready for pickup...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Pickup Detail & Claim Modal -->
+    <div class="modal fade" id="orderPickupModal" tabindex="-1" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 rounded-4 overflow-hidden shadow-lg">
+          <div class="modal-header bg-dark text-white">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-success fs-6"><i class="fa-solid fa-check-circle me-1"></i> Ready for Pickup</span>
+              <h5 class="modal-title fw-bold mb-0" id="modalOrderRef">#ORDER</h5>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-4 bg-light">
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 border h-100">
+                  <small class="text-muted d-block mb-1">Customer Name</small>
+                  <h5 class="fw-bold mb-0 text-dark" id="modalCustomerName">--</h5>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-3 bg-white rounded-3 border h-100 d-flex justify-content-between align-items-center">
+                  <div>
+                    <small class="text-muted d-block mb-1">Pickup Time</small>
+                    <h5 class="fw-bold mb-0 text-primary" id="modalPickupTime">--</h5>
+                  </div>
+                  <div class="text-end">
+                    <small class="text-muted d-block mb-1">Total Amount</small>
+                    <h5 class="fw-bold mb-0 text-success" id="modalTotalAmount">₱0.00</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ordered Food Items -->
+            <div class="p-3 bg-white rounded-3 border mb-3">
+              <h6 class="fw-bold mb-2 text-dark"><i class="fa-solid fa-utensils me-2 text-warning"></i> Ordered Items:</h6>
+              <div id="modalOrderItems" class="p-3 bg-light rounded border fs-6 font-monospace" style="white-space: pre-wrap;">--</div>
+            </div>
+
+            <!-- Payment Receipt Proof (if available) -->
+            <div class="p-3 bg-white rounded-3 border">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-receipt me-2 text-warning"></i> Payment Proof:</h6>
+                <a id="modalReceiptFullLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary d-none">
+                  <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Full Size
+                </a>
+              </div>
+              <div class="text-center bg-light p-2 rounded border" id="modalReceiptWrap">
+                <img id="modalReceiptImg" src="" alt="Payment Receipt" class="img-fluid rounded shadow-sm" style="max-height: 280px; object-fit: contain;" />
+                <p id="modalNoReceipt" class="text-muted small my-3 d-none"><i class="fa-solid fa-circle-info me-1"></i> No receipt uploaded for this order.</p>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer bg-white border-top d-flex justify-content-between px-4 py-3">
+            <button type="button" class="btn btn-secondary px-4 fw-bold" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-success px-5 py-2 fw-bold shadow-sm" id="markClaimedBtn">
+              <i class="fa-solid fa-check-double me-2"></i> Mark as Claimed
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script type="module">
@@ -180,12 +303,24 @@
         db,
         ref,
         get,
+        update,
         onAuthStateChanged,
         onValue,
         signOut,
       } from "./js/firebase-config.js";
 
       let currentUserUid = null;
+      let orderPickupModal = null;
+      let currentModalOrderId = null;
+      let activeReadyOrders = [];
+      let paymentsData = {};
+
+      window.addEventListener("DOMContentLoaded", () => {
+        const modalEl = document.getElementById("orderPickupModal");
+        if (modalEl && window.bootstrap) {
+          orderPickupModal = new bootstrap.Modal(modalEl);
+        }
+      });
 
       //----------- Check if user is admin
       onAuthStateChanged(auth, async (user) => {
@@ -200,18 +335,24 @@
         }
       });//----------- End of Auth Check
 
-      // Checks Pending Payments
+      // Cache Payments (to easily match receiptUrl by orderId)
       onValue(ref(db, "payments"), (snapshot) => {
         let pendingCount = 0;
+        paymentsData = {};
         if (snapshot.exists()) {
           snapshot.forEach((child) => {
-            if (child.val().status === "pending") {
+            const p = child.val();
+            if (p.status === "pending") {
               pendingCount++;
+            }
+            if (p.orderId) {
+              paymentsData[p.orderId] = p;
             }
           });
         }
         document.getElementById("pendingCount").textContent = pendingCount;
-      });//----------- End of Pending Payments Check
+        renderReadyPickupOrders();
+      });//----------- End of Payments Check
 
       // Checks Active Tables
       const TOTAL_TABLES = 13;
@@ -242,6 +383,154 @@
         }
         document.getElementById("todayReservationsCount").textContent = todayCount;
       });//----------- End of Today's Reservations Check
+
+      // ==========================================
+      // READY FOR PICKUP ORDERS LISTENER
+      // ==========================================
+      onValue(ref(db, "orders"), (snapshot) => {
+        activeReadyOrders = [];
+        if (snapshot.exists()) {
+          snapshot.forEach((child) => {
+            const order = child.val();
+            // Chef marks order as status: 'done' when ready for pickup
+            if (order.status === "done") {
+              activeReadyOrders.push({
+                id: child.key,
+                ...order,
+              });
+            }
+          });
+        }
+
+        // Sort latest first
+        activeReadyOrders.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        renderReadyPickupOrders();
+      });
+
+      function renderReadyPickupOrders() {
+        const container = document.getElementById("readyPickupOrdersContainer");
+        const countBadge = document.getElementById("readyPickupCount");
+        if (!container) return;
+
+        countBadge.innerText = activeReadyOrders.length;
+
+        if (activeReadyOrders.length === 0) {
+          container.innerHTML = `
+            <div class="col-12 text-center text-muted py-5">
+              <i class="fa-solid fa-mug-hot fa-3x mb-3 text-secondary opacity-50"></i>
+              <h5 class="fw-bold mb-1">No Orders Waiting for Pickup</h5>
+              <p class="small text-muted mb-0">When the kitchen chef clicks "Ready for Pickup", orders will instantly appear here for staff checkout.</p>
+            </div>
+          `;
+          return;
+        }
+
+        let cardsHtml = "";
+        activeReadyOrders.forEach((order) => {
+          const shortId = order.id.substring(1, 6).toUpperCase();
+          const itemsSummary = (order.items || "No items").replace(/, /g, " • ");
+          const totalFormatted = parseFloat(order.total || 0).toFixed(2);
+          const pickupTime = order.pickupTime || "ASAP";
+
+          cardsHtml += `
+            <div class="col-md-6 col-lg-4">
+              <div class="pickup-card shadow-sm" onclick="openOrderModal('${order.id}')">
+                <div>
+                  <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                    <span class="badge bg-success"><i class="fa-solid fa-bell me-1"></i> Ready for Pickup</span>
+                    <span class="fw-bold text-muted small">#${shortId}</span>
+                  </div>
+                  <h5 class="fw-bold mb-1 text-dark">${order.customerName || "Customer"}</h5>
+                  <p class="text-muted small mb-2"><i class="fa-regular fa-clock me-1 text-primary"></i> Pickup Time: <strong class="text-primary">${pickupTime}</strong></p>
+                  <div class="p-2 bg-light rounded border small mb-3 text-truncate" title="${order.items || ''}">
+                    <i class="fa-solid fa-utensils me-1 text-warning"></i> ${itemsSummary}
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                  <span class="fw-bold fs-5 text-success">₱${totalFormatted}</span>
+                  <button type="button" class="btn btn-sm btn-outline-success fw-bold px-3 rounded-pill">
+                    <i class="fa-solid fa-hand-holding-box me-1"></i> Review & Claim
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = cardsHtml;
+      }
+
+      window.openOrderModal = function (orderId) {
+        const order = activeReadyOrders.find((o) => o.id === orderId);
+        if (!order) return;
+
+        currentModalOrderId = orderId;
+        const shortId = order.id.substring(1, 6).toUpperCase();
+
+        document.getElementById("modalOrderRef").innerText = `#${shortId}`;
+        document.getElementById("modalCustomerName").innerText = order.customerName || "Customer";
+        document.getElementById("modalPickupTime").innerText = order.pickupTime || "Standard Pickup";
+        document.getElementById("modalTotalAmount").innerText = "₱" + parseFloat(order.total || 0).toFixed(2);
+
+        // Format items with line breaks
+        const formattedItems = (order.items || "None")
+          .split(",")
+          .map((i) => i.trim())
+          .filter((i) => i)
+          .join("\n");
+        document.getElementById("modalOrderItems").innerText = formattedItems || order.items;
+
+        // Payment Proof
+        const payment = paymentsData[orderId] || null;
+        const imgEl = document.getElementById("modalReceiptImg");
+        const noReceiptEl = document.getElementById("modalNoReceipt");
+        const fullLinkEl = document.getElementById("modalReceiptFullLink");
+
+        if (payment && payment.receiptUrl) {
+          imgEl.src = payment.receiptUrl;
+          imgEl.classList.remove("d-none");
+          noReceiptEl.classList.add("d-none");
+          fullLinkEl.href = payment.receiptUrl;
+          fullLinkEl.classList.remove("d-none");
+        } else {
+          imgEl.classList.add("d-none");
+          noReceiptEl.classList.remove("d-none");
+          fullLinkEl.classList.add("d-none");
+        }
+
+        if (!orderPickupModal) {
+          orderPickupModal = new bootstrap.Modal(document.getElementById("orderPickupModal"));
+        }
+        orderPickupModal.show();
+      };
+
+      // Mark Order as Claimed
+      document.getElementById("markClaimedBtn").addEventListener("click", async () => {
+        if (!currentModalOrderId) return;
+        const btn = document.getElementById("markClaimedBtn");
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Claiming...';
+        btn.disabled = true;
+
+        try {
+          // Update order status to 'claimed' so it disappears from 'done' ready list
+          await update(ref(db, "orders/" + currentModalOrderId), {
+            status: "claimed",
+            claimedAt: Date.now(),
+            claimedBy: currentUserUid || "admin",
+          });
+
+          if (orderPickupModal) {
+            orderPickupModal.hide();
+          }
+        } catch (error) {
+          console.error(error);
+          alert("Error marking order as claimed. Please try again.");
+        } finally {
+          btn.innerHTML = '<i class="fa-solid fa-check-double me-2"></i> Mark as Claimed';
+          btn.disabled = false;
+          currentModalOrderId = null;
+        }
+      });
 
       // Logout
       document.getElementById("adminLogoutBtn").addEventListener("click", () => {

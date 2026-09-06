@@ -12,14 +12,94 @@
       :root { --toms-orange: #f57d10ff; --toms-dark: #212529; }
       body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; padding-bottom: 90px; }
       .navbar { box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); }
-      .mobile-container { max-width: 600px; margin: 0 auto; padding: 15px; }
+      .mobile-container { 
+        max-width: 600px; 
+        margin: 0 auto; 
+        padding: 15px; 
+      }
+      @media (min-width: 768px) {
+        .mobile-container { 
+          max-width: 95%; 
+          padding: 20px 25px; 
+        }
+      }
+      @media (min-width: 992px) {
+        .mobile-container { 
+          max-width: 1160px; 
+          padding: 25px 30px; 
+        }
+      }
+      @media (min-width: 1300px) {
+        .mobile-container { 
+          max-width: 1280px; 
+        }
+      }
 
-      .category-title { font-weight: 800; font-size: 1.2rem; color: var(--toms-dark); margin-top: 30px; margin-bottom: 15px; border-bottom: 2px solid var(--toms-orange); padding-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+      .category-title { 
+        font-weight: 800; 
+        font-size: 1.25rem; 
+        color: var(--toms-dark); 
+        margin-top: 35px; 
+        margin-bottom: 18px; 
+        border-bottom: 2px solid var(--toms-orange); 
+        padding-bottom: 6px; 
+        text-transform: uppercase; 
+        letter-spacing: 1px; 
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
       
-      .menu-card { background: white; border-radius: 15px; border: none; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); overflow: hidden; display: flex; flex-direction: column; padding: 15px; margin-bottom: 15px; }
+      .menu-items-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin-bottom: 25px;
+      }
+      @media (min-width: 768px) {
+        .menu-items-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (min-width: 1200px) {
+        .menu-items-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      .menu-card { 
+        background: white; 
+        border-radius: 15px; 
+        border: 1px solid rgba(0,0,0,0.06); 
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04); 
+        overflow: visible; 
+        display: flex; 
+        flex-direction: column; 
+        justify-content: space-between;
+        padding: 15px; 
+        margin-bottom: 0; 
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .menu-card:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      }
       .menu-header-row { display: flex; align-items: center; width: 100%; }
       
-      .menu-img { width: 60px; height: 60px; border-radius: 10px; flex-shrink: 0; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; }
+      .menu-img { width: 75px; height: 75px; border-radius: 12px; flex-shrink: 0; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; overflow: visible; box-shadow: 0 2px 6px rgba(0,0,0,0.08); position: relative; cursor: pointer; }
+      .menu-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; transition: transform 0.25s ease, box-shadow 0.25s ease; }
+      @media (min-width: 769px) {
+        .menu-img:hover img {
+          position: absolute;
+          top: -35px;
+          left: -35px;
+          width: 170px;
+          height: 170px;
+          border-radius: 16px;
+          box-shadow: 0 14px 28px rgba(0,0,0,0.35);
+          z-index: 1050;
+          transform: scale(1.05);
+        }
+      }
       .menu-info { flex-grow: 1; padding-left: 15px; }
       
       .btn-add { background-color: #fff3cd; color: var(--toms-orange); border: 1px solid var(--toms-orange); border-radius: 50px; font-weight: bold; padding: 5px 20px; transition: 0.2s; white-space: nowrap; }
@@ -28,10 +108,46 @@
       .flavor-select { background-color: #f1f3f5; color: var(--toms-dark); border: 1px solid #dee2e6; border-radius: 5px; font-size: 0.8rem; padding: 4px 10px; font-weight: 600; cursor: pointer; flex: 1 1 45%; min-width: 120px; }
       .flavor-select:focus { outline: none; border-color: var(--toms-orange); }
 
-      .floating-cart { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background-color: var(--toms-orange); color: white; border-radius: 50px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 20px rgba(245, 125, 16, 0.4); z-index: 1000; cursor: pointer; }
+      .floating-cart { 
+        position: fixed; 
+        bottom: 15px; 
+        left: 50%; 
+        transform: translateX(-50%); 
+        width: 90%; 
+        max-width: 500px; 
+        background-color: var(--toms-orange); 
+        color: white; 
+        border-radius: 50px; 
+        padding: 15px 25px; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        box-shadow: 0 10px 20px rgba(245, 125, 16, 0.4); 
+        z-index: 1000; 
+        cursor: pointer; 
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      @media (min-width: 992px) {
+        .floating-cart {
+          left: auto;
+          right: 35px;
+          transform: none;
+          width: auto;
+          min-width: 360px;
+          max-width: 440px;
+          bottom: 25px;
+          box-shadow: 0 12px 28px rgba(245, 125, 16, 0.45);
+        }
+        .floating-cart:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 16px 32px rgba(245, 125, 16, 0.55);
+        }
+      }
 
       .payment-box { background: #fff3cd; border: 1px solid #ffe69c; border-radius: 10px; padding: 15px; text-align: center; }
-      .qr-placeholder { width: 150px; height: 150px; background: white; border: 2px dashed #ffc107; margin: 10px auto; display: flex; align-items: center; justify-content: center; border-radius: 10px; }
+      .qr-placeholder { width: 170px; height: 170px; background: white; border: 2px dashed #ffc107; margin: 10px auto; display: flex; align-items: center; justify-content: center; border-radius: 10px; overflow: hidden; }
+      .qr-img { width: 100%; height: 100%; object-fit: contain; cursor: pointer; transition: transform 0.2s; }
+      .qr-img:hover { transform: scale(1.03); }
       .btn-orange { background-color: var(--toms-orange); color: white; border-radius: 50px; font-weight: bold; border: none; }
     </style>
   </head>
@@ -90,10 +206,13 @@
                 <label class="form-label fw-bold small">Pickup Time</label>
                 <input type="time" id="pickupTime" class="form-control" required />
               </div>
-              <div class="payment-box mb-4">
+              <div class="payment-box mb-4 text-center">
                 <h6 class="fw-bold text-dark mb-1">Pay via GCash / PayMaya</h6>
                 <p class="mb-2 small">Send total amount to: <b>0912 345 6789</b></p>
-                <div class="qr-placeholder"><i class="fa-solid fa-qrcode fa-3x text-muted opacity-50"></i></div>
+                <div class="qr-placeholder mx-auto shadow-sm">
+                  <img src="Media/Payment_QR.png" alt="Payment QR Code" class="qr-img" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fa-solid fa-qrcode fa-3x text-muted opacity-50\'></i>';" />
+                </div>
+                <small class="text-muted d-block mt-1">Scan or tap to save QR for payment</small>
               </div>
               <div class="mb-4">
                 <label class="form-label fw-bold small">Upload Payment Receipt</label>
@@ -103,6 +222,26 @@
                 <i class="fa-solid fa-check-circle"></i> Confirm Order
               </button>
             </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Food Item Image Preview Modal (for Mobile & Click View) -->
+    <div class="modal fade" id="foodImagePreviewModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 overflow-hidden shadow-lg">
+          <div class="modal-header bg-dark text-white py-2">
+            <h6 class="modal-title fw-bold" id="previewFoodTitle">Item Preview</h6>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-0 text-center bg-light">
+            <img id="previewFoodImage" src="" alt="Food Preview" style="width: 100%; max-height: 400px; object-fit: contain;" />
+            <div class="p-3 bg-white text-start">
+              <h5 class="fw-bold mb-1" id="previewFoodName"></h5>
+              <p class="text-muted small mb-2" id="previewFoodDesc"></p>
+              <span class="badge bg-success fs-6" id="previewFoodPrice"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -132,6 +271,64 @@
         }
       });
 
+      // Image Mapping Helper for Menu Items
+      function getItemImage(item) {
+        if (item.image) return item.image;
+        if (item.img) return item.img;
+        if (item.imageUrl) return item.imageUrl;
+
+        const name = (item.name || "").toLowerCase();
+        const cat = (item.category || "").toLowerCase();
+
+        // Specific Item Name Matches
+        if (name.includes("caesar")) return "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("kani")) return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("tlc burger")) return "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("chicken burger")) return "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("clubhouse")) return "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("quesadilla")) return "https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("mozzarella")) return "https://images.unsplash.com/photo-1531749668029-2db88e4276c7?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("lumpia")) return "https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("isaw")) return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Isaw_%28street_food_in_the_Philippines%29.jpg/800px-Isaw_%28street_food_in_the_Philippines%29.jpg";
+        if (name.includes("nachos")) return "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("bacon fries")) return "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("beef fries")) return "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("fries")) return "https://images.unsplash.com/photo-1630384060421-cb34d0dc8919?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("chicken sisig")) return "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Sizzling_chicken_sisig_%28Philippines%29.jpg/800px-Sizzling_chicken_sisig_%28Philippines%29.jpg";
+        if (name.includes("pork sisig") || name.includes("sisig")) return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Pork_Sisig_served_on_a_hot_plate.jpg/800px-Pork_Sisig_served_on_a_hot_plate.jpg";
+        if (name.includes("steak") || name.includes("burger steak")) return "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("chicken") && name.includes("rice")) return "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("pesto")) return "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("tuyo")) return "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Tuyo_Gourmet_Pasta_%28Philippines%29.jpg/800px-Tuyo_Gourmet_Pasta_%28Philippines%29.jpg";
+        if (name.includes("carbonara") || name.includes("longga")) return "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("meaty") || name.includes("spaghetti")) return "https://images.unsplash.com/photo-1621996346565-e3d5d6281270?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("mango") || name.includes("shake") || name.includes("drink")) return "https://images.unsplash.com/photo-1546173159-315724a31696?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("barkada") || name.includes("set a") || name.includes("set b")) return "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("wing") || name.includes("wings")) return "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=800&auto=format&fit=crop&q=80";
+
+        // Category Matches
+        if (cat.includes("salad")) return "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("burger") || cat.includes("sandwich")) return "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("pasta")) return "https://images.unsplash.com/photo-1621996346565-e3d5d6281270?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("starter") || cat.includes("appetizer")) return "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("rice")) return "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("wing") || cat.includes("barkada")) return "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=800&auto=format&fit=crop&q=80";
+
+        // Default Fallback
+        return "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=800&auto=format&fit=crop&q=80";
+      }
+
+      // Food Image Preview Helper (for Mobile click & desktop hover modal)
+      window.openFoodPreview = function(name, imgSrc, price, desc) {
+        document.getElementById("previewFoodTitle").textContent = name;
+        document.getElementById("previewFoodName").textContent = name;
+        document.getElementById("previewFoodImage").src = imgSrc;
+        document.getElementById("previewFoodPrice").textContent = "₱" + price;
+        document.getElementById("previewFoodDesc").textContent = desc || "Freshly cooked and made to order.";
+        const previewModal = new bootstrap.Modal(document.getElementById("foodImagePreviewModal"));
+        previewModal.show();
+      };
+
       // Render Menu
       onValue(ref(db, "menu"), (snapshot) => {
         const container = document.getElementById("menuContainer");
@@ -154,7 +351,7 @@
 
           order.forEach(categoryName => {
             if (categorizedData[categoryName]) {
-              container.innerHTML += `<div class="category-title">${categoryName}</div>`;
+              let categoryHTML = `<div class="category-title"><i class="fa-solid fa-utensils text-warning me-2"></i> ${categoryName}</div><div class="menu-items-grid">`;
               
               for (let key in categorizedData[categoryName]) {
                 let item = categorizedData[categoryName][key];
@@ -175,11 +372,16 @@
                 }
 
                 let descHTML = item.desc ? `<small class="text-muted d-block mt-1" style="font-size: 0.75rem; line-height: 1.2;">${item.desc}</small>` : "";
+                let imgSrc = getItemImage(item);
+                let safeName = (item.name || "").replace(/'/g, "\\'");
+                let safeDesc = (item.desc || "").replace(/'/g, "\\'");
 
-                container.innerHTML += `
+                categoryHTML += `
                     <div class="menu-card">
                         <div class="menu-header-row">
-                            <div class="menu-img"><i class="fa-solid ${item.icon || 'fa-utensils'} fa-2x text-warning"></i></div>
+                            <div class="menu-img" onclick="openFoodPreview('${safeName}', '${imgSrc}', '${item.price}', '${safeDesc}')" title="Click to view full image">
+                                <img src="${imgSrc}" alt="${item.name}" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\\'fa-solid ${item.icon || 'fa-utensils'} fa-2x text-warning\\'></i>';" />
+                            </div>
                             <div class="menu-info">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
@@ -196,6 +398,8 @@
                         ${dropdownsHTML}
                     </div>`;
               }
+              categoryHTML += `</div>`;
+              container.innerHTML += categoryHTML;
             }
           });
         } else {

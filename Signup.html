@@ -47,6 +47,10 @@
         cursor: pointer;
         color: #6c757d;
       }
+      /* Ensure Google reCAPTCHA challenge modal displays smoothly without overlapping UI elements */
+      iframe[title*="recaptcha challenge"] {
+        z-index: 2000000000 !important;
+      }
     </style>
   </head>
   <body>
@@ -156,7 +160,7 @@
           <button
             type="submit"
             id="signupBtn"
-            class="btn w-100 py-2 text-white fw-bold"
+            class="btn w-100 py-2 text-white fw-bold shadow-sm mt-3"
             style="background-color: #f57d10ff"
           >
             VERIFY & REGISTER
@@ -173,6 +177,7 @@
       </div>
     </div>
 
+    <!-- SMS OTP Verification Modal -->
     <div
       class="modal fade"
       id="otpModal"
@@ -185,40 +190,91 @@
             class="modal-header text-white"
             style="background-color: #f57d10ff"
           >
-            <h5 class="modal-title">Verify Account</h5>
+            <h5 class="modal-title fw-bold">
+              <i class="fa-solid fa-mobile-screen-button me-2"></i> Verify Mobile Number
+            </h5>
           </div>
-          <div class="modal-body text-center">
-            <p class="mb-1">We sent a 6-digit code to your email/phone.</p>
-            <small class="text-muted fst-italic d-block mb-3"
-              >(Check Console)</small
-            >
+          <div class="modal-body text-center p-4">
+            <i class="fa-solid fa-envelope-open-text fs-1 mb-3" style="color: #f57d10ff"></i>
+            <h5 class="fw-bold mb-1">Verify Your Mobile Number</h5>
+            <p class="text-muted small mb-2">We have sent a 6-digit SMS verification code to:</p>
+            <h5 class="fw-bold mb-3 text-dark" id="otpPhoneDisplay">+63 9*********</h5>
+
+            <div id="otpSuccessAlert" class="alert alert-success small py-2 px-3 mb-3 d-none">
+              <i class="fa-solid fa-circle-check me-1"></i> <span id="otpSuccessMsg"></span>
+            </div>
 
             <input
-              type="number"
+              type="text"
+              inputmode="numeric"
+              maxlength="6"
               id="otpInput"
-              class="form-control text-center fs-2 letter-spacing-2"
+              class="form-control text-center fs-2 fw-bold"
               placeholder="000000"
-              style="letter-spacing:5px"
+              style="letter-spacing: 6px"
+              autocomplete="one-time-code"
             />
             <p id="otpError" class="text-danger small mt-2 d-none fw-bold">
               Invalid Code! Please try again.
             </p>
+
+            <div class="mt-3">
+              <button
+                type="button"
+                id="resendSmsBtn"
+                class="btn btn-link btn-sm text-decoration-none text-muted"
+                disabled
+              >
+                Resend SMS in <span id="resendTimer">60</span>s
+              </button>
+            </div>
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer justify-content-between">
             <button
               type="button"
               class="btn btn-secondary"
               data-bs-dismiss="modal"
+              id="cancelOtpBtn"
             >
               Cancel
             </button>
             <button
               type="button"
               id="confirmCodeBtn"
-              class="btn text-white fw-bold"
+              class="btn text-white fw-bold px-4"
               style="background-color: #f57d10ff"
             >
               CONFIRM CODE
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Registration Success Modal (Replaces browser alert) -->
+    <div
+      class="modal fade"
+      id="regSuccessModal"
+      tabindex="-1"
+      data-bs-backdrop="static"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center p-4">
+          <div class="modal-body">
+            <div class="mb-3">
+              <i class="fa-solid fa-circle-check text-success" style="font-size: 4rem;"></i>
+            </div>
+            <h4 class="fw-bold mb-2">Registration Successful!</h4>
+            <p class="text-muted mb-4">
+              Your mobile number has been verified. Welcome to Tom's Chicken! Redirecting to home...
+            </p>
+            <button
+              type="button"
+              id="regSuccessOkBtn"
+              class="btn text-white fw-bold px-4 py-2 w-100"
+              style="background-color: #f57d10ff"
+            >
+              CONTINUE
             </button>
           </div>
         </div>
@@ -231,7 +287,12 @@
         db,
         ref, 
         set, 
-        createUserWithEmailAndPassword,
+        get,
+        RecaptchaVerifier,
+        signInWithPhoneNumber,
+        linkWithCredential,
+        EmailAuthProvider,
+        updateProfile
       } from "./js/firebase-config.js";
 
       const form = document.getElementById("signupForm");
@@ -240,12 +301,27 @@
       const matchMsg = document.getElementById("matchMsg");
       const errorAlert = document.getElementById("error-alert");
       const otpModal = new bootstrap.Modal(document.getElementById("otpModal"));
+      const regSuccessModal = new bootstrap.Modal(document.getElementById("regSuccessModal"));
 
-      //Bootstrap Tooltips
+      // Bootstrap Tooltips
       const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
       const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-      let generatedOTP = null;
+      let pendingRegistration = null;
+      let resendCountdownInterval = null;
+
+      // Initialize invisible reCAPTCHA for Firebase Phone Auth background verification
+      function getRecaptchaVerifier() {
+        if (!window.recaptchaVerifier) {
+          window.recaptchaVerifier = new RecaptchaVerifier(auth, "signupBtn", {
+            size: "invisible",
+            callback: (response) => {
+              // Invisible captcha resolved in background
+            }
+          });
+        }
+        return window.recaptchaVerifier;
+      }
 
       function setupToggle(iconId, inputId) { 
         document.getElementById(iconId).addEventListener("click", function () { 
@@ -309,94 +385,271 @@
         }
       });
 
-      form.addEventListener("submit", (e) => {
+      // Philippine Phone Number Formatting & Validation (E.164)
+      function formatPhilippinePhone(phoneRaw) {
+        let cleaned = phoneRaw.replace(/[\s\-\(\)]/g, "");
+        if (cleaned.startsWith("09")) {
+          return "+63" + cleaned.substring(1);
+        } else if (cleaned.startsWith("9") && cleaned.length === 10) {
+          return "+63" + cleaned;
+        } else if (cleaned.startsWith("+63")) {
+          return cleaned;
+        } else if (cleaned.startsWith("63") && cleaned.length === 12) {
+          return "+" + cleaned;
+        } else if (cleaned.startsWith("+")) {
+          return cleaned;
+        }
+        return "+63" + cleaned;
+      }
+
+      function isValidPhilippineMobile(formattedPhone) {
+        return /^\+639\d{9}$/.test(formattedPhone);
+      }
+
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
         errorAlert.classList.add("d-none");
-        if (pass1.value.length < 6 || pass1.value.length > 12) {
+
+        // 1. Password Rules Validation
+        const p1 = pass1.value;
+        const p2 = pass2.value;
+
+        if (p1.length < 6 || p1.length > 12) {
           showError("Password must be 6-12 characters long!");
           return;
         }
-        if (!/[A-Z]/.test(pass1.value)) {
+        if (!/[A-Z]/.test(p1)) {
           showError("Password must contain at least one uppercase letter!");
           return;
         }
-        if (!/[a-z]/.test(pass1.value)) {
+        if (!/[a-z]/.test(p1)) {
           showError("Password must contain at least one lowercase letter!");
           return;
         }
-        if (!/[0-9]/.test(pass1.value)) {
+        if (!/[0-9]/.test(p1)) {
           showError("Password must contain at least one number!");
           return;
         }
-        if (!/[_\-@#$%&*]/.test(pass1.value)) {
+        if (!/[_\-@#$%&*]/.test(p1)) {
           showError("Password must contain at least one symbol (_ - @ # $ % & *)!");
           return;
         }
-
-        if (pass1.value !== pass2.value) {
+        if (p1 !== p2) {
           showError("Passwords do not match!");
           return;
         }
 
-        generatedOTP = Math.floor(100000 + Math.random() * 900000); 
+        // 2. Phone Validation
+        const rawPhone = document.getElementById("phone").value.trim();
+        const formattedPhone = formatPhilippinePhone(rawPhone);
+        if (!isValidPhilippineMobile(formattedPhone)) {
+          showError("Please enter a valid Philippine mobile number (e.g. 09123456789).");
+          return;
+        }
 
-        console.log("Your verification code is:", generatedOTP);
+        const emailVal = document.getElementById("email").value.trim();
+        const fnameVal = document.getElementById("fname").value.trim();
+        const lnameVal = document.getElementById("lname").value.trim();
+        const signupBtn = document.getElementById("signupBtn");
 
-        document.getElementById("otpInput").value = ""; // Clears OTP input
-        document.getElementById("otpError").classList.add("d-none"); // Hides error message from previous attempts (clinose modal)
-        otpModal.show();
+        signupBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> Sending SMS Verification Code...';
+        signupBtn.disabled = true;
+
+        try {
+          pendingRegistration = {
+            fname: fnameVal,
+            lname: lnameVal,
+            email: emailVal,
+            phone: formattedPhone,
+            pass: p1
+          };
+
+          // Send real SMS via Firebase Phone Auth with invisible background verifier
+          const appVerifier = getRecaptchaVerifier();
+          const confirmationResult = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
+          window.confirmationResult = confirmationResult;
+
+          signupBtn.innerHTML = "VERIFY & REGISTER";
+          signupBtn.disabled = false;
+
+          document.getElementById("otpPhoneDisplay").textContent = formattedPhone;
+          document.getElementById("otpInput").value = "";
+          document.getElementById("otpError").classList.add("d-none");
+
+          startResendCooldown();
+          otpModal.show();
+        } catch (error) {
+          console.error("Firebase SMS Send Error:", error);
+          signupBtn.innerHTML = "VERIFY & REGISTER";
+          signupBtn.disabled = false;
+
+          // Reset invisible verifier so user can retry immediately
+          if (window.recaptchaVerifier) {
+            try {
+              window.recaptchaVerifier.clear();
+            } catch (e) {}
+            window.recaptchaVerifier = null;
+          }
+
+          if (error.code === "auth/invalid-phone-number") {
+            showError("The phone number format is invalid. Please enter an 11-digit mobile number (e.g. 09123456789).");
+          } else if (error.code === "auth/too-many-requests") {
+            showError("Too many SMS attempts sent. Please wait a few moments before trying again.");
+          } else if (error.code === "auth/quota-exceeded") {
+            showError("Daily SMS quota exceeded. Please contact restaurant administration.");
+          } else if (error.code === "auth/captcha-check-failed") {
+            showError("Security verification failed. Please refresh and try again.");
+          } else {
+            showError("Could not send SMS code: " + error.message);
+          }
+        }
       });
 
+      // Verify SMS Code
       document.getElementById("confirmCodeBtn").addEventListener("click", async () => {
-          const userCode = document.getElementById("otpInput").value;
-          const confirmBtn = document.getElementById("confirmCodeBtn");
+        const userCode = document.getElementById("otpInput").value.trim();
+        const confirmBtn = document.getElementById("confirmCodeBtn");
+        const otpError = document.getElementById("otpError");
 
-          if (parseInt(userCode) === generatedOTP) {
-            document.getElementById("otpError").classList.add("d-none"); // Hides error message(correct OTP)
-            confirmBtn.innerHTML = "Creating Account...";
-            confirmBtn.disabled = true;
+        if (!userCode || userCode.length < 6) {
+          otpError.textContent = "Please enter the complete 6-digit SMS verification code.";
+          otpError.classList.remove("d-none");
+          return;
+        }
 
-            try {
-              const email = document.getElementById("email").value;
-              const pass = document.getElementById("password").value;
+        if (!window.confirmationResult || !pendingRegistration) {
+          otpError.textContent = "Verification session expired. Please close and try again.";
+          otpError.classList.remove("d-none");
+          return;
+        }
 
-              const userCredential = await createUserWithEmailAndPassword(
-                auth,
-                email,
-                pass,
-              );
-              const user = userCredential.user;
-              await set(ref(db, "users/" + user.uid), { // Writes user data to Firebase Realtime Database
-                firstName: document.getElementById("fname").value, 
-                lastName: document.getElementById("lname").value,
-                email: email,
-                phone: document.getElementById("phone").value,
-                role: "customer",
-                status: "active",
-              });
-              alert("Registration Successful!");
-              window.location.href = "index.html";
-            } catch (error) {
-              console.error(error);
-              if (error.code === "auth/email-already-in-use") {
-                otpModal.hide();
-                showError("Error: This email is already registered.");
-              } 
-              else if (error.code === "auth/weak-password") {
-                otpModal.hide();
-                showError("Error: Password should be at least 6 characters.");
-              }
-              else {
-                otpModal.hide();
-                showError("Error: " + error.message);
-              }
-              confirmBtn.innerHTML = "CONFIRM CODE";
-              confirmBtn.disabled = false;
-            }
-          } else {
-            document.getElementById("otpError").classList.remove("d-none");
+        confirmBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i> Verifying...';
+        confirmBtn.disabled = true;
+        otpError.classList.add("d-none");
+
+        try {
+          // 1. Confirm SMS Code
+          const userCredential = await window.confirmationResult.confirm(userCode);
+          const user = userCredential.user;
+
+          // Check if this phone number already has an existing registered user profile
+          const userDoc = await get(ref(db, "users/" + user.uid));
+          if (userDoc.exists()) {
+            otpModal.hide();
+            confirmBtn.innerHTML = "CONFIRM CODE";
+            confirmBtn.disabled = false;
+            showError("This phone number is already registered to an account. Please log in.");
+            return;
           }
-        });
+
+          // 2. Link Email & Password to user account
+          const emailCred = EmailAuthProvider.credential(pendingRegistration.email, pendingRegistration.pass);
+          await linkWithCredential(user, emailCred);
+
+          // 3. Update Display Name in Firebase Auth
+          await updateProfile(user, {
+            displayName: `${pendingRegistration.fname} ${pendingRegistration.lname}`
+          });
+
+          // 4. Save Customer Profile to Realtime Database
+          await set(ref(db, "users/" + user.uid), {
+            firstName: pendingRegistration.fname,
+            lastName: pendingRegistration.lname,
+            email: pendingRegistration.email,
+            phone: pendingRegistration.phone,
+            role: "customer",
+            status: "active",
+            phoneVerified: true,
+            createdAt: Date.now()
+          });
+
+          otpModal.hide();
+          regSuccessModal.show();
+        } catch (error) {
+          console.error("SMS Confirmation Error:", error);
+          confirmBtn.innerHTML = "CONFIRM CODE";
+          confirmBtn.disabled = false;
+
+          if (error.code === "auth/invalid-verification-code") {
+            otpError.textContent = "Invalid SMS code. Please check your text messages and re-enter.";
+            otpError.classList.remove("d-none");
+          } else if (error.code === "auth/code-expired") {
+            otpError.textContent = "SMS code has expired. Please click 'Resend SMS' below.";
+            otpError.classList.remove("d-none");
+          } else if (error.code === "auth/email-already-in-use" || error.code === "auth/credential-already-in-use") {
+            otpModal.hide();
+            showError("This email address is already registered to an account. Please log in.");
+          } else {
+            otpError.textContent = "Verification failed: " + error.message;
+            otpError.classList.remove("d-none");
+          }
+        }
+      });
+
+      // Redirect button inside success modal
+      document.getElementById("regSuccessOkBtn").addEventListener("click", () => {
+        window.location.href = "index.html";
+      });
+
+      function startResendCooldown() {
+        const resendBtn = document.getElementById("resendSmsBtn");
+        const resendTimer = document.getElementById("resendTimer");
+        let seconds = 60;
+        resendBtn.disabled = true;
+        resendBtn.innerHTML = 'Resend SMS in <span id="resendTimer">60</span>s';
+        if (resendCountdownInterval) clearInterval(resendCountdownInterval);
+
+        resendCountdownInterval = setInterval(() => {
+          seconds--;
+          const timerEl = document.getElementById("resendTimer");
+          if (timerEl) timerEl.textContent = seconds;
+          if (seconds <= 0) {
+            clearInterval(resendCountdownInterval);
+            resendBtn.disabled = false;
+            resendBtn.innerHTML = '<i class="fa-solid fa-rotate-right me-1"></i> Resend SMS Code';
+          }
+        }, 1000);
+      }
+
+      document.getElementById("resendSmsBtn").addEventListener("click", async () => {
+        if (!pendingRegistration) return;
+        const resendBtn = document.getElementById("resendSmsBtn");
+        const successAlert = document.getElementById("otpSuccessAlert");
+        const successMsg = document.getElementById("otpSuccessMsg");
+        const otpError = document.getElementById("otpError");
+
+        resendBtn.disabled = true;
+        resendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Resending SMS...';
+        successAlert.classList.add("d-none");
+        otpError.classList.add("d-none");
+
+        try {
+          const appVerifier = getRecaptchaVerifier();
+          const confirmationResult = await signInWithPhoneNumber(auth, pendingRegistration.phone, appVerifier);
+          window.confirmationResult = confirmationResult;
+          
+          // Display in-modal success notification (no ugly browser alert)
+          successMsg.textContent = "A new verification code was sent to " + pendingRegistration.phone;
+          successAlert.classList.remove("d-none");
+          startResendCooldown();
+        } catch (err) {
+          console.error("Resend Error:", err);
+          resendBtn.disabled = false;
+          resendBtn.innerHTML = '<i class="fa-solid fa-rotate-right me-1"></i> Resend SMS Code';
+          otpError.textContent = "Could not resend SMS: " + err.message;
+          otpError.classList.remove("d-none");
+        }
+      });
+
+      document.getElementById("cancelOtpBtn").addEventListener("click", () => {
+        if (resendCountdownInterval) clearInterval(resendCountdownInterval);
+        if (window.recaptchaVerifier) {
+          try {
+            window.recaptchaVerifier.clear();
+          } catch (e) {}
+          window.recaptchaVerifier = null;
+        }
+      });
 
       function showError(msg) {
         errorAlert.textContent = msg;

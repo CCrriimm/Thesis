@@ -14,31 +14,57 @@
         
         .navbar { box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .mobile-container { max-width: 600px; margin: 0 auto; padding: 15px; }
+        @media (min-width: 768px) {
+            .mobile-container { max-width: 95%; padding: 20px 25px; }
+        }
+        @media (min-width: 992px) {
+            .mobile-container { max-width: 1160px; padding: 25px 30px; }
+        }
+        @media (min-width: 1300px) {
+            .mobile-container { max-width: 1260px; }
+        }
+
+        .sticky-profile-sidebar {
+            position: static;
+        }
+        @media (min-width: 992px) {
+            .sticky-profile-sidebar {
+                position: sticky;
+                top: 85px;
+                z-index: 10;
+            }
+        }
 
         /* PROFILE CARD */
         .profile-card {
-            background: white; border-radius: 15px; border: none;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); padding: 20px;
+            background: white; border-radius: 15px; border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); padding: 25px 20px;
             text-align: center; margin-bottom: 20px;
         }
         .profile-avatar {
-            width: 80px; height: 80px; background-color: var(--toms-orange); color: white;
+            width: 85px; height: 85px; background-color: var(--toms-orange); color: white;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 2rem; font-weight: bold; margin: 0 auto 10px auto;
+            font-size: 2.2rem; font-weight: bold; margin: 0 auto 15px auto;
+            box-shadow: 0 4px 12px rgba(245, 125, 16, 0.3);
         }
 
         /* TABS */
-        .nav-pills .nav-link { color: var(--toms-dark); font-weight: bold; border-radius: 50px; padding: 8px 20px; }
+        .nav-pills .nav-link { color: var(--toms-dark); font-weight: bold; border-radius: 50px; padding: 8px 20px; transition: 0.2s; }
         .nav-pills .nav-link.active { background-color: var(--toms-orange); color: white; }
 
         /* ITEM CARDS (Reservations & Orders) */
         .item-card {
             background: white; border-radius: 12px; border: 1px solid #eee;
-            padding: 15px; margin-bottom: 15px; position: relative;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            padding: 16px; position: relative; height: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            display: flex; flex-direction: column; justify-content: space-between;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .item-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px; }
-        .status-badge { font-size: 0.75rem; padding: 5px 10px; border-radius: 50px; font-weight: bold; }
+        .item-card:hover {
+            box-shadow: 0 6px 16px rgba(0,0,0,0.07);
+        }
+        .item-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 12px; }
+        .status-badge { font-size: 0.75rem; padding: 5px 12px; border-radius: 50px; font-weight: bold; }
         
         .btn-orange-outline { border: 2px solid var(--toms-orange); color: var(--toms-orange); border-radius: 50px; font-weight: bold; transition: 0.2s; }
         .btn-orange-outline:hover { background-color: var(--toms-orange); color: white; }
@@ -54,73 +80,99 @@
                 <i class="fa-solid fa-arrow-left text-dark me-2" onclick="history.back(); return false;"></i> 
                 Tom's<span class="text-dark">Chicken</span>
             </a>
-            <button id="logoutBtn" class="btn btn-sm btn-dark rounded-pill px-3">Logout</button>
+            <button id="logoutBtn" class="btn btn-sm btn-dark rounded-pill px-3">
+                <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+            </button>
         </div>
     </nav>
 
-    <div class="container mobile-container mt-3">
-        
-        <div class="profile-card">
-            <div class="profile-avatar" id="userInitial">?</div>
-            
-            <div id="profileViewMode">
-                <h4 class="fw-bold mb-0" id="userName">Loading...</h4>
-                <button class="btn btn-link text-muted p-0 mb-3 small text-decoration-none" onclick="toggleEditMode(true)">
-                    <i class="fa-solid fa-pen-to-square"></i> Edit Name
-                </button>
-            </div>
+    <div class="container mobile-container mt-3 mt-md-4">
+        <div class="row g-4">
+            <!-- Left Column: Profile Card -->
+            <div class="col-lg-4">
+                <div class="sticky-profile-sidebar">
+                    <div class="profile-card">
+                        <div class="profile-avatar" id="userInitial">?</div>
+                        
+                        <div id="profileViewMode">
+                            <h4 class="fw-bold mb-0" id="userName">Loading...</h4>
+                            <button class="btn btn-link text-muted p-0 mb-3 small text-decoration-none" onclick="toggleEditMode(true)">
+                                <i class="fa-solid fa-pen-to-square"></i> Edit Name
+                            </button>
+                        </div>
 
-            <div id="profileEditMode" class="d-none mb-3 px-3">
-                <div class="row g-2 mb-2">
-                    <div class="col-6">
-                        <input type="text" id="editFirstName" class="form-control text-center form-control-sm" placeholder="First Name">
-                    </div>
-                    <div class="col-6">
-                        <input type="text" id="editLastName" class="form-control text-center form-control-sm" placeholder="Last Name">
+                        <div id="profileEditMode" class="d-none mb-3 px-2">
+                            <div class="row g-2 mb-2">
+                                <div class="col-6">
+                                    <input type="text" id="editFirstName" class="form-control text-center form-control-sm" placeholder="First Name">
+                                </div>
+                                <div class="col-6">
+                                    <input type="text" id="editLastName" class="form-control text-center form-control-sm" placeholder="Last Name">
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button class="btn btn-sm btn-success px-3 fw-bold" id="saveNameBtn">Save</button>
+                                <button class="btn btn-sm btn-secondary px-3" onclick="toggleEditMode(false)">Cancel</button>
+                            </div>
+                            <div id="profileEditError" class="alert alert-danger py-1 px-2 mt-2 mb-0 small d-none"></div>
+                        </div>
+
+                        <div class="p-3 bg-light rounded-3 text-start mb-3 border">
+                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                <span class="text-muted small"><i class="fa-solid fa-envelope me-2 text-warning"></i>Email</span>
+                                <div class="d-flex align-items-center">
+                                    <span id="userEmail" class="fw-bold small me-2">Loading...</span>
+                                    <i class="fa-solid fa-eye-slash text-muted cursor-pointer" id="toggleEmailIcon" title="Toggle visibility"></i>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted small"><i class="fa-solid fa-phone me-2 text-warning"></i>Mobile</span>
+                                <div class="d-flex align-items-center">
+                                    <span id="userPhone" class="fw-bold small me-2">Loading...</span>
+                                    <i class="fa-solid fa-eye-slash text-muted cursor-pointer" id="togglePhoneIcon" title="Toggle visibility"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <a href="Resetpass.html" class="btn btn-orange-outline btn-sm py-2">
+                                <i class="fa-solid fa-lock me-1"></i> Change Password
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <div class="d-flex gap-2 justify-content-center">
-                    <button class="btn btn-sm btn-success px-3 fw-bold" id="saveNameBtn">Save</button>
-                    <button class="btn btn-sm btn-secondary px-3" onclick="toggleEditMode(false)">Cancel</button>
+            </div>
+
+            <!-- Right Column: Tabs & Lists -->
+            <div class="col-lg-8">
+                <div class="bg-white p-3 p-md-4 rounded-4 shadow-sm border mb-4">
+                    <ul class="nav nav-pills mb-4 gap-2" id="profileTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active px-4 py-2" href="#" onclick="switchTab('reservations', event)">
+                                <i class="fa-solid fa-calendar-check me-2"></i> My Reservations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-4 py-2" href="#" onclick="switchTab('orders', event)">
+                                <i class="fa-solid fa-bag-shopping me-2"></i> My Pickup Orders
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div id="reservationsSection">
+                        <div id="reservationsList" class="row g-3">
+                            <p class="text-center text-muted py-4 col-12"><i class="fa-solid fa-spinner fa-spin"></i> Loading reservations...</p>
+                        </div>
+                    </div>
+
+                    <div id="ordersSection" class="d-none">
+                        <div id="ordersList" class="row g-3">
+                            <p class="text-center text-muted py-4 col-12"><i class="fa-solid fa-spinner fa-spin"></i> Loading orders...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="d-flex justify-content-center align-items-center mb-1">
-                <span class="text-muted small me-2"><i class="fa-solid fa-envelope w-15px"></i> <span id="userEmail" class="fw-bold">Loading...</span></span>
-                <i class="fa-solid fa-eye-slash text-muted cursor-pointer" id="toggleEmailIcon"></i>
-            </div>
-            
-            <div class="d-flex justify-content-center align-items-center mb-4">
-                <span class="text-muted small me-2"><i class="fa-solid fa-phone w-15px"></i> <span id="userPhone" class="fw-bold">Loading...</span></span>
-                <i class="fa-solid fa-eye-slash text-muted cursor-pointer" id="togglePhoneIcon"></i>
-            </div>
-            
-            <a href="Resetpass.html" class="btn btn-orange-outline btn-sm px-4">
-                <i class="fa-solid fa-lock"></i> Change Password
-            </a>
         </div>
-
-        <ul class="nav nav-pills justify-content-center mb-4" id="profileTabs">
-            <li class="nav-item">
-                <a class="nav-link active" href="#" onclick="switchTab('reservations', event)">My Reservations</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="switchTab('orders', event)">My Orders</a>
-            </li>
-        </ul>
-
-        <div id="reservationsSection">
-            <div id="reservationsList">
-                <p class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin"></i> Loading reservations...</p>
-            </div>
-        </div>
-
-        <div id="ordersSection" class="d-none">
-            <div id="ordersList">
-                <p class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin"></i> Loading orders...</p>
-            </div>
-        </div>
-
     </div>
 
     <script src="Bootstrap/Scripts/bootstrap.bundle.min.js"></script>
@@ -214,8 +266,16 @@
             const newFirst = document.getElementById('editFirstName').value.trim();
             const newLast = document.getElementById('editLastName').value.trim();
             const btn = document.getElementById('saveNameBtn');
+            const errBox = document.getElementById('profileEditError');
+            if (errBox) errBox.classList.add('d-none');
 
-            if (!newFirst || !newLast) return alert("First and Last name cannot be empty.");
+            if (!newFirst || !newLast) {
+                if (errBox) {
+                    errBox.textContent = "First and Last name cannot be empty.";
+                    errBox.classList.remove('d-none');
+                }
+                return;
+            }
 
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
             btn.disabled = true;
@@ -231,7 +291,10 @@
                 updateProfileUI();
                 toggleEditMode(false);
             } catch (error) {
-                alert("Error updating profile.");
+                if (errBox) {
+                    errBox.textContent = "Error updating profile. Please try again.";
+                    errBox.classList.remove('d-none');
+                }
             } finally {
                 btn.innerHTML = 'Save';
                 btn.disabled = false;
@@ -242,7 +305,7 @@
         window.switchTab = function(tabName, event) {
             event.preventDefault();
             document.querySelectorAll('#profileTabs .nav-link').forEach(link => link.classList.remove('active'));
-            event.target.classList.add('active');
+            event.currentTarget.classList.add('active');
 
             if (tabName === 'reservations') {
                 document.getElementById('reservationsSection').classList.remove('d-none');
@@ -275,28 +338,38 @@
                         hasData = true;
                         
                         let badge = "";
-                        if (r.status === "pending") badge = `<span class="status-badge bg-warning text-dark"><i class="fa-solid fa-clock"></i> Pending Review</span>`;
-                        else if (r.status === "approved") badge = `<span class="status-badge bg-success text-white"><i class="fa-solid fa-check"></i> Approved</span>`;
-                        else if (r.status === "seated") badge = `<span class="status-badge bg-dark text-white"><i class="fa-solid fa-chair"></i> Currently Seated</span>`;
+                        if (r.status === "pending") badge = `<span class="status-badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> Pending Review</span>`;
+                        else if (r.status === "approved") badge = `<span class="status-badge bg-success text-white"><i class="fa-solid fa-check me-1"></i> Approved</span>`;
+                        else if (r.status === "seated") badge = `<span class="status-badge bg-dark text-white"><i class="fa-solid fa-chair me-1"></i> Currently Seated</span>`;
                         else if (r.status === "completed") badge = `<span class="status-badge bg-secondary text-white">Completed</span>`;
                         else badge = `<span class="status-badge bg-danger text-white">Rejected</span>`;
 
+                        let advanceBadge = "";
+                        if (r.notes && r.notes.includes("[ADVANCE ORDER]")) {
+                            advanceBadge = `<div class="mt-2 small p-2 bg-light border rounded"><i class="fa-solid fa-utensils text-warning me-1"></i> <b>Advance Order:</b> ${r.notes.replace("[ADVANCE ORDER]", "").split("[NOTES]")[0].trim()}</div>`;
+                        }
+
                         container.innerHTML += `
-                            <div class="item-card">
-                                <div class="item-header">
-                                    <span class="fw-bold text-muted small">Ref: #${r.id.substring(1, 6).toUpperCase()}</span>
-                                    ${badge}
+                            <div class="col-md-6 col-12">
+                                <div class="item-card">
+                                    <div>
+                                        <div class="item-header">
+                                            <span class="fw-bold text-muted small"><i class="fa-solid fa-hashtag"></i> ${r.id.substring(1, 6).toUpperCase()}</span>
+                                            ${badge}
+                                        </div>
+                                        <h5 class="fw-bold mb-1" style="color: var(--toms-orange);">${r.date}</h5>
+                                        <p class="text-muted mb-2 small"><i class="fa-regular fa-clock me-1"></i> ${r.time} &nbsp;|&nbsp; <i class="fa-solid fa-users me-1"></i> ${r.pax} Guests</p>
+                                        <div class="small text-dark bg-light px-2 py-1 rounded border d-inline-block mb-2"><b>Table:</b> ${r.tableSize}</div>
+                                        ${advanceBadge}
+                                    </div>
                                 </div>
-                                <h5 class="fw-bold mb-1">${r.date}</h5>
-                                <p class="text-muted mb-2"><i class="fa-regular fa-clock"></i> ${r.time} &nbsp; | &nbsp; <i class="fa-solid fa-users"></i> ${r.pax} People</p>
-                                <small class="text-dark bg-light px-2 py-1 rounded"><b>Table:</b> ${r.tableSize}</small>
                             </div>
                         `;
                     });
                 }
 
                 if (!hasData) {
-                    container.innerHTML = `<div class="text-center text-muted py-5"><i class="fa-solid fa-calendar-xmark fa-3x mb-3 opacity-25"></i><p>You have no reservations yet.</p></div>`;
+                    container.innerHTML = `<div class="col-12 text-center text-muted py-5"><i class="fa-solid fa-calendar-xmark fa-3x mb-3 opacity-25"></i><p class="mb-0">You have no reservations yet.</p></div>`;
                 }
             });
         }
@@ -323,28 +396,35 @@
                         hasData = true;
                         
                         let badge = "";
-                        if (o.status === "pending") badge = `<span class="status-badge bg-warning text-dark"><i class="fa-solid fa-clock"></i> Pending Payment</span>`;
-                        else if (o.status === "approved") badge = `<span class="status-badge bg-primary text-white"><i class="fa-solid fa-thumbs-up"></i> Confirmed</span>`;
-                        else if (o.status === "preparing") badge = `<span class="status-badge bg-info text-dark"><i class="fa-solid fa-fire-burner"></i> Kitchen is Preparing</span>`;
-                        else if (o.status === "done") badge = `<span class="status-badge bg-success text-white"><i class="fa-solid fa-bag-shopping"></i> Ready for Pickup!</span>`;
+                        if (o.status === "pending") badge = `<span class="status-badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> Pending Payment</span>`;
+                        else if (o.status === "approved") badge = `<span class="status-badge bg-primary text-white"><i class="fa-solid fa-thumbs-up me-1"></i> Confirmed</span>`;
+                        else if (o.status === "preparing") badge = `<span class="status-badge bg-info text-dark"><i class="fa-solid fa-fire-burner me-1"></i> Kitchen is Preparing</span>`;
+                        else if (o.status === "done") badge = `<span class="status-badge bg-success text-white"><i class="fa-solid fa-bag-shopping me-1"></i> Ready for Pickup!</span>`;
+                        else if (o.status === "claimed") badge = `<span class="status-badge bg-secondary text-white"><i class="fa-solid fa-check-double me-1"></i> Completed & Claimed</span>`;
                         else badge = `<span class="status-badge bg-danger text-white">Rejected</span>`;
 
                         container.innerHTML += `
-                            <div class="item-card">
-                                <div class="item-header">
-                                    <span class="fw-bold text-muted small">Order: #${o.id.substring(1, 6).toUpperCase()}</span>
-                                    ${badge}
+                            <div class="col-md-6 col-12">
+                                <div class="item-card">
+                                    <div>
+                                        <div class="item-header">
+                                            <span class="fw-bold text-muted small"><i class="fa-solid fa-hashtag"></i> ${o.id.substring(1, 6).toUpperCase()}</span>
+                                            ${badge}
+                                        </div>
+                                        <h5 class="fw-bold text-success mb-2">₱${parseFloat(o.total).toFixed(2)}</h5>
+                                        <div class="small mb-2 bg-light p-2 rounded border"><b>Items:</b> ${o.items}</div>
+                                    </div>
+                                    <div class="pt-2 border-top">
+                                        <small class="text-muted"><i class="fa-solid fa-person-walking me-1"></i> Pickup Time: <b>${o.pickupTime}</b></small>
+                                    </div>
                                 </div>
-                                <h6 class="fw-bold text-success mb-2">Total: ₱${parseFloat(o.total).toFixed(2)}</h6>
-                                <p class="small mb-2 bg-light p-2 rounded"><b>Items:</b> ${o.items}</p>
-                                <small class="text-muted"><i class="fa-solid fa-person-walking"></i> Pickup Time: <b>${o.pickupTime}</b></small>
                             </div>
                         `;
                     });
                 }
 
                 if (!hasData) {
-                    container.innerHTML = `<div class="text-center text-muted py-5"><i class="fa-solid fa-bag-shopping fa-3x mb-3 opacity-25"></i><p>You have no online orders yet.</p></div>`;
+                    container.innerHTML = `<div class="col-12 text-center text-muted py-5"><i class="fa-solid fa-bag-shopping fa-3x mb-3 opacity-25"></i><p class="mb-0">You have no online orders yet.</p></div>`;
                 }
             });
         }

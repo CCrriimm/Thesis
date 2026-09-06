@@ -100,9 +100,56 @@
       .cal-day-label { font-size: 0.6rem; margin-top: 4px; letter-spacing: -0.5px; }
 
       /* MENU STYLES (From reservation.html) */
-      .menu-card { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
-      .qty-btn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--toms-orange); background: white; color: var(--toms-orange); font-weight: bold; }
+      .advance-menu-grid { display: grid; grid-template-columns: 1fr; gap: 14px; padding: 10px; }
+      @media (min-width: 768px) { .advance-menu-grid { grid-template-columns: repeat(2, 1fr); } }
+      @media (min-width: 1200px) { .advance-menu-grid { grid-template-columns: repeat(3, 1fr); } }
+      .advance-item-card { 
+        background: white; 
+        border-radius: 12px; 
+        border: 1px solid #dee2e6; 
+        box-shadow: 0 2px 6px rgba(0,0,0,0.04); 
+        padding: 12px; 
+        display: flex; 
+        flex-direction: column; 
+        justify-content: space-between; 
+        min-height: 90px;
+        transition: transform 0.15s ease, box-shadow 0.15s ease; 
+      }
+      .advance-item-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 12px rgba(0,0,0,0.08);
+      }
+      .menu-card-img-wrap { 
+        position: relative; 
+        width: 62px; 
+        height: 62px; 
+        border-radius: 10px; 
+        overflow: visible; 
+        flex-shrink: 0; 
+        background: #f8f9fa; 
+        cursor: pointer; 
+      }
+      .menu-card-img-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+      @media (min-width: 769px) {
+        .menu-card-img-wrap:hover img {
+          position: absolute;
+          top: -30px;
+          left: -30px;
+          width: 140px;
+          height: 140px;
+          border-radius: 14px;
+          box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+          z-index: 1050;
+          transform: scale(1.05);
+        }
+      }
+      .qty-btn { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--toms-orange); background: white; color: var(--toms-orange); font-weight: bold; line-height: 1; display: inline-flex; align-items: center; justify-content: center; transition: 0.15s; }
+      .qty-btn:hover { background: var(--toms-orange); color: white; }
       .form-check-input:checked { background-color: var(--toms-orange); border-color: var(--toms-orange); }
+      #menuContainer::-webkit-scrollbar { width: 6px; }
+      #menuContainer::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+      #menuContainer::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+      #menuContainer::-webkit-scrollbar-thumb:hover { background: var(--toms-orange); }
     </style>
   </head>
   <body>
@@ -157,7 +204,7 @@
     </div>
 
     <div class="modal fade" id="walkInModal" tabindex="-1" data-bs-backdrop="static">
-      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header bg-dark text-white">
             <h5 class="modal-title fw-bold">Add Reservation / Walk-in</h5>
@@ -185,6 +232,7 @@
             </div>
 
             <form id="reservationForm" class="d-none p-4">
+              <div id="walkInErrorAlert" class="alert alert-danger d-none py-2 px-3 small mb-3"></div>
               <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
                 <h4 class="fw-bold mb-0" id="displaySelectedDate" style="color: var(--toms-orange);">YYYY-MM-DD</h4>
                 <button type="button" class="btn btn-sm btn-outline-secondary fw-bold" onclick="changeDate()">Change Date</button>
@@ -235,12 +283,12 @@
                 </div>
                 
                 <div id="advanceMenuSection" class="d-none mt-3 border-top pt-3">
-                  <div id="menuContainer" style="max-height: 250px; overflow-y: auto;">
+                  <div id="menuContainer" style="max-height: 520px; overflow-y: auto; padding-right: 4px;">
                     <p class="text-center text-muted py-4"><i class="fa-solid fa-spinner fa-spin"></i> Loading Menu...</p>
                   </div>
-                  <div class="p-2 mt-2 bg-dark text-white d-flex justify-content-between align-items-center rounded">
-                    <span class="fw-bold">Food Total:</span>
-                    <span class="fw-bold">₱<span id="cartTotal">0.00</span></span>
+                  <div class="p-3 mt-3 bg-dark text-white d-flex justify-content-between align-items-center rounded shadow-sm">
+                    <span class="fw-bold fs-6"><i class="fa-solid fa-utensils me-2 text-warning"></i>Advance Food Total:</span>
+                    <span class="fw-bold fs-5 text-warning">₱<span id="cartTotal">0.00</span></span>
                   </div>
                 </div>
               </div>
@@ -305,6 +353,26 @@
           <div class="modal-footer justify-content-center">
             <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
             <button type="button" class="btn btn-orange fw-bold px-4" id="executeActionBtn">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Food Item Image Preview Modal (for Mobile & Click View) -->
+    <div class="modal fade" id="foodImagePreviewModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 overflow-hidden shadow-lg">
+          <div class="modal-header bg-dark text-white py-2">
+            <h6 class="modal-title fw-bold" id="previewFoodTitle">Item Preview</h6>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-0 text-center bg-light">
+            <img id="previewFoodImage" src="" alt="Food Preview" style="width: 100%; max-height: 400px; object-fit: contain;" />
+            <div class="p-3 bg-white text-start">
+              <h5 class="fw-bold mb-1" id="previewFoodName"></h5>
+              <p class="text-muted small mb-2" id="previewFoodDesc"></p>
+              <span class="badge bg-success fs-6" id="previewFoodPrice"></span>
+            </div>
           </div>
         </div>
       </div>
@@ -602,53 +670,229 @@
         renderTableGrid(parseInt(document.querySelector('input[name="floorSelect"]:checked').value));
         document.getElementById("selectedTableInfo").innerHTML = '<small class="text-muted">Click on a table to select</small>';
       });
+      function showWalkInError(msg) {
+        const el = document.getElementById("walkInErrorAlert");
+        if (el) {
+          el.innerHTML = `<i class="fa-solid fa-triangle-exclamation me-1"></i> ${msg}`;
+          el.classList.remove("d-none");
+          el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      }
+
+      function clearWalkInError() {
+        const el = document.getElementById("walkInErrorAlert");
+        if (el) el.classList.add("d-none");
+      }
+
       document.getElementById("openTableSelectionBtn").addEventListener("click", () => {
-        if (!document.getElementById("resTime").value) { alert("Please select a Time Slot first."); return; }
+        if (!document.getElementById("resTime").value) {
+          showWalkInError("Please select a Time Slot first.");
+          return;
+        }
+        clearWalkInError();
         tableSelectionModal.show();
       });
 
       // ==========================================
-      // ADVANCE ORDER LOGIC
+      // ADVANCE ORDER LOGIC (COMBINED MENU + PHOTOS + FLAVORS)
       // ==========================================
       let advanceCart = {}, currentMenuData = {};
+      let advanceMenuPromos = null;
+      let fullRestaurantMenu = null;
+
+      function getItemImage(item) {
+        if (item.image) return item.image;
+        if (item.img) return item.img;
+        if (item.imageUrl) return item.imageUrl;
+
+        const name = (item.name || "").toLowerCase();
+        const cat = (item.category || "").toLowerCase();
+
+        if (name.includes("caesar")) return "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("kani")) return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("tlc burger")) return "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("chicken burger")) return "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("clubhouse")) return "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("quesadilla")) return "https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("mozzarella")) return "https://images.unsplash.com/photo-1531749668029-2db88e4276c7?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("lumpia")) return "https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("isaw")) return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Isaw_%28street_food_in_the_Philippines%29.jpg/800px-Isaw_%28street_food_in_the_Philippines%29.jpg";
+        if (name.includes("nachos")) return "https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("bacon fries")) return "https://images.unsplash.com/photo-1585109649139-366815a0d713?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("beef fries")) return "https://images.unsplash.com/photo-1576107232684-1279f390859f?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("fries")) return "https://images.unsplash.com/photo-1630384060421-cb34d0dc8919?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("chicken sisig")) return "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Sizzling_chicken_sisig_%28Philippines%29.jpg/800px-Sizzling_chicken_sisig_%28Philippines%29.jpg";
+        if (name.includes("pork sisig") || name.includes("sisig")) return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Pork_Sisig_served_on_a_hot_plate.jpg/800px-Pork_Sisig_served_on_a_hot_plate.jpg";
+        if (name.includes("steak") || name.includes("burger steak")) return "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("chicken") && name.includes("rice")) return "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("pesto")) return "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("tuyo")) return "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Tuyo_Gourmet_Pasta_%28Philippines%29.jpg/800px-Tuyo_Gourmet_Pasta_%28Philippines%29.jpg";
+        if (name.includes("carbonara") || name.includes("longga")) return "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("meaty") || name.includes("spaghetti")) return "https://images.unsplash.com/photo-1621996346565-e3d5d6281270?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("mango") || name.includes("shake") || name.includes("drink")) return "https://images.unsplash.com/photo-1546173159-315724a31696?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("barkada") || name.includes("set a") || name.includes("set b")) return "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=80";
+        if (name.includes("wing") || name.includes("wings")) return "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=800&auto=format&fit=crop&q=80";
+
+        if (cat.includes("salad")) return "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("burger") || cat.includes("sandwich")) return "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("pasta")) return "https://images.unsplash.com/photo-1621996346565-e3d5d6281270?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("starter") || cat.includes("appetizer")) return "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("rice")) return "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&auto=format&fit=crop&q=80";
+        if (cat.includes("wing") || cat.includes("barkada")) return "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=800&auto=format&fit=crop&q=80";
+
+        return "https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=800&auto=format&fit=crop&q=80";
+      }
+
+      window.openFoodPreview = function (name, imgSrc, price, desc) {
+        document.getElementById("previewFoodTitle").textContent = name;
+        document.getElementById("previewFoodName").textContent = name;
+        document.getElementById("previewFoodImage").src = imgSrc;
+        document.getElementById("previewFoodPrice").textContent = "₱" + price;
+        document.getElementById("previewFoodDesc").textContent = desc || "Freshly cooked and made to order.";
+        const previewModal = new bootstrap.Modal(document.getElementById("foodImagePreviewModal"));
+        previewModal.show();
+      };
+
       document.getElementById("advanceOrderToggle").addEventListener("change", function () {
         document.getElementById("advanceMenuSection").classList.toggle("d-none", !this.checked);
         updateTotalDisplay();
       });
 
-      onValue(ref(db, "advanceMenu"), (snapshot) => {
-        const container = document.getElementById("menuContainer"); container.innerHTML = ""; currentMenuData = {};
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          for (let catKey in data) {
-            let cat = data[catKey];
-            let html = `<div class="p-2 bg-light border-bottom"><h6 class="fw-bold mb-0" style="color: var(--toms-orange);"><i class="fa-solid ${cat.icon} me-2"></i> ${cat.title}</h6></div>`;
+      function renderCombinedAdvanceMenu() {
+        const container = document.getElementById("menuContainer");
+        container.innerHTML = "";
+        currentMenuData = {};
+
+        // 1. Render Unli Promos & Barkada Sets (from advanceMenu)
+        if (advanceMenuPromos) {
+          for (let catKey in advanceMenuPromos) {
+            let cat = advanceMenuPromos[catKey];
+            let html = `<div class="p-2 bg-white border-bottom"><h6 class="fw-bold mb-0" style="color: var(--toms-orange);"><i class="fa-solid ${cat.icon || 'fa-fire'} me-2"></i> ${cat.title}</h6></div><div class="advance-menu-grid">`;
+
             for (let itemKey in cat.items) {
-              let item = cat.items[itemKey], uniqueID = `${catKey}_${itemKey}`;
+              let item = cat.items[itemKey];
+              let uniqueID = `adv_${catKey}_${itemKey}`;
               currentMenuData[uniqueID] = item;
+              let imgSrc = getItemImage(item);
+              let desc = (item.desc || "").replace(/"/g, '&quot;');
+              let safeName = (item.name || "").replace(/"/g, '&quot;');
+              let currentQty = advanceCart[uniqueID] ? advanceCart[uniqueID].qty : 0;
+
               html += `
-                <div class="menu-card bg-white p-2">
-                  <div>
-                    <h6 class="fw-bold mb-1">${item.name}</h6>
-                    <span class="fw-bold text-success">₱${item.price}</span>
-                  </div>
-                  <div class="d-flex align-items-center">
-                    <button type="button" class="qty-btn" onclick="updateCart('${uniqueID}', -1)">-</button>
-                    <span class="fw-bold mx-2" style="width: 20px; text-align:center;" id="qty_${uniqueID}">0</span>
-                    <button type="button" class="qty-btn" onclick="updateCart('${uniqueID}', 1)">+</button>
+                <div class="advance-item-card">
+                  <div class="d-flex flex-row align-items-center gap-3">
+                    <div class="menu-card-img-wrap shadow-sm" onclick="openFoodPreview('${safeName}', '${imgSrc}', '${item.price}', '${desc}')" title="Click to view full image">
+                      <img src="${imgSrc}" alt="${safeName}" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\\'fa-solid fa-utensils text-warning p-3\\'></i>';" />
+                    </div>
+                    <div style="flex-grow: 1;">
+                      <h6 class="fw-bold mb-1">${item.name}</h6>
+                      <small class="text-muted d-block mb-1" style="font-size: 0.75rem;">${item.desc || ""}</small>
+                      <span class="fw-bold text-success">₱${item.price}</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                      <button type="button" class="qty-btn" onclick="updateCart('${uniqueID}', -1)">-</button>
+                      <span class="fw-bold mx-2" style="width: 20px; text-align:center;" id="qty_${uniqueID}">${currentQty}</span>
+                      <button type="button" class="qty-btn" onclick="updateCart('${uniqueID}', 1)">+</button>
+                    </div>
                   </div>
                 </div>`;
             }
+            html += `</div>`;
             container.innerHTML += html;
           }
-        } else { container.innerHTML = '<p class="text-center text-muted py-3">Menu unavailable.</p>'; }
+        }
+
+        // 2. Render Full Restaurant Menu (Salads, Burgers, Pasta, Rice Meals, Wings, etc.)
+        if (fullRestaurantMenu) {
+          const categorizedData = {};
+          const order = ["Salads", "Burgers & Sandwiches", "Appetizers", "Starters", "Rice Meals", "Pasta", "Wings To-Go", "Barkada Sets"];
+
+          for (let key in fullRestaurantMenu) {
+            let item = fullRestaurantMenu[key];
+            let cat = item.category || "Other";
+            if (!categorizedData[cat]) categorizedData[cat] = {};
+            categorizedData[cat][key] = item;
+          }
+
+          order.forEach((categoryName) => {
+            if (categorizedData[categoryName]) {
+              let html = `<div class="p-2 bg-white border-bottom mt-2"><h6 class="fw-bold mb-0" style="color: var(--toms-orange);"><i class="fa-solid fa-utensils me-2"></i> ${categoryName}</h6></div><div class="advance-menu-grid">`;
+
+              for (let key in categorizedData[categoryName]) {
+                let item = categorizedData[categoryName][key];
+                let uniqueID = `full_${key}`;
+                currentMenuData[uniqueID] = item;
+                let imgSrc = getItemImage(item);
+                let desc = (item.desc || "").replace(/"/g, '&quot;');
+                let safeName = (item.name || "").replace(/"/g, '&quot;');
+                let currentQty = advanceCart[uniqueID] ? advanceCart[uniqueID].qty : 0;
+
+                let dropdownsHTML = "";
+                if (item.options && item.options.length > 0) {
+                  let count = item.optionCount || 1;
+                  dropdownsHTML += `<div class="d-flex flex-wrap gap-2 mt-2 p-2 bg-light rounded w-100 border">`;
+                  dropdownsHTML += `<div class="w-100 small fw-bold text-muted mb-1">Select ${count} Flavor(s):</div>`;
+                  for (let i = 0; i < count; i++) {
+                    dropdownsHTML += `<select class="form-select form-select-sm" style="font-size: 0.8rem;" id="flavor_${uniqueID}_${i}">`;
+                    item.options.forEach((opt) => {
+                      dropdownsHTML += `<option value="${opt}">${opt}</option>`;
+                    });
+                    dropdownsHTML += `</select>`;
+                  }
+                  dropdownsHTML += `</div>`;
+                }
+
+                html += `
+                  <div class="advance-item-card">
+                    <div class="d-flex flex-row align-items-center gap-3 w-100">
+                      <div class="menu-card-img-wrap shadow-sm" onclick="openFoodPreview('${safeName}', '${imgSrc}', '${item.price}', '${desc}')" title="Click to view full image">
+                        <img src="${imgSrc}" alt="${safeName}" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\\'fa-solid fa-utensils text-warning p-3\\'></i>';" />
+                      </div>
+                      <div style="flex-grow: 1;">
+                        <h6 class="fw-bold mb-1">${item.name}</h6>
+                        <small class="text-muted d-block mb-1" style="font-size: 0.75rem;">${item.desc || ""}</small>
+                        <span class="fw-bold text-success">₱${item.price}</span>
+                      </div>
+                      <div class="d-flex align-items-center">
+                        <button type="button" class="qty-btn" onclick="updateCart('${uniqueID}', -1)">-</button>
+                        <span class="fw-bold mx-2" style="width: 20px; text-align:center;" id="qty_${uniqueID}">${currentQty}</span>
+                        <button type="button" class="qty-btn" onclick="updateCart('${uniqueID}', 1)">+</button>
+                      </div>
+                    </div>
+                    ${dropdownsHTML}
+                  </div>`;
+              }
+              html += `</div>`;
+              container.innerHTML += html;
+            }
+          });
+        }
+
+        if (!advanceMenuPromos && !fullRestaurantMenu) {
+          container.innerHTML = '<p class="text-center text-muted py-3">Loading menu...</p>';
+        }
+      }
+
+      onValue(ref(db, "advanceMenu"), (snapshot) => {
+        if (snapshot.exists()) {
+          advanceMenuPromos = snapshot.val();
+        }
+        renderCombinedAdvanceMenu();
+      });
+
+      onValue(ref(db, "menu"), (snapshot) => {
+        if (snapshot.exists()) {
+          fullRestaurantMenu = snapshot.val();
+        }
+        renderCombinedAdvanceMenu();
       });
 
       window.updateCart = function (id, change) {
         if (!advanceCart[id]) advanceCart[id] = { ...currentMenuData[id], qty: 0 };
         let newQty = Math.max(0, advanceCart[id].qty + change);
         advanceCart[id].qty = newQty;
-        document.getElementById(`qty_${id}`).innerText = newQty;
+        const qtyEl = document.getElementById(`qty_${id}`);
+        if (qtyEl) qtyEl.innerText = newQty;
         if (newQty === 0) delete advanceCart[id];
         updateTotalDisplay();
       };
@@ -667,7 +911,12 @@
       // ==========================================
       document.getElementById("reservationForm").addEventListener("submit", async (e) => {
         e.preventDefault();
-        if (!document.getElementById("resTableSize").value) { alert("Please select a table from the map before proceeding."); return; }
+        clearWalkInError();
+
+        if (!document.getElementById("resTableSize").value) {
+          showWalkInError("Please select a table from the floor map before proceeding.");
+          return;
+        }
 
         const btn = document.getElementById("confirmSaveBtn");
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...'; btn.disabled = true;
@@ -675,7 +924,20 @@
         let compiledNotes = "";
         if (document.getElementById("advanceOrderToggle").checked) {
           let itemsList = [];
-          for (let id in advanceCart) itemsList.push(`${advanceCart[id].qty}x ${advanceCart[id].name}`);
+          for (let id in advanceCart) {
+            let item = advanceCart[id];
+            let optStr = "";
+            if (item.options && item.options.length > 0) {
+              let count = item.optionCount || 1;
+              let chosen = [];
+              for (let i = 0; i < count; i++) {
+                let sel = document.getElementById(`flavor_${id}_${i}`);
+                if (sel) chosen.push(sel.value);
+              }
+              if (chosen.length > 0) optStr = ` (${chosen.join(", ")})`;
+            }
+            itemsList.push(`${item.qty}x ${item.name}${optStr}`);
+          }
           if (itemsList.length > 0) compiledNotes = "[ADVANCE ORDER] " + itemsList.join(", ");
         }
         
@@ -708,7 +970,8 @@
           btn.innerHTML = 'Confirm & Save Booking'; btn.disabled = false;
           walkInModal.hide();
         } catch (error) {
-          console.error(error); alert("Error saving reservation.");
+          console.error(error);
+          showWalkInError("Error saving reservation: " + (error.message || "Please try again."));
           btn.innerHTML = 'Confirm & Save Booking'; btn.disabled = false;
         }
       });
